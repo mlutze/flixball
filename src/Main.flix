@@ -1,6 +1,6 @@
 namespace Flixball {
 
-    def getPlayerMap(b: Board): Map[Int32, Position] =
+    pub def getPlayerMap(b: Board): Map[Int32, Position] =
         let Board(br) = b;
         br.tiles |> Map.toList |> List.filterMap(match ((x, y), t) -> match t {
             case Person(Player(id, direction, _)) =>
