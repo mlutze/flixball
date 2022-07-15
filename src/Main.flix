@@ -87,12 +87,12 @@ namespace Flixball {
                 case Shoot => None
                 case Walk => None
             });
-        /// let players2 = players1 |> Set.foldLeft(acc -> match Player(id))
-
+        // TODO finish rotating
         let movers = moves1
             |> Map.filter(Eq.eq(Walk))
             |> Map.keysOf;
         ???
+        // TODO finish moving
     }
 
     pub def removePlayer(state: GameState, p: Int32, b: Board): Board = {
