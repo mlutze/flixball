@@ -1,4 +1,19 @@
 namespace Flixball {
+
+    ///
+    /// resolves one step of the GameState.
+    ///
+    pub def runStep(gs: GameState): GameState = {
+        let GameState(_, board) = gs;
+        let Board(br) = board;
+        let moves0 = Map.valuesOf(br.tiles) |> List.filterMap(tile -> match tile {
+            case Person(p) =>
+                let Player(_, _, move) = p;
+                Some((p, move(gs)))
+            case _ => None
+        }) |> List.toMap;
+        resolve(moves0, gs)
+    }
     
     pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[(Int32, Int32), Tile]})
 

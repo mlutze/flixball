@@ -35,6 +35,16 @@ namespace Flixball/Display {
             StringBuilder.toString(sb) |> println
         })
     }
+
+    def sleep(): Unit & Impure =
+        import static java.lang.Thread.sleep(Int64): Unit & Impure;
+        sleep(Time/Duration.oneSecond())
+
+    pub def runState(b: Board): Unit & Impure =
+        displayBoard(b);
+        sleep();
+        ???
+
     
     def tileStr(idColor: Int32 -> String -> String, t: Tile): String = match t {
         case Wall => "#"
