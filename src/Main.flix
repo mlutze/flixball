@@ -26,7 +26,7 @@ namespace Flixball {
     }
 
     // id
-    pub enum Player(Int32, Direction, Board -> Move)
+    pub enum Player(Int32, Direction, GameState -> Move)
 
     instance Eq[Player] {
 
@@ -64,6 +64,14 @@ namespace Flixball {
             |> Map.filter(Eq.eq(Shoot)) 
             |> Map.keysOf;
         let dead = resolveShots(state, shooters);
+        let rotators = moves
+            |> Map.filterMap(m -> match m {
+                case Turn(r) => Some(r)
+                case Shoot => None
+                case Walk => None
+            })
+            |> Map.filterWithKey((person, _) -> not Set.memberOf(person, dead)); 
+
         let movers = moves
             |> Map.filter(Eq.eq(Walk))
             |> Map.keysOf;
