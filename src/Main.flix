@@ -1,5 +1,13 @@
 namespace Flixball {
 
+    def getPlayerMap(b: Board): Map[Int32, Position] =
+        let Board(br) = b;
+        br.tiles |> Map.toList |> List.filterMap(match ((x, y), t) -> match t {
+            case Person(Player(id, direction, _)) =>
+                Some((id, Position(x, y, direction)))
+            case _ => None
+        }) |> List.toMap
+
     ///
     /// resolves one step of the GameState.
     ///

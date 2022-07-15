@@ -7,6 +7,8 @@ namespace Flixball/Display {
     use Flixball.Player.{Player};
     use Flixball.Direction;
     use Flixball.Direction.{North, East, South, West};
+    use Flixball.GameState;
+    use Flixball.GameState.GameState;
 
     ///
     /// Clears the screen completely and resets the cursor to the first
@@ -38,14 +40,19 @@ namespace Flixball/Display {
 
     def sleep(): Unit & Impure =
         import static java.lang.Thread.sleep(Int64): Unit & Impure;
-        sleep(Time/Duration.oneSecond())
+        sleep(1000i64)
 
-    pub def runState(b: Board): Unit & Impure =
-        displayBoard(b);
+    pub def runBoard(b: Board): Unit & Impure =
+        runGameState(GameState(Flixball.getPlayerMap(b), b))
+        
+        
+    pub def runGameState(gs: GameState): Unit & Impure =
+        let GameState(_, board) = gs;
+        displayBoard(board);
+        println(Time/Epoch.seconds());
         sleep();
-        ???
+        runGameState(Flixball.runStep(gs))
 
-    
     def tileStr(idColor: Int32 -> String -> String, t: Tile): String = match t {
         case Wall => "#"
         case Person(Player(id, direction, _)) => directionStr(direction) |> idColor(id)
