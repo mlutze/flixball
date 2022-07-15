@@ -1,17 +1,5 @@
-// The main entry point.
-def main(): Unit & Impure =
-    println("Hello World!")
-
 namespace Flixball {
     
-    pub def left(): Char = '<'
-
-    pub def right(): Char = '>'
-
-    pub def up(): Char = '^'
-
-    pub def down(): Char = 'v'
-
     pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[(Int32, Int32), Tile]})
 
     pub enum Direction with Eq {
