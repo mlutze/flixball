@@ -61,7 +61,7 @@ namespace Flixball {
             |> Map.keysOf;
         let dead = resolveShots(state0, shooters);
         let GameState(players0, board0) = state0;
-        let players1 = (players0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
+        let players1 = ???; // (players0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
         let moves1 = (moves0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
         let board1 = (board0, dead) ||> ???;
         let rotators = moves1
@@ -87,7 +87,7 @@ namespace Flixball {
     pub def resolveShot(state: GameState, shooter: Player): Option[Player] = {
         let GameState(_, board) = state;
         use Option.flatMap;
-        let* (dir, row, col) = getPosition(shooter, state);
+        let* Position(row, col, dir) = getPosition(shooter, state);
         let (r, c) = step(row, col, dir);
         match raytrace(dir, r, c, board) {
             case Some(Person(p)) => Some(p)
@@ -122,12 +122,10 @@ namespace Flixball {
         }
     }
 
-    pub def getPosition(p: Player, state: GameState): Option[(Direction, Int32, Int32)] = {
-        let Player.Player(_, dir, _) = p;
+    pub def getPosition(p: Player, state: GameState): Option[Position] = {
+        let Player.Player(id, _, _) = p;
         let GameState(players, _) = state;
         use Option.flatMap;
-        let* loc = players |> Map.get(p);
-        let (row, col) = loc;
-        Some((dir, row, col))
+        players |> Map.get(id)
     }
 }
