@@ -47,13 +47,7 @@ namespace Flixball {
 
     }
 
-    enum Location {
-        case At(Int32, Int32)
-        case Dead
-    }
-
-
-    pub enum GameState(Map[Player, Location], Board)
+    pub enum GameState(Map[Player, (Int32, Int32)], Board)
 
     // loop:
     // get all players' moves
@@ -127,12 +121,7 @@ namespace Flixball {
         let GameState(players, _) = state;
         use Option.flatMap;
         let* loc = players |> Map.get(p);
-        let* (row, col) = loc |> toOption;
+        let (row, col) = loc;
         Some((dir, row, col))
-    }
-
-    pub def toOption(loc: Location): Option[(Int32, Int32)] = match loc {
-        case At(row, col) => Some((row, col))
-        case Dead => None
     }
 }
