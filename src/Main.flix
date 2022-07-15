@@ -12,7 +12,11 @@ namespace Flixball {
 
     pub def down(): Char = 'v'
 
+<<<<<<< HEAD
     pub enum Board({rows :: Int32, cols :: Int32, get :: (Int32, Int32) -> Tile})
+=======
+enum Board({rows :: Int32, cols :: Int32, tiles :: Map[(Int32, Int32), Tile]})
+>>>>>>> 9e71ca184e1dd580dca733a3e60bcfb85cec3192
 
     pub enum Rotation with Eq {
         case Clockwise
@@ -56,14 +60,19 @@ namespace Flixball {
 
     pub enum GameState(Set[Player], Board)
 
+<<<<<<< HEAD
     // loop:
     // get all players' moves
     // resolve the moves
     // display the board
-    pub def resolve(moves: Map[Player, Move], board: Board): Board = {
+    def resolve(moves: Map[Player, Move], board: Board): Board = {
         let shoots = moves 
             |> Map.filter(Eq.eq(Shoot)) 
             |> Map.keysOf;
+        ???
+    }
+
+    def resolveShoots(shooters: Set[Player], board: Board): Board = {
         ???
     }
 }
