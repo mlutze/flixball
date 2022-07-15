@@ -76,9 +76,9 @@ namespace Flixball {
             |> Map.keysOf;
         let dead = resolveShots(state0, shooters);
         let GameState(players0, board0) = state0;
-        let players1 = ???; // (players0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
+        let players1 = (players0, dead) ||> Set.foldLeft(acc -> match Player(id, _, _) -> Map.remove(id, acc));
         let moves1 = (moves0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
-        let board1 = (board0, dead) ||> ???;
+        let board1 = (board0, dead) ||> Set.foldLeft(acc -> match Player(id, _, _) -> removePlayer(state0, id, acc));
         let rotators = moves1
             |> Map.filterMap(m -> match m {
                 case Turn(r) => Some(r)
@@ -91,6 +91,20 @@ namespace Flixball {
             |> Map.filter(Eq.eq(Walk))
             |> Map.keysOf;
         ???
+    }
+
+    pub def removePlayer(state: GameState, p: Int32, b: Board): Board = {
+        let Board(rec) = b;
+        let tiles = rec.tiles;
+        let GameState(players, _) = state;
+        let Position(row, col, _) = unsafeGet(p, players);
+        let newTiles = Map.remove((row, col), tiles);
+        Board({ tiles = newTiles | rec })
+    }
+
+    pub def unsafeGet(k: k, m: Map[k, v]): v with Order[k] = match Map.get(k, m) {
+        case None => bug!(":(")
+        case Some(v) => v
     }
 
     /// Returns the set of dead players
