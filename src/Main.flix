@@ -1,17 +1,5 @@
-// The main entry point.
-def main(): Unit & Impure =
-    println("Hello World!")
-
 namespace Flixball {
     
-    pub def left(): Char = '<'
-
-    pub def right(): Char = '>'
-
-    pub def up(): Char = '^'
-
-    pub def down(): Char = 'v'
-
     pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[(Int32, Int32), Tile]})
 
     pub enum Direction with Eq {
@@ -29,7 +17,7 @@ namespace Flixball {
     pub enum Move with Eq {
         case Turn(Rotation)
         case Shoot
-        case Move
+        case Walk
     }
 
     pub enum Tile {
@@ -71,22 +59,33 @@ namespace Flixball {
     // get all players' moves
     // resolve the moves
     // display the board
-    pub def resolve(moves: Map[Player, Move], board: Board): Board = {
-        let shoots = moves 
+    pub def resolve(moves: Map[Player, Move], state: GameState): GameState = {
+        let shooters = moves 
             |> Map.filter(Eq.eq(Shoot)) 
+            |> Map.keysOf;
+        let dead = resolveShots(state, shooters);
+        let movers = moves
+            |> Map.filter(Eq.eq(Walk))
             |> Map.keysOf;
         ???
     }
 
     /// Returns the set of dead players
-    pub def resolveShots(shooters: Set[Player], board: Board): Set[Player] = {
-        ???
+    pub def resolveShots(state: GameState, shooters: Set[Player]): Set[Player] = {
+        shooters |> Set.flatMap(resolveShot(state) >> Option.toSet) 
     }
 
-    pub def resolveShot(shooter: Player, state: GameState): Option[Player] = {
+
+    pub def resolveShot(state: GameState, shooter: Player): Option[Player] = {
+        let GameState(_, board) = state;
         use Option.flatMap;
         let* (dir, row, col) = getPosition(shooter, state);
-        ???
+        let (r, c) = step(row, col, dir);
+        match raytrace(dir, r, c, board) {
+            case Some(Person(p)) => Some(p)
+            case Some(Wall) => None
+            case None => None
+        }
     }
 
     pub def step(row: Int32, col: Int32, dir: Direction): (Int32, Int32) = match dir {
@@ -100,7 +99,19 @@ namespace Flixball {
         let Board(rec) = board;
         let rows = rec.rows;
         let cols = rec.cols;
-        ???
+        let tiles = rec.tiles;
+        if (row < 0 or row >= rows) {
+            None
+        } else if (col < 0 or col >= cols) {
+            None
+        } else {
+            match (tiles |> Map.get((row, col))) {
+                case None =>
+                    let (r, c) = step(row, col, dir);
+                    raytrace(dir, r, c, board)
+                case Some(tile) => Some(tile)
+            }
+        }
     }
 
     pub def getPosition(p: Player, state: GameState): Option[(Direction, Int32, Int32)] = {
