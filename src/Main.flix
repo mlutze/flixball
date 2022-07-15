@@ -14,6 +14,13 @@ namespace Flixball {
 
     pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[(Int32, Int32), Tile]})
 
+    pub enum Direction with Eq {
+        case North
+        case East
+        case South
+        case West
+    }
+
     pub enum Rotation with Eq {
         case Clockwise
         case Counterclockwise
@@ -32,7 +39,7 @@ namespace Flixball {
     }
 
     // id
-    pub enum Player(Int32, Rotation, Board -> Move)
+    pub enum Player(Int32, Direction, Board -> Move)
 
     instance Eq[Player] {
 
@@ -86,7 +93,9 @@ namespace Flixball {
         let GameState(players, _) = state;
         use Option.flatMap;
         let* loc = players |> Map.get(p);
+        let* (row, col) = loc |> toOption;
         ???
+        /// (rot, row, col)
     }
 
     pub def toOption(loc: Location): Option[(Int32, Int32)] = match loc {
