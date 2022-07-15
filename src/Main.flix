@@ -53,12 +53,16 @@ namespace Flixball {
     // get all players' moves
     // resolve the moves
     // display the board
-    pub def resolve(moves: Map[Player, Move], state: GameState): GameState = {
-        let shooters = moves 
+    pub def resolve(moves0: Map[Player, Move], state0: GameState): GameState = {
+        let shooters = moves0 
             |> Map.filter(Eq.eq(Shoot)) 
             |> Map.keysOf;
-        let dead = resolveShots(state, shooters);
-        let rotators = moves
+        let dead = resolveShots(state0, shooters);
+        let GameState(players0, board0) = state0;
+        let players1 = (players0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
+        let moves1 = (moves0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
+        let board1 = (board0, dead) ||> ???;
+        let rotators = moves1
             |> Map.filterMap(m -> match m {
                 case Turn(r) => Some(r)
                 case Shoot => None
@@ -66,7 +70,7 @@ namespace Flixball {
             })
             |> Map.filterWithKey((person, _) -> not Set.memberOf(person, dead)); 
 
-        let movers = moves
+        let movers = moves1
             |> Map.filter(Eq.eq(Walk))
             |> Map.keysOf;
         ???
