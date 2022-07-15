@@ -47,7 +47,9 @@ namespace Flixball {
 
     }
 
-    pub enum GameState(Map[Int32, (Int32, Int32)], Board)
+    pub enum Position(Int32, Int32, Direction)
+
+    pub enum GameState(Map[Int32, Position], Board)
 
     // loop:
     // get all players' moves
