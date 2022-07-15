@@ -10,7 +10,7 @@ def up(): Char = '^'
 
 def down(): Char = 'v'
 
-enum Board[a]({rows :: Int32, cols :: Int32, get :: (Int32, Int32) -> a})
+enum Board({rows :: Int32, cols :: Int32, get :: (Int32, Int32) -> Tile})
 
 enum Rotation {
     case Clockwise
@@ -30,7 +30,7 @@ enum Tile {
 }
 
 // id
-enum Player(Int32)
+enum Player(Int32, Board -> Move)
 
 // loop:
 // get all players' moves
