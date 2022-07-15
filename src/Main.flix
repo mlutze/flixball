@@ -88,14 +88,13 @@ namespace Flixball {
     ///     let* start = 
     /// }
 
-    pub def getPosition(p: Player, state: GameState): Option[(Rotation, Int32, Int32)] = {
-        let Player.Player(_, rot, _) = p;
+    pub def getPosition(p: Player, state: GameState): Option[(Direction, Int32, Int32)] = {
+        let Player.Player(_, dir, _) = p;
         let GameState(players, _) = state;
         use Option.flatMap;
         let* loc = players |> Map.get(p);
         let* (row, col) = loc |> toOption;
-        ???
-        /// (rot, row, col)
+        Some((dir, row, col))
     }
 
     pub def toOption(loc: Location): Option[(Int32, Int32)] = match loc {
