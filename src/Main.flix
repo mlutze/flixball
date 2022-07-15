@@ -35,7 +35,6 @@ namespace Flixball {
     pub enum Tile {
         case Wall
         case Person(Player)
-        case Empty
     }
 
     // id
@@ -84,9 +83,25 @@ namespace Flixball {
         ???
     }
 
-    /// pub def resolveShot(shooter: Player, board: Board): Option[Player] = {
-    ///     let* start = 
-    /// }
+    pub def resolveShot(shooter: Player, state: GameState): Option[Player] = {
+        use Option.flatMap;
+        let* (dir, row, col) = getPosition(shooter, state);
+        ???
+    }
+
+    pub def step(row: Int32, col: Int32, dir: Direction): (Int32, Int32) = match dir {
+        case North => (row - 1, col)
+        case East => (row, col + 1)
+        case South => (row + 1, col)
+        case West => (row, col - 1)
+    }
+
+    pub def raytrace(dir: Direction, row: Int32, col: Int32, board: Board): Option[Tile] = {
+        let Board(rec) = board;
+        let rows = rec.rows;
+        let cols = rec.cols;
+        ???
+    }
 
     pub def getPosition(p: Player, state: GameState): Option[(Direction, Int32, Int32)] = {
         let Player.Player(_, dir, _) = p;
