@@ -27,7 +27,7 @@ namespace Flixball {
 
     pub enum Tile {
         case Wall
-        case Player(Player)
+        case Person(Player)
         case Empty
     }
 
@@ -53,8 +53,13 @@ namespace Flixball {
 
     }
 
+    enum Location {
+        case At(Int32, Int32)
+        case Dead
+    }
 
-    pub enum GameState(Set[Player], Board)
+
+    pub enum GameState(Map[Player, Location], Board)
 
     // loop:
     // get all players' moves
@@ -67,7 +72,25 @@ namespace Flixball {
         ???
     }
 
-    pub def resolveShoots(shooters: Set[Player], board: Board): Board = {
+    /// Returns the set of dead players
+    pub def resolveShots(shooters: Set[Player], board: Board): Set[Player] = {
         ???
+    }
+
+    /// pub def resolveShot(shooter: Player, board: Board): Option[Player] = {
+    ///     let* start = 
+    /// }
+
+    pub def getPosition(p: Player, state: GameState): Option[(Rotation, Location)] = {
+        let Player.Player(_, rot, _) = p;
+        let GameState(players, _) = state;
+        use Option.flatMap;
+        let* loc = ???; // player;
+        ???
+    }
+
+    pub def toOption(loc: Location): Option[(Int32, Int32)] = match loc {
+        case At(row, col) => Some((row, col))
+        case Dead => None
     }
 }
