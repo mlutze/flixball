@@ -10,7 +10,7 @@ def up(): Char = '^'
 
 def down(): Char = 'v'
 
-enum Board({rows :: Int32, cols :: Int32, get :: (Int32, Int32) -> Tile})
+enum Board({rows :: Int32, cols :: Int32, tiles :: Map[(Int32, Int32), Tile]})
 
 enum Rotation with Eq {
     case Clockwise
@@ -62,5 +62,9 @@ def resolve(moves: Map[Player, Move], board: Board): Board = {
     let shoots = moves 
         |> Map.filter(Eq.eq(Shoot)) 
         |> Map.keysOf;
+    ???
+}
+
+def resolveShoots(shooters: Set[Player], board: Board): Board = {
     ???
 }
