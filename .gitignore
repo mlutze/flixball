@@ -1,0 +1,33 @@
+#### Flix ####
+# Standard output folders of flix
+build/
+target/
+
+# Crash Reports
+crash_report_*.txt
+
+# Custom flix jar and build jars
+*.jar
+
+# Flix package
+*.fpkg
+
+# local files
+**/personal/**
+
+
+
+#### vscode ####
+# (from https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
