@@ -22,3 +22,17 @@ enum Move {
     case Shoot
     case Move
 }
+
+enum Tile {
+    case Wall
+    case Player(Player)
+    case Empty
+}
+
+// id
+enum Player(Int32)
+
+// loop:
+// get all players' moves
+// resolve the moves
+// display the board
