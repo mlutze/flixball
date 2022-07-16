@@ -1,14 +1,14 @@
 namespace Flixball/Display {
-    use Flixball.Board;
-    use Flixball.Board.{Board};
-    use Flixball.Tile;
-    use Flixball.Tile.{Wall, Person};
-    use Flixball.Player;
-    use Flixball.Player.{Player};
-    use Flixball.Direction;
-    use Flixball.Direction.{North, East, South, West};
-    use Flixball.GameState;
-    use Flixball.GameState.GameState;
+    use Flixball/Core.Board;
+    use Flixball/Core.Board.{Board};
+    use Flixball/Core.Tile;
+    use Flixball/Core.Tile.{Wall, Person};
+    use Flixball/Core.Player;
+    use Flixball/Core.Player.{Player};
+    use Flixball/Core.Direction;
+    use Flixball/Core.Direction.{North, East, South, West};
+    use Flixball/Core.GameState;
+    use Flixball/Core.GameState.GameState;
 
     ///
     /// Clears the screen completely and resets the cursor to the first
@@ -43,7 +43,7 @@ namespace Flixball/Display {
         sleep(1000i64)
 
     pub def runBoard(b: Board): Unit & Impure =
-        runGameState(GameState(Flixball.getPlayerMap(b), b))
+        runGameState(GameState(Flixball/Engine.getPlayerMap(b), b))
         
         
     pub def runGameState(gs: GameState): Unit & Impure =
@@ -51,7 +51,7 @@ namespace Flixball/Display {
         displayBoard(board);
         println(Time/Epoch.seconds());
         sleep();
-        runGameState(Flixball.runStep(gs))
+        runGameState(Flixball/Engine.runStep(gs))
 
     def tileStr(idColor: Int32 -> String -> String, t: Tile): String = match t {
         case Wall => "#"

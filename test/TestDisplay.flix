@@ -1,20 +1,20 @@
 namespace TestDisplay {
-    use Flixball.Board;
-    use Flixball.Board.{Board};
-    use Flixball.GameState;
-    use Flixball.GameState.{GameState};
-    use Flixball.Tile;
-    use Flixball.Tile.{Wall, Person};
-    use Flixball.Player;
-    use Flixball.Player.{Player};
-    use Flixball.Direction;
-    use Flixball.Direction.{North, West, South, East};
-    use Flixball.Move;
-    use Flixball.Move.{Turn, Shoot, Walk};
-    use Flixball.Position;
-    use Flixball.Position.{Position};
-    use Flixball.Rotation;
-    use Flixball.Rotation.{Clockwise, Counterclockwise};
+    use Flixball/Core.Board;
+    use Flixball/Core.Board.{Board};
+    use Flixball/Core.GameState;
+    use Flixball/Core.GameState.{GameState};
+    use Flixball/Core.Tile;
+    use Flixball/Core.Tile.{Wall, Person};
+    use Flixball/Core.Player;
+    use Flixball/Core.Player.{Player};
+    use Flixball/Core.Direction;
+    use Flixball/Core.Direction.{North, West, South, East};
+    use Flixball/Core.Move;
+    use Flixball/Core.Move.{Turn, Shoot, Walk};
+    use Flixball/Core.Position;
+    use Flixball/Core.Position.{Position};
+    use Flixball/Core.Rotation;
+    use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
 
     def testBoard01(): Board =
         Board({cols = 5, rows = 5, tiles = Map#{
