@@ -29,7 +29,7 @@ namespace Flixball {
         }
 
         // id
-        pub enum Player(Int32, Direction, GameState -> Move)
+        pub enum Player(PlayerId, Direction, GameState -> Move)
 
 
         instance Eq[Player] {
