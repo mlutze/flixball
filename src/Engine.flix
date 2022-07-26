@@ -22,36 +22,36 @@ namespace Flixball/Engine {
     use Flixball/Core.Tile.Person;
     use Flixball/Core.Tile.Wall;
     use Flixball/Core.Tile;
-
-
-
-    pub def getPlayerMap(b: Board): Map[Int32, Position] =
-        let Board(br) = b;
-        br.tiles |> Map.toList |> List.filterMap(match ((x, y), t) -> match t {
-            case Person(Player(id, direction, _)) =>
-                Some((id, Position(x, y, direction)))
-            case _ => None
-        }) |> List.toMap
+    use Flixball/Core.MoveLogic;
+    use Flixball/Core.MoveLogic.{MoveLogic};
 
     ///
     /// resolves one step of the GameState.
     ///
-    pub def runStep(gs: GameState): GameState = {
-        let GameState(_, board) = gs;
-        let Board(br) = board;
-        let moves0 = Map.valuesOf(br.tiles) |> List.filterMap(tile -> match tile {
-            case Person(p) =>
-                let Player(_, _, move) = p;
-                Some((p, move(gs)))
-            case _ => None
+    pub def runStep(gs: GameState): GameState = region r {
+        let GameState(states0, playerMap0, board) = gs;
+        let players = Flixball/Core/Board.players(board);
+        let newStates = new MutMap(r);
+        let moves = players |> List.map(p -> match p {
+            case Player(id, _, MoveLogic(move)) =>
+                match Map.get(id, states0) {
+                    case Some((i0, m0)) =>
+                        let (moveToDo, i, m) = move(gs, i0, m0);
+                        MutMap.put!(id, (i, m), newStates);
+                        (p, moveToDo)
+                    case None => unreachable!()
+                }
         }) |> List.toMap;
-        resolve(moves0, gs)
+        // Everything in gamestate except the values in player states is handled in resolve.
+        resolve(moves, GameState(MutMap.toMap(newStates), playerMap0, board))
     }
     
-    // loop:
-    // get all players' moves
-    // resolve the moves
-    // display the board
+    ///
+    /// Resolve in order:
+    ///     shoot
+    ///     rotate
+    ///     move
+    ///
     pub def resolve(moves0: Map[Player, Move], state0: GameState): GameState = {
         let shooters = moves0 
             |> Map.filter(Eq.eq(Shoot)) 
@@ -104,7 +104,7 @@ namespace Flixball/Engine {
 
 
     pub def resolveShot(state: GameState, shooter: Player): Option[Player] = {
-        let GameState(_, board) = state;
+        let GameState(_, _, board) = state;
         use Option.flatMap;
         let* Position(row, col, dir) = getPosition(shooter, state);
         let (r, c) = step(row, col, dir);
@@ -143,7 +143,7 @@ namespace Flixball/Engine {
 
     pub def getPosition(p: Player, state: GameState): Option[Position] = {
         let Player.Player(id, _, _) = p;
-        let GameState(players, _) = state;
+        let GameState(_, players, _) = state;
         use Option.flatMap;
         players |> Map.get(id)
     }
