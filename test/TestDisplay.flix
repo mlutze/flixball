@@ -18,7 +18,7 @@ namespace TestDisplay {
     use Flixball/Core.Tile;
     use Flixball/Core.Tile.{Wall, Person};
 
-    use Flixball/AiLibrary.{rotate, shoot, walk};
+    use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot};
 
     def testBoard01(): Board =
         Board({cols = 5, rows = 5, tiles = Map#{
@@ -45,15 +45,15 @@ namespace TestDisplay {
     def testBoard02(): Board =
         Board({cols = 15, rows = 3, tiles = Map#{
             (1, 1) => Person(Player(0, East, shoot())),
-            (1, 3) => Person(Player(1, North, shoot())),
-            (1, 4) => Person(Player(2, North, shoot())),
-            (1, 5) => Person(Player(3, North, shoot())),
-            (1, 6) => Person(Player(4, North, shoot())),
-            (1, 7) => Person(Player(5, North, shoot())),
-            (1, 8) => Person(Player(6, North, shoot())),
-            (1, 9) => Person(Player(7, North, shoot())),
+            (1, 3) => Person(Player(1, North, rotate(Clockwise))),
+            (1, 4) => Person(Player(2, North, rotate(Counterclockwise))),
+            (1, 5) => Person(Player(3, North, rotate(Clockwise))),
+            (1, 6) => Person(Player(4, North, rotate(Counterclockwise))),
+            (1, 7) => Person(Player(5, North, rotate(Clockwise))),
+            (1, 8) => Person(Player(6, North, rotate(Counterclockwise))),
+            (1, 9) => Person(Player(7, North, rotate(Clockwise))),
             (1, 10) => Wall,
-            (1, 12) => Person(Player(8, West, shoot()))
+            (1, 12) => Person(Player(8, West, spinAndShoot(Clockwise)))
         }})
 
 
