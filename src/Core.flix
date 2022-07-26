@@ -26,9 +26,13 @@ namespace Flixball/Core {
         case Person(Player)
     }
 
-    // id
-    pub enum Player(PlayerId, Direction, GameState -> Move)
+    pub enum MoveLogic(
+        (GameState, Int32, Map[String, String]) ->
+        (Move, Int32, Map[String, String])
+    )
 
+    // id
+    pub enum Player(PlayerId, Direction, MoveLogic)
 
     instance Eq[Player] {
 
@@ -38,7 +42,6 @@ namespace Flixball/Core {
             p1 == p2
 
     }
-
 
     instance Order[Player] {
 
@@ -51,38 +54,65 @@ namespace Flixball/Core {
 
     pub enum Position(Int32, Int32, Direction)
 
-    pub enum GameState(Map[PlayerId, Position], Board)
+    pub enum GameState(
+        Map[PlayerId, (Int32, Map[String, String])],
+        Map[PlayerId, Position],
+        Board
+    )
+
+    pub def initialPlayerState(): (Int32, Map[String, String]) = (0, Map.empty())
 
     namespace GameState {
         use Flixball/Core.GameState.GameState;
         use Flixball/Core.Position;
-        use Flixball/Core.Position.Position;
+        use Flixball/Core.Position.{Position};
         use Flixball/Core.GameState;
+        use Flixball/Core.Board;
         use Flixball/Core.PlayerId;
+        use Flixball/Core.Player.Player;
         use Flixball/Core/Board.set_;
 
         /// Removes a player from the game.
         /// Does nothing if the player does not exist in the game.
         pub def removePlayer(id: PlayerId, state0: GameState): GameState = {
-            let GameState(map0, board0) = state0;
+            let GameState(states0, map0, board0) = state0;
             match (map0 |> Map.get(id)) {
                 // Case 1: No such player. Do nothing.
                 case None => state0
 
-                // Case 2: Found the player. Remove from both the map and the board.
+                // Case 2: Found the player. Remove from the map, the board, and the states.
                 case Some(Position(row, col, _)) =>
                     let map = map0 |> Map.remove(id);
+                    let states = states0 |> Map.remove(id);
                     let board = board0 |> set_(row, col, None);
-                    GameState(map, board)
+                    GameState(states, map, board)
             }
         }
 
+        pub def initialStates(players: List[PlayerId]): Map[PlayerId, (Int32, Map[String, String])] =
+            players |> List.map(p -> {
+                (p, Flixball/Core.initialPlayerState())
+            }) |> List.toMap
+        
+        pub def mkGameState(b: Board): GameState =
+            let states = b |>
+                Flixball/Core/Board.players |>
+                List.map(match Player(id, _, _) -> id) |>
+                Flixball/Core/GameState.initialStates;
+            let players = Flixball/Core/Board.playerMap(b);
+            GameState(states, players, b)
     }
 
     namespace Board {
         use Flixball/Core.Board;
         use Flixball/Core.Board.Board;
         use Flixball/Core.Tile;
+        use Flixball/Core.Tile.{Person};
+        use Flixball/Core.Player;
+        use Flixball/Core.Player.{Player};
+        use Flixball/Core.Position;
+        use Flixball/Core.Position.{Position};
+        use Flixball/Core.PlayerId;
 
         pub def set_(row: Int32, col: Int32, tile: Option[Tile], board0: Board): Board = {
             let Board(rec0) = board0;
@@ -92,5 +122,21 @@ namespace Flixball/Core {
             };
             Board({tiles = tiles | rec0})
         }
+
+        pub def players(b: Board): List[Player] =
+            let Board(br) = b;
+            br.tiles |> Map.valuesOf |> List.filterMap(t -> match t {
+                case Person(player) =>
+                    Some(player)
+                case _ => None
+            })
+
+        pub def playerMap(b: Board): Map[PlayerId, Position] =
+            let Board(br) = b;
+            br.tiles |> Map.toList |> List.filterMap(match ((x, y), t) -> match t {
+                case Person(Player(id, direction, _)) =>
+                    Some((id, Position(x, y, direction)))
+                case _ => None
+            }) |> List.toMap
     }
 }

@@ -43,11 +43,10 @@ namespace Flixball/Display {
         sleep(1000i64)
 
     pub def runBoard(b: Board): Unit & Impure =
-        runGameState(GameState(Flixball/Engine.getPlayerMap(b), b))
-        
+        runGameState(Flixball/Core/GameState.mkGameState(b))
         
     pub def runGameState(gs: GameState): Unit & Impure =
-        let GameState(_, board) = gs;
+        let GameState(_, _, board) = gs;
         displayBoard(board);
         println(Time/Epoch.seconds());
         sleep();
