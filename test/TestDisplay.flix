@@ -1,22 +1,24 @@
 namespace TestDisplay {
     use Flixball/Core.Board;
     use Flixball/Core.Board.{Board};
-    use Flixball/Core.GameState;
-    use Flixball/Core.GameState.{GameState};
-    use Flixball/Core.Tile;
-    use Flixball/Core.Tile.{Wall, Person};
-    use Flixball/Core.Player;
-    use Flixball/Core.Player.{Player};
     use Flixball/Core.Direction;
     use Flixball/Core.Direction.{North, West, South, East};
+    use Flixball/Core.GameState;
+    use Flixball/Core.GameState.{GameState};
     use Flixball/Core.Move;
     use Flixball/Core.Move.{Turn, Shoot, Walk};
+    use Flixball/Core.MoveLogic;
+    use Flixball/Core.MoveLogic.{MoveLogic};
+    use Flixball/Core.Player;
+    use Flixball/Core.Player.{Player};
     use Flixball/Core.Position;
     use Flixball/Core.Position.{Position};
     use Flixball/Core.Rotation;
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
-    use Flixball/Core.MoveLogic;
-    use Flixball/Core.MoveLogic.{MoveLogic};
+    use Flixball/Core.Tile;
+    use Flixball/Core.Tile.{Wall, Person};
+
+    use Flixball/AiLibrary.{rotate, shoot, walk};
 
     def testBoard01(): Board =
         Board({cols = 5, rows = 5, tiles = Map#{
@@ -36,23 +38,22 @@ namespace TestDisplay {
             (4, 2) => Wall,
             (4, 3) => Wall,
             (4, 4) => Wall,
-            (2, 2) => Person(Player(0, South, MoveLogic((_, i, m) -> (Walk, i, m)))),
-            (3, 3) => Person(Player(1, West, MoveLogic((_, i, m) -> (Shoot, i, m))))
+            (2, 2) => Person(Player(0, South, walk())),
+            (3, 3) => Person(Player(1, West, shoot()))
         }})
     
     def testBoard02(): Board =
-        let shootSpam = MoveLogic((_, i, m) -> (Shoot, i, m));
         Board({cols = 15, rows = 3, tiles = Map#{
-            (1, 1) => Person(Player(0, East, shootSpam)),
-            (1, 3) => Person(Player(1, North, shootSpam)),
-            (1, 4) => Person(Player(2, North, shootSpam)),
-            (1, 5) => Person(Player(3, North, shootSpam)),
-            (1, 6) => Person(Player(4, North, shootSpam)),
-            (1, 7) => Person(Player(5, North, shootSpam)),
-            (1, 8) => Person(Player(6, North, shootSpam)),
-            (1, 9) => Person(Player(7, North, shootSpam)),
+            (1, 1) => Person(Player(0, East, shoot())),
+            (1, 3) => Person(Player(1, North, shoot())),
+            (1, 4) => Person(Player(2, North, shoot())),
+            (1, 5) => Person(Player(3, North, shoot())),
+            (1, 6) => Person(Player(4, North, shoot())),
+            (1, 7) => Person(Player(5, North, shoot())),
+            (1, 8) => Person(Player(6, North, shoot())),
+            (1, 9) => Person(Player(7, North, shoot())),
             (1, 10) => Wall,
-            (1, 12) => Person(Player(8, West, shootSpam))
+            (1, 12) => Person(Player(8, West, shoot()))
         }})
 
 

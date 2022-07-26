@@ -1,29 +1,29 @@
 namespace Flixball/Engine {
-    use Flixball/Core.Board.Board;
     use Flixball/Core.Board;
+    use Flixball/Core.Board.Board;
+    use Flixball/Core.Direction;
     use Flixball/Core.Direction.East;
     use Flixball/Core.Direction.North;
     use Flixball/Core.Direction.South;
     use Flixball/Core.Direction.West;
-    use Flixball/Core.Direction;
-    use Flixball/Core.GameState.GameState;
     use Flixball/Core.GameState;
+    use Flixball/Core.GameState.GameState;
+    use Flixball/Core.Move;
     use Flixball/Core.Move.Shoot;
     use Flixball/Core.Move.Turn;
     use Flixball/Core.Move.Walk;
-    use Flixball/Core.Move;
-    use Flixball/Core.Player.Player;
-    use Flixball/Core.Player;
-    use Flixball/Core.Position.Position;
-    use Flixball/Core.Position;
-    use Flixball/Core.Rotation.Clockwise;
-    use Flixball/Core.Rotation.Counterclockwise;
-    use Flixball/Core.Rotation;
-    use Flixball/Core.Tile.Person;
-    use Flixball/Core.Tile.Wall;
-    use Flixball/Core.Tile;
     use Flixball/Core.MoveLogic;
     use Flixball/Core.MoveLogic.{MoveLogic};
+    use Flixball/Core.Player;
+    use Flixball/Core.Player.Player;
+    use Flixball/Core.Position;
+    use Flixball/Core.Position.Position;
+    use Flixball/Core.Rotation;
+    use Flixball/Core.Rotation.Clockwise;
+    use Flixball/Core.Rotation.Counterclockwise;
+    use Flixball/Core.Tile;
+    use Flixball/Core.Tile.Person;
+    use Flixball/Core.Tile.Wall;
 
     ///
     /// resolves one step of the GameState.

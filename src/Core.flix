@@ -78,18 +78,18 @@ namespace Flixball {
 
         namespace GameState {
             use Flixball/Core.Board;
-            use Flixball/Core.GameState.GameState;
             use Flixball/Core.GameState;
+            use Flixball/Core.GameState.GameState;
             use Flixball/Core.Player.Player;
             use Flixball/Core.PlayerId;
-            use Flixball/Core.Position.{Position};
             use Flixball/Core.Position;
+            use Flixball/Core.Position.{Position};
+            use Flixball/Core.rotateDir;
+            use Flixball/Core.Rotation;
             use Flixball/Core.Tile;
             use Flixball/Core.Tile.Person;
-            use Flixball/Core.Rotation;
-            use Flixball/Core.rotateDir;
-            use Flixball/Core/Board.set_;
             use Flixball/Core/Board.adjust;
+            use Flixball/Core/Board.set_;
             use Utils.{|||>};
 
             /// Removes a player from the game.
@@ -145,13 +145,13 @@ namespace Flixball {
         namespace Board {
             use Flixball/Core.Board;
             use Flixball/Core.Board.Board;
-            use Flixball/Core.Tile;
-            use Flixball/Core.Tile.{Person};
             use Flixball/Core.Player;
             use Flixball/Core.Player.{Player};
+            use Flixball/Core.PlayerId;
             use Flixball/Core.Position;
             use Flixball/Core.Position.{Position};
-            use Flixball/Core.PlayerId;
+            use Flixball/Core.Tile;
+            use Flixball/Core.Tile.{Person};
 
             pub def set_(row: Int32, col: Int32, tile: Option[Tile], board0: Board): Board = {
                 let Board(rec0) = board0;

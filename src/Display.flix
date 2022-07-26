@@ -1,14 +1,14 @@
 namespace Flixball/Display {
     use Flixball/Core.Board;
     use Flixball/Core.Board.{Board};
-    use Flixball/Core.Tile;
-    use Flixball/Core.Tile.{Wall, Person};
-    use Flixball/Core.Player;
-    use Flixball/Core.Player.{Player};
     use Flixball/Core.Direction;
     use Flixball/Core.Direction.{North, East, South, West};
     use Flixball/Core.GameState;
     use Flixball/Core.GameState.GameState;
+    use Flixball/Core.Player;
+    use Flixball/Core.Player.{Player};
+    use Flixball/Core.Tile;
+    use Flixball/Core.Tile.{Wall, Person};
 
     ///
     /// Clears the screen completely and resets the cursor to the first
