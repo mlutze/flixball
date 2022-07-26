@@ -49,11 +49,32 @@ namespace TestDisplay {
             })),
             (3, 3) => Person(Player(1, West, _ -> Shoot))
         }})
+    
+    def testBoard02(): Board =
+        let shootSpam = _ -> Shoot;
+        Board({cols = 15, rows = 3, tiles = Map#{
+            (1, 1) => Person(Player(0, East, shootSpam)),
+            (1, 3) => Person(Player(1, North, shootSpam)),
+            (1, 4) => Person(Player(2, North, shootSpam)),
+            (1, 5) => Person(Player(3, North, shootSpam)),
+            (1, 6) => Person(Player(4, North, shootSpam)),
+            (1, 7) => Person(Player(5, North, shootSpam)),
+            (1, 8) => Person(Player(6, North, shootSpam)),
+            (1, 9) => Person(Player(7, North, shootSpam)),
+            (1, 10) => Wall,
+            (1, 12) => Person(Player(8, West, shootSpam))
+        }})
 
-    pub def test01(): Unit & Impure =
+    pub def testDisplayBoard01(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard01())
 
-    pub def test02(): Unit & Impure =
+    pub def testDisplayBoard02(): Unit & Impure =
+        Flixball/Display.displayBoard(testBoard02())
+
+    pub def testRunBoard01(): Unit & Impure =
         Flixball/Display.runBoard(testBoard01())
+
+    pub def testRunBoard02(): Unit & Impure =
+        Flixball/Display.runBoard(testBoard02())
 
 }
