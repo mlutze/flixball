@@ -64,6 +64,18 @@ namespace Flixball {
 
         pub def initialPlayerState(): (Int32, Map[String, String]) = (0, Map.empty())
 
+        pub def rotateDir(rot: Rotation, dir: Direction): Direction = match (rot, dir) {
+            case (Clockwise, North) => East
+            case (Clockwise, East) => South
+            case (Clockwise, South) => West
+            case (Clockwise, West) => North
+
+            case (Counterclockwise, North) => West
+            case (Counterclockwise, West) => South
+            case (Counterclockwise, South) => East
+            case (Counterclockwise, East) => North
+        }
+
         namespace GameState {
             use Flixball/Core.Board;
             use Flixball/Core.GameState;
@@ -72,7 +84,13 @@ namespace Flixball {
             use Flixball/Core.PlayerId;
             use Flixball/Core.Position;
             use Flixball/Core.Position.{Position};
+            use Flixball/Core.Tile;
+            use Flixball/Core.Tile.Person;
+            use Flixball/Core.Rotation;
+            use Flixball/Core.rotateDir;
             use Flixball/Core/Board.set_;
+            use Flixball/Core/Board.adjust;
+            use Utils.{|||>};
 
             /// Removes a player from the game.
             /// Does nothing if the player does not exist in the game.
@@ -87,6 +105,25 @@ namespace Flixball {
                         let map = map0 |> Map.remove(id);
                         let states = states0 |> Map.remove(id);
                         let board = board0 |> set_(row, col, None);
+                        GameState(states, map, board)
+                }
+            }
+
+            pub def rotatePlayer(id: PlayerId, rot: Rotation, state0: GameState): GameState = {
+                let GameState(states, map0, board0) = state0;
+                match (map0 |> Map.get(id)) {
+                    // Case 1: No such player. Do nothing.
+                    case None => state0
+
+                    // Case 2: Found the player. Change their direction in the map and the board.
+                    case Some(Position(row, col, dir0)) =>
+                        let dir = dir0 |> rotateDir(rot);
+                        let map = map0 |> Map.remove(id);
+                        let board = (row, col, board0) |||> adjust(tileOpt -> match tileOpt {
+                                case Some(Person(Player(_, _, logic))) => Some(Person(Player(id, dir, logic)))
+                                case other => other
+                            }
+                        );
                         GameState(states, map, board)
                 }
             }
@@ -123,6 +160,16 @@ namespace Flixball {
                     case Some(t) => rec0.tiles |> Map.insert((row, col), t)
                 };
                 Board({tiles = tiles | rec0})
+            }
+
+            pub def get_(row: Int32, col: Int32, board: Board): Option[Tile] = {
+                let Board(rec) = board;
+                rec.tiles |> Map.get((row, col))
+            }
+
+            pub def adjust(f: Option[Tile] -> Option[Tile], row: Int32, col: Int32, board: Board): Board = {
+                let tile = get_(row, col, board);
+                set_(row, col, f(tile), board)
             }
 
             pub def players(b: Board): List[Player] =
