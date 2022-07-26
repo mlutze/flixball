@@ -1,5 +1,6 @@
 namespace Flixball {
     namespace Core {
+
         pub type alias PlayerId = Int32
 
         pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[(Int32, Int32), Tile]})
