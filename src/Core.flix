@@ -84,12 +84,12 @@ namespace Flixball {
             use Flixball/Core.PlayerId;
             use Flixball/Core.Position;
             use Flixball/Core.Position.{Position};
+            use Flixball/Core.rotateDir;
+            use Flixball/Core.Rotation;
             use Flixball/Core.Tile;
             use Flixball/Core.Tile.Person;
-            use Flixball/Core.Rotation;
-            use Flixball/Core.rotateDir;
-            use Flixball/Core/Board.set_;
             use Flixball/Core/Board.adjust;
+            use Flixball/Core/Board.set_;
             use Utils.{|||>};
 
             /// Removes a player from the game.
