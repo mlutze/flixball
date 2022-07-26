@@ -59,18 +59,20 @@ namespace Flixball/Engine {
         let dead = resolveShots(state0, shooters);
         let state1 = (state0, dead) ||> Set.foldLeft(acc -> match Player(id, _, _) -> Flixball/Core/GameState.removePlayer(id, acc));
         let moves1 = (moves0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
-        let rotators = moves1
+        let _rotators = moves1
             |> Map.filterMap(m -> match m {
                 case Turn(r) => Some(r)
                 case Shoot => None
                 case Walk => None
             });
         // TODO finish rotating
-        let movers = moves1
+
+        let _movers = moves1
             |> Map.filter(Eq.eq(Walk))
             |> Map.keysOf;
-        ???
         // TODO finish moving
+        
+        state1
     }
 
     pub def unsafeGet(k: k, m: Map[k, v]): v with Order[k] = match Map.get(k, m) {
