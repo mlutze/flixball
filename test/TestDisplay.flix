@@ -15,6 +15,8 @@ namespace TestDisplay {
     use Flixball/Core.Position.{Position};
     use Flixball/Core.Rotation;
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
+    use Flixball/Core.MoveLogic;
+    use Flixball/Core.MoveLogic.{MoveLogic};
 
     def testBoard01(): Board =
         Board({cols = 5, rows = 5, tiles = Map#{
@@ -34,24 +36,12 @@ namespace TestDisplay {
             (4, 2) => Wall,
             (4, 3) => Wall,
             (4, 4) => Wall,
-            (2, 2) => Person(Player(0, South, gs -> {
-                let GameState(playerMap, _) = gs;
-                match Map.get(0, playerMap) {
-                    case Some(Position(x, y, direction)) => match (x, y, direction) {
-                        case (1, 1, East) => Walk
-                        case (1, 2, South) => Walk
-                        case (2, 2, West) => Walk
-                        case (2, 1, North) => Walk
-                        case _ => Turn(Clockwise)
-                    }
-                    case None => Turn(Counterclockwise)
-                }
-            })),
-            (3, 3) => Person(Player(1, West, _ -> Shoot))
+            (2, 2) => Person(Player(0, South, MoveLogic((_, i, m) -> (Walk, i, m)))),
+            (3, 3) => Person(Player(1, West, MoveLogic((_, i, m) -> (Shoot, i, m))))
         }})
     
     def testBoard02(): Board =
-        let shootSpam = _ -> Shoot;
+        let shootSpam = MoveLogic((_, i, m) -> (Shoot, i, m));
         Board({cols = 15, rows = 3, tiles = Map#{
             (1, 1) => Person(Player(0, East, shootSpam)),
             (1, 3) => Person(Player(1, North, shootSpam)),
@@ -65,6 +55,7 @@ namespace TestDisplay {
             (1, 12) => Person(Player(8, West, shootSpam))
         }})
 
+
     pub def testDisplayBoard01(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard01())
 
@@ -76,5 +67,4 @@ namespace TestDisplay {
 
     pub def testRunBoard02(): Unit & Impure =
         Flixball/Display.runBoard(testBoard02())
-
 }
