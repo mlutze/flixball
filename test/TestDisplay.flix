@@ -36,8 +36,8 @@ namespace TestDisplay {
             (4, 2) => Wall,
             (4, 3) => Wall,
             (4, 4) => Wall,
-            (2, 2) => Person(Player(0, South, Flixball/AiLibrary.walk())),
-            (3, 3) => Person(Player(1, West, Flixball/AiLibrary.shoot()))
+            (2, 2) => Person(Player(0, South, MoveLogic((_, i, m) -> (Walk, i, m)))),
+            (3, 3) => Person(Player(1, West, MoveLogic((_, i, m) -> (Shoot, i, m))))
         }})
 
     pub def testDisplayBoard(): Unit & Impure =
