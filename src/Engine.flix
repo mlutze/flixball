@@ -59,42 +59,25 @@ namespace Flixball/Engine {
         let dead = resolveShots(state0, shooters);
         let state1 = (state0, dead) ||> Set.foldLeft(acc -> match Player(id, _, _) -> Flixball/Core/GameState.removePlayer(id, acc));
         let moves1 = (moves0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
-        let _rotators = moves1
+        let rotators = moves1
             |> Map.filterMap(m -> match m {
                 case Turn(r) => Some(r)
                 case Shoot => None
                 case Walk => None
             });
-        // TODO finish rotating
+        let state2 = (state1, rotators) ||> Map.foldLeftWithKey(acc -> match Player(id, _, _) -> rot -> Flixball/Core/GameState.rotatePlayer(id, rot, acc));
 
         let _movers = moves1
             |> Map.filter(Eq.eq(Walk))
             |> Map.keysOf;
         // TODO finish moving
         
-        state1
+        state2
     }
 
     pub def unsafeGet(k: k, m: Map[k, v]): v with Order[k] = match Map.get(k, m) {
         case None => bug!(":(")
         case Some(v) => v
-    }
-
-    pub def rotatePlayer(rot: Rotation, p: Player): Player = {
-        let Player(id, dir, f) = p; 
-        Player(id, rotateDir(rot, dir), f)
-    }
-
-    pub def rotateDir(rot: Rotation, dir: Direction): Direction = match (rot, dir) {
-        case (Clockwise, North) => East
-        case (Clockwise, East) => South
-        case (Clockwise, South) => West
-        case (Clockwise, West) => North
-
-        case (Counterclockwise, North) => West
-        case (Counterclockwise, West) => South
-        case (Counterclockwise, South) => East
-        case (Counterclockwise, East) => North
     }
 
     /// Returns the set of dead players
