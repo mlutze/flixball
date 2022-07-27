@@ -109,6 +109,8 @@ namespace Flixball {
                 }
             }
 
+            /// Rotates a player with the given rotation.
+            /// Does nothing if the player does not exist in the game.
             pub def rotatePlayer(id: PlayerId, rot: Rotation, state0: GameState): GameState = {
                 let GameState(states, map0, board0) = state0;
                 match (map0 |> Map.get(id)) {
@@ -118,7 +120,7 @@ namespace Flixball {
                     // Case 2: Found the player. Change their direction in the map and the board.
                     case Some(Position(row, col, dir0)) =>
                         let dir = dir0 |> rotateDir(rot);
-                        let map = map0 |> Map.remove(id);
+                        let map = map0 |> Map.insert(id, Position(row, col, dir));
                         let board = (row, col, board0) |||> adjust(tileOpt -> match tileOpt {
                                 case Some(Person(Player(_, _, logic))) => Some(Person(Player(id, dir, logic)))
                                 case other => other
