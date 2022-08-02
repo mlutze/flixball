@@ -3,6 +3,25 @@ namespace Flixball {
 
         pub type alias PlayerId = Int32
 
+
+        ///
+        /// Board uses matrix-like index ordering. Map entries should not be out
+        /// of bounds and the outer border of the board should be wall to avoid
+        /// out-of-bounds checking.
+        ///
+        /// Example: `{rows=5, cols=4, tiles = Map#{(0, 0) => Wall, (3,1) =>
+        /// Wall}}`
+        /// # := wall, @ := empty
+        ///
+        /// #@@@
+        /// @@@@
+        /// @@@@
+        /// #@@@
+        /// @@@@
+        ///
+        /// North, East, South, West correspond to the drawing above, likewise
+        /// with Clockwise and Counterclockwise.
+        /// 
         pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[(Int32, Int32), Tile]})
 
         pub enum Direction with Eq {
@@ -153,7 +172,7 @@ namespace Flixball {
             use Flixball/Core.Position;
             use Flixball/Core.Position.{Position};
             use Flixball/Core.Tile;
-            use Flixball/Core.Tile.{Person};
+            use Flixball/Core.Tile.{Person, Wall};
 
             pub def set_(row: Int32, col: Int32, tile: Option[Tile], board0: Board): Board = {
                 let Board(rec0) = board0;
@@ -172,6 +191,30 @@ namespace Flixball {
             pub def adjust(f: Option[Tile] -> Option[Tile], row: Int32, col: Int32, board: Board): Board = {
                 let tile = get_(row, col, board);
                 set_(row, col, f(tile), board)
+            }
+
+            ///
+            /// Adds a border around the board by increasing the size in each
+            /// dimension by two and increasing each tile position by one in
+            /// each dimension.
+            /// 
+            pub def addBorder(b: Board): Board = region r {
+                let Board(br) = b;
+                let rows = br.rows+2;
+                let cols = br.cols+2;
+                let translatedMap = new MutMap(r);
+                // Add translated existing tiles
+                foreach(((x, y), tile) <- Map.iterator(r, br.tiles)) {
+                    MutMap.put!((x+1, y+1), tile, translatedMap)
+                };
+                // Add border walls
+                foreach(i <- Iterator.range(r, 0, cols)) {
+                    MutMap.put!((i, 0), Wall, translatedMap);
+                    MutMap.put!((i, cols-1), Wall, translatedMap);
+                    MutMap.put!((0, i), Wall, translatedMap);
+                    MutMap.put!((rows-1, i), Wall, translatedMap)
+                };
+                Board({rows = rows, cols = cols, tiles = MutMap.toMap(translatedMap)})
             }
 
             pub def players(b: Board): List[Player] =
