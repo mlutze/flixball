@@ -64,8 +64,8 @@ namespace TestDisplay {
         Flixball/Display.displayBoard(testBoard02())
 
     pub def testRunBoard01(): Unit & Impure =
-        Flixball/Display.runBoard(testBoard01())
+        Flixball/Display.runBoard(1000i64, testBoard01())
 
     pub def testRunBoard02(): Unit & Impure =
-        Flixball/Display.runBoard(testBoard02())
+        Flixball/Display.runBoard(1000i64, testBoard02())
 }
