@@ -11,12 +11,30 @@ namespace Flixball/Display {
     use Flixball/Core.Tile.{Wall, Person};
 
     ///
-    /// Clears the screen completely and resets the cursor to the first
-    /// position.
+    /// Clears then screen and then displays the board. The cursor will be left
+    /// at the end.
     ///
-    pub def resetScreen(): Unit & Impure =
-        clearScreen();
-        resetCursor()
+    pub def displayBoard(b: Board): Unit & Impure =
+        Flixball/Terminal.resetTerminal() |> print;
+        b |> boardLines |> List.foreach(println)
+
+    ///
+    /// Continously simulates the board and drawing it between each step with a
+    /// set delay. One second is `1000i64`.
+    ///
+    pub def runBoard(delayDuration: Int64, b: Board): Unit & Impure =
+        runGameState(delayDuration, Flixball/Core/GameState.mkGameState(b))
+
+    ///
+    /// Continously simulates the game state and drawing it between each step with a
+    /// set delay. One second is `1000i64`.
+    ///
+    pub def runGameState(delayDuration: Int64, gs: GameState): Unit & Impure =
+        import static java.lang.Thread.sleep(Int64): Unit & Impure;
+        let GameState(_, _, board) = gs;
+        displayBoard(board);
+        sleep(delayDuration);
+        runGameState(delayDuration, Flixball/Engine.runStep(gs))
 
     def boardLines(b: Board): List[String] = region r {
         let Board(br) = b;
@@ -34,27 +52,6 @@ namespace Flixball/Display {
         });
         MutList.toList(lines)
     }
-
-    ///
-    /// Clears then screen and then displays the board. The cursor will be left
-    /// at the end.
-    ///
-    pub def displayBoard(b: Board): Unit & Impure =
-        resetScreen();
-        b |> boardLines |> List.foreach(println)
-
-    def sleep(): Unit & Impure =
-        import static java.lang.Thread.sleep(Int64): Unit & Impure;
-        sleep(1000i64)
-
-    pub def runBoard(b: Board): Unit & Impure =
-        runGameState(Flixball/Core/GameState.mkGameState(b))
-        
-    pub def runGameState(gs: GameState): Unit & Impure =
-        let GameState(_, _, board) = gs;
-        displayBoard(board);
-        sleep();
-        runGameState(Flixball/Engine.runStep(gs))
 
     def tileStr(idColor: Int32 -> String -> String, t: Tile): String = match t {
         case Wall => "#"
@@ -80,20 +77,4 @@ namespace Flixball/Display {
     def print(s: s): Unit & Impure with ToString[s] = Console.print(s)
 
     def println(s: s): Unit & Impure with ToString[s] = Console.printLine(s)
-
-    def escape(s: String): String =
-        "\u001B${s}"
-
-    def csi(s: String): String =
-        escape("[${s}")
-
-    def setCursor(x: {x::Int32}, y: Int32): Unit & Impure =
-        csi("${y+1};${x.x+1}H") |> print
-    
-    def resetCursor(): Unit & Impure =
-        setCursor(x = 0, 0)
-    
-    def clearScreen(): Unit & Impure =
-        csi("2J") |> print
-
 }
