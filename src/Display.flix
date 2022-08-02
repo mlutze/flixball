@@ -18,14 +18,10 @@ namespace Flixball/Display {
         clearScreen();
         resetCursor()
 
-    ///
-    /// Clears then screen and then displays the board. The cursor will be left
-    /// at the end.
-    ///
-    pub def displayBoard(b: Board): Unit & Impure = region r {
+    def boardLines(b: Board): List[String] = region r {
         let Board(br) = b;
+        let lines = new MutList(r);
         let idColor = mkIdColorMap(b);
-        resetScreen();
         Iterator.range(r, 0, br.rows) |> Iterator.foreach(row -> {
             let sb = StringBuilder.new(r);
             Iterator.range(r, 0, br.cols) |> Iterator.foreach(column -> {
@@ -34,9 +30,18 @@ namespace Flixball/Display {
                     case Some(tile) => StringBuilder.append!(tileStr(idColor, tile), sb)
                 }
             });
-            StringBuilder.toString(sb) |> println
-        })
+            MutList.push!(StringBuilder.toString(sb), lines)
+        });
+        MutList.toList(lines)
     }
+
+    ///
+    /// Clears then screen and then displays the board. The cursor will be left
+    /// at the end.
+    ///
+    pub def displayBoard(b: Board): Unit & Impure =
+        resetScreen();
+        b |> boardLines |> List.foreach(println)
 
     def sleep(): Unit & Impure =
         import static java.lang.Thread.sleep(Int64): Unit & Impure;
