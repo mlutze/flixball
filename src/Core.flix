@@ -109,6 +109,7 @@ namespace Flixball {
             use Flixball/Core.Tile.Person;
             use Flixball/Core/Board.adjust;
             use Flixball/Core/Board.set_;
+            use Flixball/Core/Board.get_;
             use Utils.{|||>};
 
             /// Removes a player from the game.
@@ -158,14 +159,14 @@ namespace Flixball {
                     case None => state0
 
                     // Case 2: Found the player. Change their position in the map and the board.
-                    case Some(Position(_, _, dir)) =>
+                    case Some(Position(row0, col0, dir)) =>
                         let map = map0 |> Map.insert(id, Position(row, col, dir));
-                        let board = (row, col, board0) |||> adjust(tileOpt -> match tileOpt {
-                                case Some(Person(Player(_, _, logic))) => Some(Person(Player(id, dir, logic)))
-                                case other => other
-                            }
-                        );
-                        GameState(states, map, board)
+                        match get_(row0, col0, board0) {
+                            case None => bug!("invalid game state")
+                            case Some(person) =>
+                                let board = board0 |> set_(row0, col0, None) |> set_(row, col, Some(person));
+                                GameState(states, map, board)
+                        }
                 }
             }
 
