@@ -18,7 +18,7 @@ namespace TestDisplay {
     use Flixball/Core.Tile;
     use Flixball/Core.Tile.{Wall, Person};
 
-    use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot};
+    use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot, goAndSpin};
 
     def testBoard01(): Board =
         Board({rows = 5, cols = 5, tiles = Map#{
@@ -40,6 +40,11 @@ namespace TestDisplay {
             (1, 12) => Person(Player(8, West, spinAndShoot(Clockwise)))
         }}) |> Flixball/Core/Board.addBorder
 
+    def testBoard03(): Board =
+        Board({rows = 10, cols = 10, tiles = Map#{
+            (0, 0) => Person(Player(0, North, goAndSpin(id = 0, x = 10, 10)))
+        }}) |> Flixball/Core/Board.addBorder
+
 
     pub def testDisplayBoard01(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard01())
@@ -47,9 +52,15 @@ namespace TestDisplay {
     pub def testDisplayBoard02(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard02())
 
+    pub def testDisplayBoard03(): Unit & Impure =
+        Flixball/Display.displayBoard(testBoard03())
+
     pub def testRunBoard01(): Unit & Impure =
         Flixball/Display.runBoard(1000i64, testBoard01())
 
     pub def testRunBoard02(): Unit & Impure =
         Flixball/Display.runBoard(1000i64, testBoard02())
+
+    pub def testRunBoard03(): Unit & Impure =
+        Flixball/Display.runBoard(1000i64, testBoard03())
 }
