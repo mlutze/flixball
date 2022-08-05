@@ -109,6 +109,7 @@ namespace Flixball {
             use Flixball/Core.Tile.Person;
             use Flixball/Core/Board.adjust;
             use Flixball/Core/Board.set_;
+            use Flixball/Core/Board.get_;
             use Utils.{|||>};
 
             /// Removes a player from the game.
@@ -146,6 +147,26 @@ namespace Flixball {
                             }
                         );
                         GameState(states, map, board)
+                }
+            }
+
+            /// Moves a player to a new position.
+            /// Does not change the direction of the player.
+            pub def movePlayer(id: PlayerId, row: Int32, col: Int32, state0: GameState): GameState = {
+                let GameState(states, map0, board0) = state0;
+                match (map0 |> Map.get(id)) {
+                    // Case 1: No such player. Do nothing.
+                    case None => state0
+
+                    // Case 2: Found the player. Change their position in the map and the board.
+                    case Some(Position(row0, col0, dir)) =>
+                        let map = map0 |> Map.insert(id, Position(row, col, dir));
+                        match get_(row0, col0, board0) {
+                            case None => bug!("invalid game state")
+                            case Some(person) =>
+                                let board = board0 |> set_(row0, col0, None) |> set_(row, col, Some(person));
+                                GameState(states, map, board)
+                        }
                 }
             }
 

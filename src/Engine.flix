@@ -1,6 +1,7 @@
 namespace Flixball/Engine {
     use Flixball/Core.Board;
     use Flixball/Core.Board.Board;
+    use Flixball/Core/Board.get_;
     use Flixball/Core.Direction;
     use Flixball/Core.Direction.East;
     use Flixball/Core.Direction.North;
@@ -43,7 +44,7 @@ namespace Flixball/Engine {
                 }
         }) |> List.toMap;
         // Everything in gamestate except the values in player states is handled in resolve.
-        resolve(moves, GameState(MutMap.toMap(newStates), playerMap0, board))
+        resolve(moves, GameState(MutMap.toMap(newStates), playerMap0, board)) as & Pure
     }
     
     ///
@@ -59,6 +60,7 @@ namespace Flixball/Engine {
         let dead = resolveShots(state0, shooters);
         let state1 = (state0, dead) ||> Set.foldLeft(acc -> match Player(id, _, _) -> Flixball/Core/GameState.removePlayer(id, acc));
         let moves1 = (moves0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
+
         let rotators = moves1
             |> Map.filterMap(m -> match m {
                 case Turn(r) => Some(r)
@@ -66,18 +68,32 @@ namespace Flixball/Engine {
                 case Walk => None
             });
         let state2 = (state1, rotators) ||> Map.foldLeftWithKey(acc -> match Player(id, _, _) -> rot -> Flixball/Core/GameState.rotatePlayer(id, rot, acc));
+        let GameState(_, _, board2) = state2;
 
-        let _movers = moves1
+        let movers = moves1
             |> Map.filter(Eq.eq(Walk))
             |> Map.keysOf;
-        // TODO finish moving
+        let maybeNewPos = movers 
+            |> Set.toList 
+            |> List.filterMap(mover -> getPosition(mover, state2) |> Option.map(match Position(row0, col0, dir) -> (mover, step(row0, col0, dir))))
+            |> List.toMap;
+        let newPos = maybeNewPos 
+            |> Map.filter(match (row, col) -> (board2 |> get_(row, col)) |> Option.isEmpty)
+            |> withUniqueValues;
+        // a new position cannot be a wall, a previous player's position, or a new player's position
+        let state3 = (state2, newPos) ||> Map.foldLeftWithKey(acc -> match Player(id, _, _) -> match (row, col) -> Flixball/Core/GameState.movePlayer(id, row, col, acc));
         
-        state2
+        state3
     }
 
     pub def unsafeGet(k: k, m: Map[k, v]): v with Order[k] = match Map.get(k, m) {
         case None => bug!(":(")
         case Some(v) => v
+    }
+
+    // TODO terribly inefficient but I did not want to enforce order on the values
+    def withUniqueValues(m: Map[k, v]): Map[k, v] with Order[k], Eq[v] = {
+        m |> Map.filter(v1 -> Map.count((_, v2) -> v1 == v2, m) == 1)
     }
 
     /// Returns the set of dead players
