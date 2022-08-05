@@ -149,6 +149,26 @@ namespace Flixball {
                 }
             }
 
+            /// Moves a player to a new position.
+            /// Does not change the direction of the player.
+            pub def movePlayer(id: PlayerId, row: Int32, col: Int32, state0: GameState): GameState = {
+                let GameState(states, map0, board0) = state0;
+                match (map0 |> Map.get(id)) {
+                    // Case 1: No such player. Do nothing.
+                    case None => state0
+
+                    // Case 2: Found the player. Change their position in the map and the board.
+                    case Some(Position(_, _, dir)) =>
+                        let map = map0 |> Map.insert(id, Position(row, col, dir));
+                        let board = (row, col, board0) |||> adjust(tileOpt -> match tileOpt {
+                                case Some(Person(Player(_, _, logic))) => Some(Person(Player(id, dir, logic)))
+                                case other => other
+                            }
+                        );
+                        GameState(states, map, board)
+                }
+            }
+
             pub def initialStates(players: List[PlayerId]): Map[PlayerId, (Int32, Map[String, String])] =
                 players |> List.map(p -> {
                     (p, Flixball/Core.initialPlayerState())

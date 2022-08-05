@@ -1,6 +1,7 @@
 namespace Flixball/Engine {
     use Flixball/Core.Board;
     use Flixball/Core.Board.Board;
+    use Flixball/Core/Board.get_;
     use Flixball/Core.Direction;
     use Flixball/Core.Direction.East;
     use Flixball/Core.Direction.North;
@@ -66,18 +67,33 @@ namespace Flixball/Engine {
                 case Walk => None
             });
         let state2 = (state1, rotators) ||> Map.foldLeftWithKey(acc -> match Player(id, _, _) -> rot -> Flixball/Core/GameState.rotatePlayer(id, rot, acc));
+        let GameState(_, _, board2) = state2;
 
-        let _movers = moves1
+        let movers = moves1
             |> Map.filter(Eq.eq(Walk))
             |> Map.keysOf;
-        // TODO finish moving
+        let maybeNewPos = movers 
+            |> Set.toList 
+            |> List.filterMap(mover -> getPosition(mover, state2) |> Option.map(pos -> (mover, pos)))
+            |> List.toMap;
+        let newPos = maybeNewPos 
+            |> Map.filter(match Position(row, col, _) -> (board2 |> get_(row, col)) |> Option.isEmpty)
+            |> Map.map(match Position(row, col, _) -> (row, col))
+            |> withUniqueValues;
+        // a new position cannot be a wall, a previous player's position, or a new player's position
+        let state3 = (state2, newPos) ||> Map.foldLeftWithKey(acc -> match Player(id, _, _) -> match (row, col) -> Flixball/Core/GameState.movePlayer(id, row, col, acc));
         
-        state2
+        state3
     }
 
     pub def unsafeGet(k: k, m: Map[k, v]): v with Order[k] = match Map.get(k, m) {
         case None => bug!(":(")
         case Some(v) => v
+    }
+
+    // TODO terribly inefficient but I did not want to enforce order on the values
+    def withUniqueValues(m: Map[k, v]): Map[k, v] with Order[k], Eq[v] = {
+        m |> Map.filter(v1 -> not Map.exists((_, v2) -> v1 == v2, m))
     }
 
     /// Returns the set of dead players
