@@ -40,7 +40,7 @@ namespace Flixball/Engine {
                         let (moveToDo, i, m) = move(gs, i0, m0);
                         MutMap.put!(id, (i, m), newStates);
                         (p, moveToDo)
-                    case None => unreachable!()
+                    case None => ?unreachable
                 }
         }) |> List.toMap;
         // Everything in gamestate except the values in player states is handled in resolve.

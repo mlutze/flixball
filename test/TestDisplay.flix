@@ -42,7 +42,23 @@ namespace TestDisplay {
 
     def testBoard03(): Board =
         Board({rows = 10, cols = 10, tiles = Map#{
-            (0, 0) => Person(Player(0, North, goAndSpin(id = 0, x = 10, 10)))
+            (0, 0) => Person(Player(0, North, goAndSpin(id = 0, x = 10, 10))),
+            (0, 2) => Wall,
+            (1, 2) => Wall,
+            (2, 2) => Wall,
+            (3, 2) => Wall,
+            (5, 0) => Wall,
+            (5, 1) => Wall,
+            (5, 2) => Wall,
+            (5, 3) => Wall,
+            (5, 4) => Wall,
+            (5, 5) => Wall,
+            (5, 6) => Wall,
+            (5, 7) => Wall,
+            (4, 5) => Wall,
+            (3, 5) => Wall,
+            (7, 9) => Wall,
+            (7, 8) => Wall
         }}) |> Flixball/Core/Board.addBorder
 
 
@@ -56,11 +72,11 @@ namespace TestDisplay {
         Flixball/Display.displayBoard(testBoard03())
 
     pub def testRunBoard01(): Unit & Impure =
-        Flixball/Display.runBoard(1000i64, testBoard01())
+        Flixball/Display.runBoard(500i64, testBoard01())
 
     pub def testRunBoard02(): Unit & Impure =
-        Flixball/Display.runBoard(1000i64, testBoard02())
+        Flixball/Display.runBoard(500i64, testBoard02())
 
     pub def testRunBoard03(): Unit & Impure =
-        Flixball/Display.runBoard(1000i64, testBoard03())
+        Flixball/Display.runBoard(500i64, testBoard03())
 }
