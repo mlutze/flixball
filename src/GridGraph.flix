@@ -8,7 +8,7 @@ namespace Flixball/GridGraph {
     ///
     pub def findShortestPath(available: Coordinate -> Bool \ ef,
         start: {start :: Coordinate}, end: Coordinate): Option[List[Coordinate]] \ ef =
-    region r {
+    region r { if (start.start == end) Some(Nil) else {
         // bfs
         let dists: MutMap[Coordinate, Int32, r] = new MutMap(r);
         MutMap.put!(start.start, 0, dists);
@@ -19,7 +19,7 @@ namespace Flixball/GridGraph {
                 foreach(next <- possibleMoves(r, current)) {
                     if (available(next)) {
                         let currentLength = match MutMap.get(current, dists) {
-                            case None => unreachable!()
+                            case None => ?unreachable
                             case Some(v) => v
                         };
                         if (MutMap.get(next, dists) |> Option.isEmpty) {
@@ -39,7 +39,7 @@ namespace Flixball/GridGraph {
         // construct the path list, end to start
         def stepBack(c) = {
             let cLength = match MutMap.get(c, dists) {
-                case None => unreachable!()
+                case None => ?unreachable
                 case Some(l) => l
             };
             if (cLength == 1) None else
@@ -50,13 +50,13 @@ namespace Flixball/GridGraph {
                     Option.foreach(d -> if (d == cLength - 1) res := Some(next) else ())
             };
             match deref res {
-                case None => unreachable!()
+                case None => ?unreachable
                 case Some(value) => Some(value)
             }
         };
         let revPathList = List.unfold(c ->  stepBack(c) |> Option.map(next -> (next, next)), end);
-        Some(List.reverse(revPathList))
-    }
+        Some(List.reverse(end :: revPathList))
+    }}
 
     def possibleMoves(r: Region[r], c: Coordinate): Iterator[Coordinate, r] \ r =
         let x = fst(c);

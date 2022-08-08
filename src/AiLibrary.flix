@@ -34,7 +34,7 @@ namespace Flixball/AiLibrary {
     pub def goAndSpin(id: {id::Int32}, x: {x :: Int32}, y: Int32): MoveLogic =
         MoveLogic(match GameState(_, playerMap, board) -> (i0, m0) -> {
             let currentPosition = match playerMap |> Map.get(id.id) {
-                case None => unreachable!()
+                case None => ?unreachable
                 case Some(v) => v
             };
             let move = goTo(currentPosition, x = x.x, y, board) |> Option.getWithDefault(Turn(Clockwise));
@@ -43,7 +43,7 @@ namespace Flixball/AiLibrary {
 
     // Utilities
 
-    pub def goTo(p: Position, x: {x :: Int32}, y: Int32, b: Board): Option[Move] =
+    pub def goTo(p: Position, x: {x :: Int32}, y: Int32, b: Board): Option[Move] = {
         use Option.flatMap;
 
         let Board(br) = b;
@@ -60,13 +60,14 @@ namespace Flixball/AiLibrary {
             case (-1, 0 ) => North
             case (0 , 1 ) => East
             case (0 , -1) => West
-            case _ => unreachable!()
+            case _ => ?unreachable
         };
         match rotateTowardsDir(current=direction, neededDirection) {
             case Nothing => Some(Walk)
             case MustTurn(rot) => Some(Turn(rot))
             case Either => Some(Turn(Clockwise))
         }
+    }
 
     pub enum DirectionChoice with Eq {
         case Nothing
