@@ -22,4 +22,12 @@ namespace Utils {
             x
         } else x
     }
+
+    @Unsafe
+    pub def dbgAny(msg: String, cond: a -> Bool \ ef1, toStr: a -> String \ ef2, x: a): a \ {ef1, ef2} = {
+        if (cond(x)) {
+            println("${msg}: ${toStr(x)}") as \ ef2;
+            x
+        } else x
+    }
 }

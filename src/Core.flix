@@ -243,28 +243,33 @@ namespace Flixball {
             ///
             /// Creates a pseudo-random board from the seed with an average wall
             /// density of `density` in the range [0.0, 1.0]. The map will have
-            /// an encompasing border.
+            /// an encompasing border.  
             ///
-            pub def randomBoard(seed: Int64, rows: {rows::Int32}, cols: Int32, density: Float32): Board = region r {
-                let noise = Flixball/Noise.noise2d(r, width=rows.rows, height=cols, seed);
-                let correctedDensity = density |> Float32.min(1.0f32) |> Float32.max(0.0f32);
-                let densityBoundf32 = (Int32.toFloat32(Int32.maxValue()) * correctedDensity) |> Float32.floor;
-                let densityBound = match Float32.tryToInt32(densityBoundf32) {
-                    case None => ?unreachable
-                    case Some(v) => v
-                };
+            pub def randomBoard(seed: Int64, rows: {rows::Int32}, cols: Int32, density: Float64): Board = region r {
+                let grid = Flixball/Noise.boolNoise2d(r, {width=rows.rows, height=cols}, seed, density);
+                Board({rows=rows.rows, cols=cols, tiles=gridToMap(grid)}) |> addBorder
+            }
+
+            ///
+            /// Cellular Automata Refinement.
+            /// sensible defaults, prob=0.40, iterations=3
+            ///
+            pub def automataBoard(seed: Int64, rows: {rows::Int32}, cols: Int32, density: Float64, iterations: Int32): Board = region r {
+                let grid = Flixball/Noise.cellularGeneration(r, {width=rows.rows, height=cols}, seed, density, iterations);
+                Board({rows=rows.rows, cols=cols, tiles=gridToMap(grid)}) |> addBorder
+            }
+
+            def gridToMap(g: Array[Array[Bool, r], r]): Map[(Int32, Int32), Tile] \ Read(r) =
+                let r = Scoped.regionOf(g);
                 let mutTiles = new MutMap(r);
                 foreach(
-                    (arr, x) <- (Array.iterator(noise) |> Iterator.enumerator);
-                    (value, y) <- Array.iterator(arr) |> Iterator.enumerator)
+                    (arr, x) <- Array.enumerator(g);
+                    (b, y) <- Array.enumerator(arr))
                 {
-                    if (value < densityBound)
-                        mutTiles |> MutMap.put!((x, y), Wall)
+                    if (b) mutTiles |> MutMap.put!((x, y), Wall)
                     else ()
                 };
-                let tiles = MutMap.toMap(mutTiles);
-                Board({rows=rows.rows, cols=cols, tiles=tiles}) |> addBorder
-            }
+                MutMap.toMap(mutTiles)
 
             pub def players(b: Board): List[Player] =
                 let Board(br) = b;

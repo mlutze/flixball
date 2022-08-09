@@ -1,7 +1,7 @@
 namespace TestDisplay {
     use Flixball/Core.Board;
     use Flixball/Core.Board.{Board};
-    use Flixball/Core/Board.randomBoard;
+    use Flixball/Core/Board.{randomBoard, automataBoard};
     use Flixball/Core.Direction;
     use Flixball/Core.Direction.{North, West, South, East};
     use Flixball/Core.GameState;
@@ -63,7 +63,10 @@ namespace TestDisplay {
         }}) |> Flixball/Core/Board.addBorder
 
     pub def testBoard04(): Board =
-        randomBoard(719_657i64, rows=15, 10, 0.3f32)
+        randomBoard(719_657i64, rows=15, 10, 0.3)
+    
+    pub def testBoard05(): Board =
+        automataBoard(285_041_125i64, rows=25, 40, 0.38, 3)
 
     // Test Scenarios
 
@@ -87,4 +90,7 @@ namespace TestDisplay {
 
     pub def testDisplayBoard04(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard04())
+
+    pub def testDisplayBoard05(): Unit & Impure =
+        Flixball/Display.displayBoard(testBoard05())
 }
