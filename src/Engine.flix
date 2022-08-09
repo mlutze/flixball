@@ -44,7 +44,7 @@ namespace Flixball/Engine {
                 }
         }) |> List.toMap;
         // Everything in gamestate except the values in player states is handled in resolve.
-        resolve(moves, GameState(MutMap.toMap(newStates), playerMap0, board)) as & Pure
+        resolve(moves, GameState(MutMap.toMap(newStates), playerMap0, board))
     }
     
     ///
