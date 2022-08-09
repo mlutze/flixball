@@ -230,10 +230,12 @@ namespace Flixball {
                 };
                 // Add border walls
                 foreach(i <- Iterator.range(r, 0, cols)) {
-                    MutMap.put!((i, 0), Wall, translatedMap);
-                    MutMap.put!((i, cols-1), Wall, translatedMap);
                     MutMap.put!((0, i), Wall, translatedMap);
                     MutMap.put!((rows-1, i), Wall, translatedMap)
+                };
+                foreach(i <- Iterator.range(r, 0, rows)) {
+                    MutMap.put!((i, 0), Wall, translatedMap);
+                    MutMap.put!((i, cols-1), Wall, translatedMap)
                 };
                 Board({rows = rows, cols = cols, tiles = MutMap.toMap(translatedMap)})
             }
