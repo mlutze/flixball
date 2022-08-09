@@ -1,23 +1,95 @@
 namespace Flixball/Noise {
 
+    pub type alias Grid[t: Type, r: Region] = Array[Array[t, r], r]
+
+    pub type alias Dimensions = {width :: Int32, height :: Int32} 
+
+    def createGrid(r: Region[r], f: (Int32, Int32) -> t \ ef, d: Dimensions): Grid[t, r] \ {Write(r), ef} =
+        use Array.init;
+        init(r, x -> init(r, y -> f(x, y), d.height), d.width)
+
     ///
     /// Returns a two-dimensional array of random values >= 0.
     ///
-    pub def noise2d(r: Region[r], width: {width::Int32}, height: {height::Int32}, seed: Int64): Array[Array[Int32, r], r] \ r = region r1 {
-        let w = width.width; let h = height.height;
+    pub def int32Noise2d(r: Region[r], d: Dimensions, seed: Int64): Grid[Int32, r] \ Write(r) = region r1 {
         // avoid r1 being unused
         let _ = r1;
         // This is a safe cast to r since the call sequence to rand is fixed.
         let rand = Random.newWithSeed(seed) as \ r1;
-        let nextInt = Random.nextInt32 as Random.Random -> Int32 \ r1;
-        let arr = Array.init(r, _ -> Array.repeat(r, h, 0), w);
-        foreach(
-            x <- Iterator.range(r, 0, w);
-            y <- Iterator.range(r, 0, h))
-        {
-            arr[x][y] = nextInt(rand) |> Int32.abs
-        };
-        arr
+        let next = Random.nextInt32 as Random.Random -> Int32 \ r1;
+        createGrid(r, (_, _) -> Int32.abs(next(rand)), d)
     }
+
+    ///
+    /// boolean noise with `prob` probability of `true`.
+    /// prob is between 0 and 1 inclusive.
+    ///
+    pub def boolNoise2d(r: Region[r], d: Dimensions, seed: Int64, prob: Float64): Grid[Bool, r] \ Write(r) = region r1 {
+        // avoid r1 being unused
+        let _ = r1;
+        // This is a safe cast to r since the call sequence to rand is fixed.
+        let rand = Random.newWithSeed(seed) as \ Write(r1);
+        let next = x -> Random.nextFloat64(x) as \ {Read(r1), Write(r1)};
+
+        // sample function
+        let clampedProb = prob |> Float64.min(1.0) |> Float64.max(0.0);
+        def sample() = {
+            let randPosFloat = next(rand) |> Float64.abs;
+            randPosFloat < clampedProb
+        };
+        createGrid(r, (_, _) -> sample(), d)
+    }
+
+    ///
+    /// Cellular Automata Refinement.
+    /// sensible defaults, prob=0.40, iterations=3
+    ///
+    pub def cellularGeneration(r: Region[r], d: Dimensions, seed: Int64, prob: Float64, iterations: Int32): Grid[Bool, r] \ Write(r) = region r1 {
+        let floorToWallReq = 4;
+        let wallToFloorReq = 3;
+
+        let current = ref boolNoise2d(r, d, seed, prob) @ r1;
+        let isWall = p -> (deref current)[p.x][p.y];
+        let swap = ref createGrid(r, (_, _) -> false, d) @ r1;
+        // perform automation step in current, storing the result in swap,
+        // and the swapping them.
+        def simulationStep(iteration) = if (iteration <= 0) () else {
+            foreach(
+                (arr, x) <- Array.enumerator(deref current);
+                (_, y) <- Array.enumerator(arr))
+            {
+                let p = {x = x, y = y};
+                let nbh = mooreNeighborhood(p, d);
+                let oob = 8 - List.length(nbh);
+                let wallCount = nbh |> List.count(isWall);
+                if (isWall(p)) {
+                    // stays true/wall if there is enough nearby walls
+                    // and vice versa
+                    (deref swap)[x][y] = oob+wallCount >= wallToFloorReq
+                } else {
+                    // floor/false swaps to wall if there are enough nearby
+                    // walls and vice versa
+                    (deref swap)[x][y] = oob+wallCount > floorToWallReq
+                }
+            };
+            let tmp = deref current;
+            current := deref swap;
+            swap := tmp;
+            simulationStep(iteration-1)
+        };
+        simulationStep(iterations);
+        deref current
+    }
+
+    def mooreNeighborhood(p: {x::Int32, y::Int32}, d: Dimensions): List[{x::Int32, y::Int32}] =
+        let inbound = px -> px.x >= 0 and px.x < d.width and px.y >= 0 and px.y < d.height;
+        let self = px -> px.x == p.x and px.y == p.y;
+        let offsets = List.range(-1, 2);
+        offsets |> List.flatMap(xset ->
+            offsets |> List.filterMap(yset ->
+                let nb = {x=p.x + xset, y=p.y + yset};
+                if (inbound(nb) and not self(nb)) Some(nb) else None
+            )
+        )
 
 }
