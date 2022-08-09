@@ -1,6 +1,7 @@
 namespace TestDisplay {
     use Flixball/Core.Board;
     use Flixball/Core.Board.{Board};
+    use Flixball/Core/Board.randomBoard;
     use Flixball/Core.Direction;
     use Flixball/Core.Direction.{North, West, South, East};
     use Flixball/Core.GameState;
@@ -61,22 +62,29 @@ namespace TestDisplay {
             (7, 8) => Wall
         }}) |> Flixball/Core/Board.addBorder
 
+    pub def testBoard04(): Board =
+        randomBoard(719_657i64, rows=15, 10, 0.2f32) |>
+            Flixball/Core/Board.addBorder
+
 
     pub def testDisplayBoard01(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard01())
 
-    pub def testDisplayBoard02(): Unit & Impure =
-        Flixball/Display.displayBoard(testBoard02())
-
-    pub def testDisplayBoard03(): Unit & Impure =
-        Flixball/Display.displayBoard(testBoard03())
-
     pub def testRunBoard01(): Unit & Impure =
         Flixball/Display.runBoard(500i64, testBoard01())
+
+    pub def testDisplayBoard02(): Unit & Impure =
+        Flixball/Display.displayBoard(testBoard02())
 
     pub def testRunBoard02(): Unit & Impure =
         Flixball/Display.runBoard(500i64, testBoard02())
 
+    pub def testDisplayBoard03(): Unit & Impure =
+        Flixball/Display.displayBoard(testBoard03())
+
     pub def testRunBoard03(): Unit & Impure =
         Flixball/Display.runBoard(500i64, testBoard03())
+
+    pub def testDisplayBoard04(): Unit & Impure =
+        Flixball/Display.displayBoard(testBoard04())
 }

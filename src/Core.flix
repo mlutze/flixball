@@ -238,6 +238,31 @@ namespace Flixball {
                 Board({rows = rows, cols = cols, tiles = MutMap.toMap(translatedMap)})
             }
 
+            ///
+            /// Creates a pseudo-random board from the seed with an average wall
+            /// density of `density` in the range [0.0, 1.0].
+            ///
+            pub def randomBoard(seed: Int64, rows: {rows::Int32}, cols: Int32, density: Float32): Board = region r {
+                let noise = Flixball/Noise.noise2d(r, width=rows.rows, height=cols, seed);
+                let correctedDensity = density |> Float32.min(1.0f32) |> Float32.max(0.0f32);
+                let densityBoundf32 = (Int32.toFloat32(Int32.maxValue()) * correctedDensity) |> Float32.floor;
+                let densityBound = match Float32.tryToInt32(densityBoundf32) {
+                    case None => ?unreachable
+                    case Some(v) => v
+                };
+                let mutTiles = new MutMap(r);
+                foreach(
+                    (arr, x) <- (Array.iterator(noise) |> Iterator.enumerator);
+                    (value, y) <- Array.iterator(arr) |> Iterator.enumerator)
+                {
+                    if (value < densityBound)
+                        mutTiles |> MutMap.put!((x, y), Wall)
+                    else ()
+                };
+                let tiles = MutMap.toMap(mutTiles);
+                Board({rows=rows.rows, cols=cols, tiles=tiles})
+            }
+
             pub def players(b: Board): List[Player] =
                 let Board(br) = b;
                 br.tiles |> Map.valuesOf |> List.filterMap(t -> match t {
