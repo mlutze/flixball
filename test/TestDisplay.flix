@@ -63,9 +63,9 @@ namespace TestDisplay {
         }}) |> Flixball/Core/Board.addBorder
 
     pub def testBoard04(): Board =
-        randomBoard(719_657i64, rows=15, 10, 0.2f32) |>
-            Flixball/Core/Board.addBorder
+        randomBoard(719_657i64, rows=15, 10, 0.3f32)
 
+    // Test Scenarios
 
     pub def testDisplayBoard01(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard01())

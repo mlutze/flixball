@@ -242,7 +242,8 @@ namespace Flixball {
 
             ///
             /// Creates a pseudo-random board from the seed with an average wall
-            /// density of `density` in the range [0.0, 1.0].
+            /// density of `density` in the range [0.0, 1.0]. The map will have
+            /// an encompasing border.
             ///
             pub def randomBoard(seed: Int64, rows: {rows::Int32}, cols: Int32, density: Float32): Board = region r {
                 let noise = Flixball/Noise.noise2d(r, width=rows.rows, height=cols, seed);
@@ -262,7 +263,7 @@ namespace Flixball {
                     else ()
                 };
                 let tiles = MutMap.toMap(mutTiles);
-                Board({rows=rows.rows, cols=cols, tiles=tiles})
+                Board({rows=rows.rows, cols=cols, tiles=tiles}) |> addBorder
             }
 
             pub def players(b: Board): List[Player] =
