@@ -48,12 +48,12 @@ namespace Flixball/Engine {
     }
     
     ///
-    /// Resolve in order:
+    /// Resolves the given moves on the gamestate in the order:
     ///     shoot
     ///     rotate
     ///     move
     ///
-    pub def resolve(moves0: Map[Player, Move], state0: GameState): GameState = {
+    def resolve(moves0: Map[Player, Move], state0: GameState): GameState = {
         let shooters = moves0 
             |> Map.filter(Eq.eq(Shoot)) 
             |> Map.keysOf;
@@ -86,23 +86,25 @@ namespace Flixball/Engine {
         state3
     }
 
-    pub def unsafeGet(k: k, m: Map[k, v]): v with Order[k] = match Map.get(k, m) {
-        case None => bug!(":(")
-        case Some(v) => v
-    }
-
-    // TODO terribly inefficient but I did not want to enforce order on the values
+    ///
+    /// Returns the set where values that appear more than once are removed.
+    ///
     def withUniqueValues(m: Map[k, v]): Map[k, v] with Order[k], Eq[v] = {
+        // TODO terribly inefficient but I did not want to enforce order on the values
         m |> Map.filter(v1 -> Map.count((_, v2) -> v1 == v2, m) == 1)
     }
 
-    /// Returns the set of dead players
-    pub def resolveShots(state: GameState, shooters: Set[Player]): Set[Player] = {
+    ///
+    /// Returns the set of dead players.
+    ///
+    def resolveShots(state: GameState, shooters: Set[Player]): Set[Player] = {
         shooters |> Set.flatMap(resolveShot(state) >> Option.toSet) 
     }
 
-
-    pub def resolveShot(state: GameState, shooter: Player): Option[Player] = {
+    ///
+    /// Returns the player killed by the shot.
+    ///
+    def resolveShot(state: GameState, shooter: Player): Option[Player] = {
         let GameState(_, _, board) = state;
         use Option.flatMap;
         let* Position(row, col, dir) = getPosition(shooter, state);
@@ -114,14 +116,20 @@ namespace Flixball/Engine {
         }
     }
 
-    pub def step(row: Int32, col: Int32, dir: Direction): (Int32, Int32) = match dir {
+    ///
+    /// Returns the coordinates one step in the given direction.
+    ///
+    def step(row: Int32, col: Int32, dir: Direction): (Int32, Int32) = match dir {
         case North => (row - 1, col)
         case East => (row, col + 1)
         case South => (row + 1, col)
         case West => (row, col - 1)
     }
 
-    pub def raytrace(dir: Direction, row: Int32, col: Int32, board: Board): Option[Tile] = {
+    ///
+    /// Finds the first nonempty tile tracing in the given direction.
+    ///
+    def raytrace(dir: Direction, row: Int32, col: Int32, board: Board): Option[Tile] = {
         let Board(rec) = board;
         let rows = rec.rows;
         let cols = rec.cols;
@@ -140,7 +148,10 @@ namespace Flixball/Engine {
         }
     }
 
-    pub def getPosition(p: Player, state: GameState): Option[Position] = {
+    ///
+    /// Gets the position of the given player.
+    ///
+    def getPosition(p: Player, state: GameState): Option[Position] = {
         let Player.Player(id, _, _) = p;
         let GameState(_, players, _) = state;
         use Option.flatMap;
