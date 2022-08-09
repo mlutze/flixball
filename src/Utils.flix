@@ -2,4 +2,24 @@ namespace Utils {
     pub def |||>(triple: (a, b, c), f: (a, b, c) -> d): d =
         let (a, b, c) = triple;
         f(a, b, c)
+    
+    @Unsafe
+    pub def dbg(x: a): a with ToString[a] = {
+        println(x);
+        x
+    } as \ {}
+    
+    @Unsafe
+    pub def dbgMsg(msg: String, x: a): a with ToString[a] = {
+        println("${msg}: ${x}");
+        x
+    } as \ {}
+
+    @Unsafe
+    pub def dbgCond(msg: String, cond: a -> Bool \ ef, x: a): a \ ef with ToString[a] = {
+        if (cond(x)) {
+            println("${msg}: ${x}") as \ ef;
+            x
+        } else x
+    }
 }
