@@ -2,6 +2,8 @@ namespace Flixball/Engine {
     use Flixball/Core.Board;
     use Flixball/Core.Board.Board;
     use Flixball/Core/Board.get_;
+    use Flixball/Core.Coordinates;
+    use Flixball/Core.Coordinates.Coordinates;
     use Flixball/Core.Direction;
     use Flixball/Core.Direction.East;
     use Flixball/Core.Direction.North;
@@ -75,13 +77,13 @@ namespace Flixball/Engine {
             |> Map.keysOf;
         let maybeNewPos = movers 
             |> Set.toList 
-            |> List.filterMap(mover -> getPosition(mover, state2) |> Option.map(match Position(row0, col0, dir) -> (mover, step(row0, col0, dir))))
+            |> List.filterMap(mover -> getPosition(mover, state2) |> Option.map(match Position(coords, dir) -> (mover, step(coords, dir))))
             |> List.toMap;
         let newPos = maybeNewPos 
-            |> Map.filter(match (row, col) -> (board2 |> get_(row, col)) |> Option.isEmpty)
+            |> Map.filter(coords -> (board2 |> get_(coords)) |> Option.isEmpty)
             |> withUniqueValues;
         // a new position cannot be a wall, a previous player's position, or a new player's position
-        let state3 = (state2, newPos) ||> Map.foldLeftWithKey(acc -> match Player(id, _, _) -> match (row, col) -> Flixball/Core/GameState.movePlayer(id, row, col, acc));
+        let state3 = (state2, newPos) ||> Map.foldLeftWithKey(acc -> match Player(id, _, _) -> coords -> Flixball/Core/GameState.movePlayer(id, coords, acc));
         
         state3
     }
@@ -107,9 +109,9 @@ namespace Flixball/Engine {
     def resolveShot(state: GameState, shooter: Player): Option[Player] = {
         let GameState(_, _, board) = state;
         use Option.flatMap;
-        let* Position(row, col, dir) = getPosition(shooter, state);
-        let (r, c) = step(row, col, dir);
-        match raytrace(dir, r, c, board) {
+        let* Position(coords0, dir) = getPosition(shooter, state);
+        let coords = step(coords0, dir);
+        match raytrace(dir, coords, board) {
             case Some(Person(p)) => Some(p)
             case Some(Wall) => None
             case None => None
@@ -119,17 +121,21 @@ namespace Flixball/Engine {
     ///
     /// Returns the coordinates one step in the given direction.
     ///
-    def step(row: Int32, col: Int32, dir: Direction): (Int32, Int32) = match dir {
-        case North => (row - 1, col)
-        case East => (row, col + 1)
-        case South => (row + 1, col)
-        case West => (row, col - 1)
+    def step(coords: Coordinates, dir: Direction): (Int32, Int32) = {
+        let (row, col) = coords;
+        match dir {
+            case North => (row - 1, col)
+            case East => (row, col + 1)
+            case South => (row + 1, col)
+            case West => (row, col - 1)
+        }
     }
 
     ///
     /// Finds the first nonempty tile tracing in the given direction.
     ///
-    def raytrace(dir: Direction, row: Int32, col: Int32, board: Board): Option[Tile] = {
+    def raytrace(dir: Direction, coords0: Coordinates, board: Board): Option[Tile] = {
+        let (row, col) = coords0;
         let Board(rec) = board;
         let rows = rec.rows;
         let cols = rec.cols;
@@ -139,10 +145,10 @@ namespace Flixball/Engine {
         } else if (col < 0 or col >= cols) {
             None
         } else {
-            match (tiles |> Map.get((row, col))) {
+            match (tiles |> Map.get(coords0)) {
                 case None =>
-                    let (r, c) = step(row, col, dir);
-                    raytrace(dir, r, c, board)
+                    let coords = step(coords0, dir);
+                    raytrace(dir, coords, board)
                 case Some(tile) => Some(tile)
             }
         }

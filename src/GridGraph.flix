@@ -1,16 +1,17 @@
 namespace Flixball/GridGraph {
 
-    pub type alias Coordinate = (Int32, Int32)
+    use Flixball/Core.Coordinates;
+    use Flixball/Core.Coordinates.Coordinates;
 
     ///
     /// It is assumed that `available` keeps the search space finite.
     /// This function might otherwise not halt.
     ///
-    pub def findShortestPath(available: Coordinate -> Bool \ ef,
-        start: {start :: Coordinate}, end: Coordinate): Option[List[Coordinate]] \ ef =
+    pub def findShortestPath(available: Coordinates -> Bool \ ef,
+        start: {start :: Coordinates}, end: Coordinates): Option[List[Coordinates]] \ ef =
     region r { if (start.start == end) Some(Nil) else {
         // bfs
-        let dists: MutMap[Coordinate, Int32, r] = new MutMap(r);
+        let dists: MutMap[Coordinates, Int32, r] = new MutMap(r);
         MutMap.put!(start.start, 0, dists);
         let taskList = new MutDeque(r);
         MutDeque.pushBack(start.start, taskList);
@@ -58,7 +59,7 @@ namespace Flixball/GridGraph {
         Some(List.reverse(end :: revPathList))
     }}
 
-    def possibleMoves(r: Region[r], c: Coordinate): Iterator[Coordinate, r] \ r =
+    def possibleMoves(r: Region[r], c: Coordinates): Iterator[Coordinates, r] \ r =
         let x = fst(c);
         let y = snd(c);
         let coordinates = (x, y+1) :: (x, y-1) :: (x+1, y) :: (x-1, y) :: Nil;
