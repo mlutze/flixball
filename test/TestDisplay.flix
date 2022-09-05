@@ -43,7 +43,7 @@ namespace TestDisplay {
 
     def testBoard03(): Board =
         Board({rows = 10, cols = 10, tiles = Map#{
-            (0, 0) => Person(Player(0, North, goAndSpin(id = 0, x = 10, 10))),
+            (0, 0) => Person(Player(0, North, goAndSpin(id = 0, (10, 10)))),
             (0, 2) => Wall,
             (1, 2) => Wall,
             (2, 2) => Wall,

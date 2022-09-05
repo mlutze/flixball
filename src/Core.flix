@@ -3,6 +3,8 @@ namespace Flixball {
 
         pub type alias PlayerId = Int32
 
+        pub type alias Coordinates = (Int32, Int32)
+
 
         ///
         /// Board uses matrix-like index ordering. Map entries should not be out
@@ -22,7 +24,7 @@ namespace Flixball {
         /// North, East, South, West correspond to the drawing above, likewise
         /// with Clockwise and Counterclockwise.
         /// 
-        pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[(Int32, Int32), Tile]})
+        pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[Coordinates, Tile]})
 
         pub enum Direction with Eq {
             case North
@@ -73,7 +75,7 @@ namespace Flixball {
 
         }
 
-        pub enum Position(Int32, Int32, Direction)
+        pub enum Position(Coordinates, Direction)
 
         pub enum GameState(
             Map[PlayerId, (Int32, Map[String, String])],
@@ -97,6 +99,8 @@ namespace Flixball {
 
         namespace GameState {
             use Flixball/Core.Board;
+            use Flixball/Core.Coordinates;
+            use Flixball/Core.Coordinates.Coordinates;
             use Flixball/Core.GameState;
             use Flixball/Core.GameState.GameState;
             use Flixball/Core.Player.Player;
@@ -121,10 +125,10 @@ namespace Flixball {
                     case None => state0
 
                     // Case 2: Found the player. Remove from the map, the board, and the states.
-                    case Some(Position(row, col, _)) =>
+                    case Some(Position(coords, _)) =>
                         let map = map0 |> Map.remove(id);
                         let states = states0 |> Map.remove(id);
-                        let board = board0 |> set_(row, col, None);
+                        let board = board0 |> set_(coords, None);
                         GameState(states, map, board)
                 }
             }
@@ -138,10 +142,10 @@ namespace Flixball {
                     case None => state0
 
                     // Case 2: Found the player. Change their direction in the map and the board.
-                    case Some(Position(row, col, dir0)) =>
+                    case Some(Position(coords, dir0)) =>
                         let dir = dir0 |> rotateDir(rot);
-                        let map = map0 |> Map.insert(id, Position(row, col, dir));
-                        let board = (row, col, board0) |||> adjust(tileOpt -> match tileOpt {
+                        let map = map0 |> Map.insert(id, Position(coords, dir));
+                        let board = (coords, board0) ||> adjust(tileOpt -> match tileOpt {
                                 case Some(Person(Player(_, _, logic))) => Some(Person(Player(id, dir, logic)))
                                 case other => other
                             }
@@ -152,19 +156,19 @@ namespace Flixball {
 
             /// Moves a player to a new position.
             /// Does not change the direction of the player.
-            pub def movePlayer(id: PlayerId, row: Int32, col: Int32, state0: GameState): GameState = {
+            pub def movePlayer(id: PlayerId, coords: Coordinates, state0: GameState): GameState = {
                 let GameState(states, map0, board0) = state0;
                 match (map0 |> Map.get(id)) {
                     // Case 1: No such player. Do nothing.
                     case None => state0
 
                     // Case 2: Found the player. Change their position in the map and the board.
-                    case Some(Position(row0, col0, dir)) =>
-                        let map = map0 |> Map.insert(id, Position(row, col, dir));
-                        match get_(row0, col0, board0) {
+                    case Some(Position(coords0, dir)) =>
+                        let map = map0 |> Map.insert(id, Position(coords, dir));
+                        match get_(coords0, board0) {
                             case None => bug!("invalid game state")
                             case Some(person) =>
-                                let board = board0 |> set_(row0, col0, None) |> set_(row, col, Some(person));
+                                let board = board0 |> set_(coords0, None) |> set_(coords, Some(person));
                                 GameState(states, map, board)
                         }
                 }
@@ -187,6 +191,8 @@ namespace Flixball {
         namespace Board {
             use Flixball/Core.Board;
             use Flixball/Core.Board.Board;
+            use Flixball/Core.Coordinates;
+            use Flixball/Core.Coordinates.Coordinates;
             use Flixball/Core.Player;
             use Flixball/Core.Player.{Player};
             use Flixball/Core.PlayerId;
@@ -195,23 +201,23 @@ namespace Flixball {
             use Flixball/Core.Tile;
             use Flixball/Core.Tile.{Person, Wall};
 
-            pub def set_(row: Int32, col: Int32, tile: Option[Tile], board0: Board): Board = {
+            pub def set_(coords: Coordinates, tile: Option[Tile], board0: Board): Board = {
                 let Board(rec0) = board0;
                 let tiles = match tile {
-                    case None => rec0.tiles |> Map.remove((row, col))
-                    case Some(t) => rec0.tiles |> Map.insert((row, col), t)
+                    case None => rec0.tiles |> Map.remove(coords)
+                    case Some(t) => rec0.tiles |> Map.insert(coords, t)
                 };
                 Board({tiles = tiles | rec0})
             }
 
-            pub def get_(row: Int32, col: Int32, board: Board): Option[Tile] = {
+            pub def get_(coords: Coordinates, board: Board): Option[Tile] = {
                 let Board(rec) = board;
-                rec.tiles |> Map.get((row, col))
+                rec.tiles |> Map.get(coords)
             }
 
-            pub def adjust(f: Option[Tile] -> Option[Tile], row: Int32, col: Int32, board: Board): Board = {
-                let tile = get_(row, col, board);
-                set_(row, col, f(tile), board)
+            pub def adjust(f: Option[Tile] -> Option[Tile], coords: Coordinates, board: Board): Board = {
+                let tile = get_(coords, board);
+                set_(coords, f(tile), board)
             }
 
             ///
@@ -281,9 +287,9 @@ namespace Flixball {
 
             pub def playerMap(b: Board): Map[PlayerId, Position] =
                 let Board(br) = b;
-                br.tiles |> Map.toList |> List.filterMap(match ((x, y), t) -> match t {
+                br.tiles |> Map.toList |> List.filterMap(match (coords, t) -> match t {
                     case Person(Player(id, direction, _)) =>
-                        Some((id, Position(x, y, direction)))
+                        Some((id, Position(coords, direction)))
                     case _ => None
                 }) |> List.toMap
         }

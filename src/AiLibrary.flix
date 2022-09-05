@@ -3,6 +3,8 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.GameState.{GameState};
     use Flixball/Core.Board;
     use Flixball/Core.Board.{Board};
+    use Flixball/Core.Coordinates;
+    use Flixball/Core.Coordinates.Coordinates;
     use Flixball/Core.Move;
     use Flixball/Core.Move.{Turn, Shoot, Walk};
     use Flixball/Core.Position;
@@ -31,28 +33,29 @@ namespace Flixball/AiLibrary {
             else (Shoot, 0, m0)
         })
 
-    pub def goAndSpin(id: {id::Int32}, x: {x :: Int32}, y: Int32): MoveLogic =
+    pub def goAndSpin(id: {id::Int32}, coords: Coordinates): MoveLogic =
         MoveLogic(match GameState(_, playerMap, board) -> (i0, m0) -> {
             let currentPosition = match playerMap |> Map.get(id.id) {
                 case None => ?unreachable
                 case Some(v) => v
             };
-            let move = goTo(currentPosition, x = x.x, y, board) |> Option.getWithDefault(Turn(Clockwise));
+            let move = goTo(currentPosition, coords, board) |> Option.getWithDefault(Turn(Clockwise));
             (move, i0, m0)
         })
 
     // Utilities
 
-    pub def goTo(p: Position, x: {x :: Int32}, y: Int32, b: Board): Option[Move] = {
+    pub def goTo(p: Position, coords: Coordinates, b: Board): Option[Move] = {
         use Option.flatMap;
 
         let Board(br) = b;
-        let Position(xFrom, yFrom, direction) = p;
+        let Position(coordsFrom, direction) = p;
         
         let* path = findShortestPath(
             c -> Option.isEmpty(Map.get(c, br.tiles)),
-            start=(xFrom, yFrom), (x.x, y));
+            start=coordsFrom, coords);
         let* (xNext, yNext) = List.head(path);
+        let (xFrom, yFrom) = coordsFrom;
 
         // if a path exist, find the correct move/turn
         let neededDirection = match (xNext-xFrom, yNext-yFrom) {
