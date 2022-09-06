@@ -34,7 +34,7 @@ namespace Flixball/AiLibrary {
         })
 
     pub def goAndSpin(id: {id::Int32}, coords: Coordinates): MoveLogic =
-        MoveLogic(match GameState(_, playerMap, board) -> (i0, m0) -> {
+        MoveLogic(match GameState(_, _, playerMap, board) -> (i0, m0) -> {
             let currentPosition = match playerMap |> Map.get(id.id) {
                 case None => ?unreachable
                 case Some(v) => v

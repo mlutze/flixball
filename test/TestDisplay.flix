@@ -10,40 +10,57 @@ namespace TestDisplay {
     use Flixball/Core.Move.{Turn, Shoot, Walk};
     use Flixball/Core.MoveLogic;
     use Flixball/Core.MoveLogic.{MoveLogic};
-    use Flixball/Core.Player;
-    use Flixball/Core.Player.{Player};
+    use Flixball/Core.PlayerId;
     use Flixball/Core.Position;
     use Flixball/Core.Position.{Position};
     use Flixball/Core.Rotation;
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
     use Flixball/Core.Tile;
     use Flixball/Core.Tile.{Wall, Person};
+    use Flixball/Core/GameState.mkGameState;
 
     use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot, goAndSpin};
 
-    def testBoard01(): Board =
-        Board({rows = 5, cols = 5, tiles = Map#{
-            (2, 2) => Person(Player(0, South, walk())),
-            (3, 3) => Person(Player(1, West, shoot()))
-        }}) |> Flixball/Core/Board.addBorder
+    def testBoard01(): (Board, Map[PlayerId, MoveLogic]) =
+        let board = Board({rows = 5, cols = 5, tiles = Map#{
+            (2, 2) => Person(0, South),
+            (3, 3) => Person(1, West)
+        }}) |> Flixball/Core/Board.addBorder;
+        let moveLogics = Map#{
+            0 => walk(),
+            1 => shoot()
+        };
+        (board, moveLogics)
     
-    def testBoard02(): Board =
-        Board({rows = 3, cols = 15, tiles = Map#{
-            (1, 1) => Person(Player(0, East, shoot())),
-            (1, 3) => Person(Player(1, North, rotate(Clockwise))),
-            (1, 4) => Person(Player(2, North, rotate(Counterclockwise))),
-            (1, 5) => Person(Player(3, North, rotate(Clockwise))),
-            (1, 6) => Person(Player(4, North, rotate(Counterclockwise))),
-            (1, 7) => Person(Player(5, North, rotate(Clockwise))),
-            (1, 8) => Person(Player(6, North, rotate(Counterclockwise))),
-            (1, 9) => Person(Player(7, North, rotate(Clockwise))),
+    def testBoard02(): (Board, Map[PlayerId, MoveLogic]) =
+        let board = Board({rows = 3, cols = 15, tiles = Map#{
+            (1, 1) => Person(0, East),
+            (1, 3) => Person(1, North),
+            (1, 4) => Person(2, North),
+            (1, 5) => Person(3, North),
+            (1, 6) => Person(4, North),
+            (1, 7) => Person(5, North),
+            (1, 8) => Person(6, North),
+            (1, 9) => Person(7, North),
             (1, 10) => Wall,
-            (1, 12) => Person(Player(8, West, spinAndShoot(Clockwise)))
-        }}) |> Flixball/Core/Board.addBorder
+            (1, 12) => Person(8, West)
+        }}) |> Flixball/Core/Board.addBorder;
+        let moveLogics = Map#{
+            0 => shoot(),
+            1 => rotate(Clockwise),
+            2 => rotate(Counterclockwise),
+            3 => rotate(Clockwise),
+            4 => rotate(Counterclockwise),
+            5 => rotate(Clockwise),
+            6 => rotate(Counterclockwise),
+            7 => rotate(Clockwise),
+            8 => spinAndShoot(Clockwise)
+        };
+        (board, moveLogics)
 
-    def testBoard03(): Board =
-        Board({rows = 10, cols = 10, tiles = Map#{
-            (0, 0) => Person(Player(0, North, goAndSpin(id = 0, (10, 10)))),
+    def testBoard03(): (Board, Map[PlayerId, MoveLogic]) =
+        let board = Board({rows = 10, cols = 10, tiles = Map#{
+            (0, 0) => Person(0, North),
             (0, 2) => Wall,
             (1, 2) => Wall,
             (2, 2) => Wall,
@@ -60,7 +77,9 @@ namespace TestDisplay {
             (3, 5) => Wall,
             (7, 9) => Wall,
             (7, 8) => Wall
-        }}) |> Flixball/Core/Board.addBorder
+        }}) |> Flixball/Core/Board.addBorder;
+        let moveLogics = Map#{0 => goAndSpin(id = 0, (10, 10))};
+        (board, moveLogics)
 
     pub def testBoard04(): Board =
         randomBoard(719_657i64, rows=15, 10, 0.3)
@@ -71,22 +90,22 @@ namespace TestDisplay {
     // Test Scenarios
 
     pub def testDisplayBoard01(): Unit & Impure =
-        Flixball/Display.displayBoard(testBoard01())
+        Flixball/Display.displayBoard(fst(testBoard01()))
 
     pub def testRunBoard01(): Unit & Impure =
-        Flixball/Display.runBoard(500i64, testBoard01())
+        Flixball/Display.runGameState(500i64, testBoard01() ||> mkGameState)
 
     pub def testDisplayBoard02(): Unit & Impure =
-        Flixball/Display.displayBoard(testBoard02())
+        Flixball/Display.displayBoard(fst(testBoard02()))
 
     pub def testRunBoard02(): Unit & Impure =
-        Flixball/Display.runBoard(500i64, testBoard02())
+        Flixball/Display.runGameState(500i64, testBoard02() ||> mkGameState)
 
     pub def testDisplayBoard03(): Unit & Impure =
-        Flixball/Display.displayBoard(testBoard03())
+        Flixball/Display.displayBoard(fst(testBoard03()))
 
     pub def testRunBoard03(): Unit & Impure =
-        Flixball/Display.runBoard(500i64, testBoard03())
+        Flixball/Display.runGameState(500i64, testBoard03() ||> mkGameState)
 
     pub def testDisplayBoard04(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard04())

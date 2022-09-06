@@ -46,7 +46,7 @@ namespace Flixball {
 
         pub enum Tile {
             case Wall
-            case Person(Player)
+            case Person(PlayerId, Direction)
         }
 
         pub enum MoveLogic(
@@ -54,31 +54,11 @@ namespace Flixball {
             (Move, Int32, Map[String, String])
         )
 
-        // id
-        pub enum Player(PlayerId, Direction, MoveLogic)
-
-        instance Eq[Player] {
-
-            pub def eq(x: Player, y: Player): Bool =
-                let Player.Player((p1, _, _)) = x;
-                let Player.Player((p2, _, _)) = y;
-                p1 == p2
-
-        }
-
-        instance Order[Player] {
-
-            pub def compare(x: Player, y: Player): Comparison =
-                let Player.Player((p1, _, _)) = x;
-                let Player.Player((p2, _, _)) = y;
-                p1 <=> p2
-
-        }
-
         pub enum Position(Coordinates, Direction)
 
         pub enum GameState(
             Map[PlayerId, (Int32, Map[String, String])],
+            Map[PlayerId, MoveLogic],
             Map[PlayerId, Position],
             Board
         )
@@ -103,7 +83,7 @@ namespace Flixball {
             use Flixball/Core.Coordinates.Coordinates;
             use Flixball/Core.GameState;
             use Flixball/Core.GameState.GameState;
-            use Flixball/Core.Player.Player;
+            use Flixball/Core.MoveLogic;
             use Flixball/Core.PlayerId;
             use Flixball/Core.Position;
             use Flixball/Core.Position.{Position};
@@ -112,64 +92,64 @@ namespace Flixball {
             use Flixball/Core.Tile;
             use Flixball/Core.Tile.Person;
             use Flixball/Core/Board.adjust;
-            use Flixball/Core/Board.set_;
             use Flixball/Core/Board.get_;
+            use Flixball/Core/Board.set_;
             use Utils.{|||>};
 
             /// Removes a player from the game.
             /// Does nothing if the player does not exist in the game.
             pub def removePlayer(id: PlayerId, state0: GameState): GameState = {
-                let GameState(states0, map0, board0) = state0;
-                match (map0 |> Map.get(id)) {
+                let GameState(states0, moveLogics, playerPositions0, board0) = state0;
+                match (playerPositions0 |> Map.get(id)) {
                     // Case 1: No such player. Do nothing.
                     case None => state0
 
                     // Case 2: Found the player. Remove from the map, the board, and the states.
                     case Some(Position(coords, _)) =>
-                        let map = map0 |> Map.remove(id);
+                        let playerPositions = playerPositions0 |> Map.remove(id);
                         let states = states0 |> Map.remove(id);
                         let board = board0 |> set_(coords, None);
-                        GameState(states, map, board)
+                        GameState(states, moveLogics, playerPositions, board)
                 }
             }
 
             /// Rotates a player with the given rotation.
             /// Does nothing if the player does not exist in the game.
             pub def rotatePlayer(id: PlayerId, rot: Rotation, state0: GameState): GameState = {
-                let GameState(states, map0, board0) = state0;
-                match (map0 |> Map.get(id)) {
+                let GameState(states, moveLogics, playerPositions0, board0) = state0;
+                match (playerPositions0 |> Map.get(id)) {
                     // Case 1: No such player. Do nothing.
                     case None => state0
 
                     // Case 2: Found the player. Change their direction in the map and the board.
                     case Some(Position(coords, dir0)) =>
                         let dir = dir0 |> rotateDir(rot);
-                        let map = map0 |> Map.insert(id, Position(coords, dir));
+                        let playerPositions = playerPositions0 |> Map.insert(id, Position(coords, dir));
                         let board = (coords, board0) ||> adjust(tileOpt -> match tileOpt {
-                                case Some(Person(Player(_, _, logic))) => Some(Person(Player(id, dir, logic)))
+                                case Some(Person(_, _)) => Some(Person(id, dir))
                                 case other => other
                             }
                         );
-                        GameState(states, map, board)
+                        GameState(states, moveLogics, playerPositions, board)
                 }
             }
 
             /// Moves a player to a new position.
             /// Does not change the direction of the player.
             pub def movePlayer(id: PlayerId, coords: Coordinates, state0: GameState): GameState = {
-                let GameState(states, map0, board0) = state0;
-                match (map0 |> Map.get(id)) {
+                let GameState(states, moveLogics, playerPositions0, board0) = state0;
+                match (playerPositions0 |> Map.get(id)) {
                     // Case 1: No such player. Do nothing.
                     case None => state0
 
                     // Case 2: Found the player. Change their position in the map and the board.
                     case Some(Position(coords0, dir)) =>
-                        let map = map0 |> Map.insert(id, Position(coords, dir));
+                        let playerPositions = playerPositions0 |> Map.insert(id, Position(coords, dir));
                         match get_(coords0, board0) {
                             case None => bug!("invalid game state")
                             case Some(person) =>
                                 let board = board0 |> set_(coords0, None) |> set_(coords, Some(person));
-                                GameState(states, map, board)
+                                GameState(states, moveLogics, playerPositions, board)
                         }
                 }
             }
@@ -179,13 +159,13 @@ namespace Flixball {
                     (p, Flixball/Core.initialPlayerState())
                 }) |> List.toMap
             
-            pub def mkGameState(b: Board): GameState =
+            pub def mkGameState(b: Board, moveLogics: Map[PlayerId, MoveLogic]): GameState =
                 let states = b |>
                     Flixball/Core/Board.players |>
-                    List.map(match Player(id, _, _) -> id) |>
-                    Flixball/Core/GameState.initialStates;
+                    List.map(fst) |>
+                    initialStates;
                 let players = Flixball/Core/Board.playerMap(b);
-                GameState(states, players, b)
+                GameState(states, moveLogics, players, b)
         }
 
         namespace Board {
@@ -193,8 +173,7 @@ namespace Flixball {
             use Flixball/Core.Board.Board;
             use Flixball/Core.Coordinates;
             use Flixball/Core.Coordinates.Coordinates;
-            use Flixball/Core.Player;
-            use Flixball/Core.Player.{Player};
+            use Flixball/Core.Direction;
             use Flixball/Core.PlayerId;
             use Flixball/Core.Position;
             use Flixball/Core.Position.{Position};
@@ -277,18 +256,17 @@ namespace Flixball {
                 };
                 MutMap.toMap(mutTiles)
 
-            pub def players(b: Board): List[Player] =
+            pub def players(b: Board): List[(PlayerId, Direction)] =
                 let Board(br) = b;
                 br.tiles |> Map.valuesOf |> List.filterMap(t -> match t {
-                    case Person(player) =>
-                        Some(player)
+                    case Person(id, dir) => Some(id, dir)
                     case _ => None
                 })
 
             pub def playerMap(b: Board): Map[PlayerId, Position] =
                 let Board(br) = b;
                 br.tiles |> Map.toList |> List.filterMap(match (coords, t) -> match t {
-                    case Person(Player(id, direction, _)) =>
+                    case Person(id, direction) =>
                         Some((id, Position(coords, direction)))
                     case _ => None
                 }) |> List.toMap
