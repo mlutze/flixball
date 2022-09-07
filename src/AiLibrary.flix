@@ -52,22 +52,32 @@ namespace Flixball/AiLibrary {
     ///
     pub def naiveSearchAndDestroy(): MoveLogic =
         MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
+
+            // Pick a target from among the players (lowest ID except me)
             let target = playerMap 
                 |> Map.filterWithKey((id2, _) -> id != id2) 
                 |> Map.toList
                 |> List.head;
+
+            // Get my own position
             let Position(coords, dir) = match playerMap |> Map.get(id) {
                 case None => unreachable!()
                 case Some(v) => v
             };
+
+            // Pick a move
             let move = match target {
+                // Case 1: No target. Just spin for fun.
                 case None => Turn(Clockwise)
+
+                // Case 2: Some target. Hunt them down.
                 case Some((targetId, Position(targetCoords, _))) =>
-                    match (raytraceEx(dir, coords, board) |> Utils.dbg) {
-                        // Case 1: Looking at my target. Shoot.
+                    match raytraceEx(dir, coords, board) {
+                        // Case 2.1: Looking at my target. Shoot.
                         case Some(Person(viewId, _)) if viewId == targetId => Shoot 
-                        // Case 2: Not looking at my target. Keep moving.
+                        // Case 2.2: Not looking at my target. Keep moving.
                         case _ => goTo(Position(coords, dir), targetCoords, board) |> Option.getWithDefault(Turn(Clockwise))
+                            // TODO pick another target if this one is inaccessible
                     }
             };
             (move, state)
@@ -75,6 +85,9 @@ namespace Flixball/AiLibrary {
 
     // Utilities
 
+    ///
+    /// Selects a move based on the shortest path from position p to the given coords.
+    ///
     pub def goTo(p: Position, coords: Coordinates, b: Board): Option[Move] = {
         use Option.flatMap;
 
@@ -102,13 +115,13 @@ namespace Flixball/AiLibrary {
         }
     }
 
-    pub enum DirectionChoice with Eq {
+    enum DirectionChoice with Eq {
         case Nothing
         case Either
         case MustTurn(Rotation)
     }
 
-    pub def rotateTowardsDir(current: {current::Direction}, target: Direction): DirectionChoice =
+    def rotateTowardsDir(current: {current::Direction}, target: Direction): DirectionChoice =
         match (current.current, target) {
             case (North, North) => Nothing
             case (North, East ) => MustTurn(Clockwise)
