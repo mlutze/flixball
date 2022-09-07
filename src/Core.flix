@@ -265,6 +265,11 @@ namespace Flixball {
                     case _ => None
                 })
 
+            pub def player(b: Board, id: PlayerId): Option[Position] =
+                players(b) |>
+                    List.find(match (foundId, _) -> foundId == id) |>
+                    Option.map(match (_, pos) -> pos)
+
         }
     }
 }
