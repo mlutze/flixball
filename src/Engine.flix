@@ -1,7 +1,6 @@
 namespace Flixball/Engine {
     use Flixball/Core.Board;
     use Flixball/Core.Board.Board;
-    use Flixball/Core/Board.get_;
     use Flixball/Core.Coordinates;
     use Flixball/Core.Coordinates.Coordinates;
     use Flixball/Core.Direction;
@@ -17,8 +16,7 @@ namespace Flixball/Engine {
     use Flixball/Core.Move.Walk;
     use Flixball/Core.MoveLogic;
     use Flixball/Core.MoveLogic.{MoveLogic};
-    use Flixball/Core.Player;
-    use Flixball/Core.Player.Player;
+    use Flixball/Core.PlayerId;
     use Flixball/Core.Position;
     use Flixball/Core.Position.Position;
     use Flixball/Core.Rotation;
@@ -27,26 +25,29 @@ namespace Flixball/Engine {
     use Flixball/Core.Tile;
     use Flixball/Core.Tile.Person;
     use Flixball/Core.Tile.Wall;
+    use Flixball/Core/Board.{get_, players};
 
     ///
     /// resolves one step of the GameState.
     ///
     pub def runStep(gs: GameState): GameState = region r {
-        let GameState(states0, playerMap0, board) = gs;
-        let players = Flixball/Core/Board.players(board);
+        let GameState(states0, moveLogics, playerPositions, board) = gs;
         let newStates = new MutMap(r);
-        let moves = players |> List.map(p -> match p {
-            case Player(id, _, MoveLogic(move)) =>
-                match Map.get(id, states0) {
-                    case Some((i0, m0)) =>
-                        let (moveToDo, i, m) = move(gs, i0, m0);
-                        MutMap.put!(id, (i, m), newStates);
-                        (p, moveToDo)
-                    case None => ?unreachable
-                }
-        }) |> List.toMap;
+        let moves = players(board) |>
+            List.map(match (id, _) ->
+                use Option.flatMap;
+                let* MoveLogic(move) = Map.get(id, moveLogics);
+                let* (i0, m0) = Map.get(id, states0);
+                let (moveToDo, i, m) = move(gs, i0, m0);
+                MutMap.put!(id, (i, m), newStates);
+                Some((id, moveToDo))
+            ) |>
+            List.map(opt -> match opt {
+                case Some(v) => v
+                case None => ?unreachable
+            }) |> List.toMap;
         // Everything in gamestate except the values in player states is handled in resolve.
-        resolve(moves, GameState(MutMap.toMap(newStates), playerMap0, board))
+        resolve(moves, GameState(MutMap.toMap(newStates), moveLogics, playerPositions, board))
     }
     
     ///
@@ -55,12 +56,12 @@ namespace Flixball/Engine {
     ///     rotate
     ///     move
     ///
-    def resolve(moves0: Map[Player, Move], state0: GameState): GameState = {
+    def resolve(moves0: Map[PlayerId, Move], state0: GameState): GameState = {
         let shooters = moves0 
             |> Map.filter(Eq.eq(Shoot)) 
             |> Map.keysOf;
         let dead = resolveShots(state0, shooters);
-        let state1 = (state0, dead) ||> Set.foldLeft(acc -> match Player(id, _, _) -> Flixball/Core/GameState.removePlayer(id, acc));
+        let state1 = (state0, dead) ||> Set.foldLeft((acc, id) -> Flixball/Core/GameState.removePlayer(id, acc));
         let moves1 = (moves0, dead) ||> Set.foldLeft((acc, p) -> Map.remove(p, acc));
 
         let rotators = moves1
@@ -69,8 +70,8 @@ namespace Flixball/Engine {
                 case Shoot => None
                 case Walk => None
             });
-        let state2 = (state1, rotators) ||> Map.foldLeftWithKey(acc -> match Player(id, _, _) -> rot -> Flixball/Core/GameState.rotatePlayer(id, rot, acc));
-        let GameState(_, _, board2) = state2;
+        let state2 = (state1, rotators) ||> Map.foldLeftWithKey((acc, id) -> rot -> Flixball/Core/GameState.rotatePlayer(id, rot, acc));
+        let GameState(_, _, _, board2) = state2;
 
         let movers = moves1
             |> Map.filter(Eq.eq(Walk))
@@ -83,7 +84,7 @@ namespace Flixball/Engine {
             |> Map.filter(coords -> (board2 |> get_(coords)) |> Option.isEmpty)
             |> withUniqueValues;
         // a new position cannot be a wall, a previous player's position, or a new player's position
-        let state3 = (state2, newPos) ||> Map.foldLeftWithKey(acc -> match Player(id, _, _) -> coords -> Flixball/Core/GameState.movePlayer(id, coords, acc));
+        let state3 = (state2, newPos) ||> Map.foldLeftWithKey((acc, id) -> coords -> Flixball/Core/GameState.movePlayer(id, coords, acc));
         
         state3
     }
@@ -99,20 +100,20 @@ namespace Flixball/Engine {
     ///
     /// Returns the set of dead players.
     ///
-    def resolveShots(state: GameState, shooters: Set[Player]): Set[Player] = {
+    def resolveShots(state: GameState, shooters: Set[PlayerId]): Set[PlayerId] = {
         shooters |> Set.flatMap(resolveShot(state) >> Option.toSet) 
     }
 
     ///
     /// Returns the player killed by the shot.
     ///
-    def resolveShot(state: GameState, shooter: Player): Option[Player] = {
-        let GameState(_, _, board) = state;
+    def resolveShot(state: GameState, shooter: PlayerId): Option[PlayerId] = {
+        let GameState(_, _, _, board) = state;
         use Option.flatMap;
         let* Position(coords0, dir) = getPosition(shooter, state);
         let coords = step(coords0, dir);
         match raytrace(dir, coords, board) {
-            case Some(Person(p)) => Some(p)
+            case Some(Person(id, _)) => Some(id)
             case Some(Wall) => None
             case None => None
         }
@@ -157,10 +158,9 @@ namespace Flixball/Engine {
     ///
     /// Gets the position of the given player.
     ///
-    def getPosition(p: Player, state: GameState): Option[Position] = {
-        let Player.Player(id, _, _) = p;
-        let GameState(_, players, _) = state;
+    def getPosition(id: PlayerId, state: GameState): Option[Position] = {
+        let GameState(_, _, playerPositions, _) = state;
         use Option.flatMap;
-        players |> Map.get(id)
+        playerPositions |> Map.get(id)
     }
 }

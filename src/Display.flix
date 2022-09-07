@@ -6,7 +6,6 @@ namespace Flixball/Display {
     use Flixball/Core.GameState;
     use Flixball/Core.GameState.GameState;
     use Flixball/Core.Player;
-    use Flixball/Core.Player.{Player};
     use Flixball/Core.Tile;
     use Flixball/Core.Tile.{Wall, Person};
 
@@ -19,19 +18,12 @@ namespace Flixball/Display {
         b |> boardLines |> List.foreach(println)
 
     ///
-    /// Continously simulates the board and drawing it between each step with a
-    /// set delay. One second is `1000i64`.
-    ///
-    pub def runBoard(delayDuration: Int64, b: Board): Unit & Impure =
-        runGameState(delayDuration, Flixball/Core/GameState.mkGameState(b))
-
-    ///
     /// Continously simulates the game state and drawing it between each step with a
     /// set delay. One second is `1000i64`.
     ///
     pub def runGameState(delayDuration: Int64, gs: GameState): Unit & Impure =
         import static java.lang.Thread.sleep(Int64): Unit & Impure;
-        let GameState(_, _, board) = gs;
+        let GameState(_, _, _, board) = gs;
         displayBoard(board);
         sleep(delayDuration);
         runGameState(delayDuration, Flixball/Engine.runStep(gs))
@@ -55,7 +47,7 @@ namespace Flixball/Display {
 
     def tileStr(idColor: Int32 -> String -> String, t: Tile): String = match t {
         case Wall => "#"
-        case Person(Player(id, direction, _)) => directionStr(direction) |> idColor(id)
+        case Person(id, direction) => directionStr(direction) |> idColor(id)
     }
 
     def mkIdColorMap(_b: Board): Int32 -> String -> String =
