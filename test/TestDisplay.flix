@@ -78,7 +78,7 @@ namespace TestDisplay {
             (7, 9) => Wall,
             (7, 8) => Wall
         }}) |> Flixball/Core/Board.addBorder;
-        let moveLogics = Map#{0 => goAndSpin(id = 0, (10, 10))};
+        let moveLogics = Map#{0 => goAndSpin((10, 10))};
         (board, moveLogics)
 
     pub def testBoard04(): Board =
