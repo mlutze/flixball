@@ -4,6 +4,7 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.Board;
     use Flixball/Core.Coordinates.Coordinates;
     use Flixball/Core.Coordinates;
+    use Flixball/GridGraph.raytraceEx;
     use Flixball/Core.Direction.{North, South, West, East};
     use Flixball/Core.Direction;
     use Flixball/Core.GameState.{GameState};
@@ -16,6 +17,7 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.Position;
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
     use Flixball/Core.Rotation;
+    use Flixball/Core.Tile.{Person, Wall};
 
     use Flixball/GridGraph.findShortestPath;
 
@@ -27,6 +29,21 @@ namespace Flixball/AiLibrary {
     pub def walk(): MoveLogic = constantAction(Walk)
 
     pub def rotate(r: Rotation): MoveLogic = constantAction(Turn(r))
+
+    pub def wander(): MoveLogic =
+        MoveLogic((_, _) -> match (i0, m0) -> {
+            match i0 mod 2 {
+                case 0 => (Walk, (nextRandom(i0), m0))
+                case 1 =>
+                    let i1 = nextRandom(i0);
+                    match i1 mod 2 {
+                        case 0 => (Turn(Clockwise), (nextRandom(i1), m0))
+                        case 1 => (Turn(Counterclockwise), (nextRandom(i1), m0))
+                        case _ => unreachable!()
+                    }
+                case _ => unreachable!()
+            }
+        })
 
     pub def spinAndShoot(r: Rotation): MoveLogic =
         MoveLogic((_, _) -> match (i0, m0) -> {
@@ -43,17 +60,57 @@ namespace Flixball/AiLibrary {
             let move = goTo(currentPosition, coords, board) |> Option.getWithDefault(Turn(Clockwise));
             (move, state)
         })
+    
+    ///
+    /// Go to the next player on the list and shoot them.
+    /// Doesn't necessarily take the shortest path to find a shooting angle.
+    ///
+    pub def naiveSearchAndDestroy(): MoveLogic =
+        MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
+
+            // Pick a target from among the players (lowest ID except me)
+            let target = playerMap 
+                |> Map.filterWithKey((id2, _) -> id != id2) 
+                |> Map.toList
+                |> List.head;
+
+            // Get my own position
+            let Position(coords, dir) = match playerMap |> Map.get(id) {
+                case None => unreachable!()
+                case Some(v) => v
+            };
+
+            // Pick a move
+            let move = match target {
+                // Case 1: No target. Just spin for fun.
+                case None => Turn(Clockwise)
+
+                // Case 2: Some target. Hunt them down.
+                case Some((targetId, Position(targetCoords, _))) =>
+                    match raytraceEx(dir, coords, board) {
+                        // Case 2.1: Looking at my target. Shoot.
+                        case Some(Person(viewId, _)) if viewId == targetId => Shoot 
+                        // Case 2.2: Not looking at my target. Keep moving.
+                        case _ => goTo(Position(coords, dir), targetCoords, board) |> Option.getWithDefault(Turn(Clockwise))
+                            // TODO pick another target if this one is inaccessible
+                    }
+            };
+            (move, state)
+        })
 
     // Utilities
 
-    pub def goTo(p: Position, coords: Coordinates, b: Board): Option[Move] = {
+    ///
+    /// Selects a move based on the shortest path from position p to the given coords.
+    ///
+    def goTo(p: Position, coords: Coordinates, b: Board): Option[Move] = {
         use Option.flatMap;
 
         let Board(br) = b;
         let Position(coordsFrom, direction) = p;
         
         let* path = findShortestPath(
-            c -> Option.isEmpty(Map.get(c, br.tiles)),
+            c -> Map.get(c, br.tiles) != Some(Wall),
             start=coordsFrom, coords);
         let* (xNext, yNext) = List.head(path);
         let (xFrom, yFrom) = coordsFrom;
@@ -73,13 +130,13 @@ namespace Flixball/AiLibrary {
         }
     }
 
-    pub enum DirectionChoice with Eq {
+    enum DirectionChoice with Eq {
         case Nothing
         case Either
         case MustTurn(Rotation)
     }
 
-    pub def rotateTowardsDir(current: {current::Direction}, target: Direction): DirectionChoice =
+    def rotateTowardsDir(current: {current::Direction}, target: Direction): DirectionChoice =
         match (current.current, target) {
             case (North, North) => Nothing
             case (North, East ) => MustTurn(Clockwise)
@@ -101,4 +158,9 @@ namespace Flixball/AiLibrary {
             case (West, South) => MustTurn(Counterclockwise)
             case (West, West ) => Nothing
         }
+    
+    def nextRandom(i: Int32): Int32 = {
+        let r = Random.newWithSeed(Int32.toInt64(i));
+        Random.nextInt32(r)
+    } as \ {}
 }

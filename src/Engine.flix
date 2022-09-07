@@ -1,31 +1,33 @@
 namespace Flixball/Engine {
-    use Flixball/Core.Board;
     use Flixball/Core.Board.Board;
-    use Flixball/Core.Coordinates;
+    use Flixball/Core.Board;
     use Flixball/Core.Coordinates.Coordinates;
-    use Flixball/Core.Direction;
+    use Flixball/Core.Coordinates;
     use Flixball/Core.Direction.East;
     use Flixball/Core.Direction.North;
     use Flixball/Core.Direction.South;
     use Flixball/Core.Direction.West;
-    use Flixball/Core.GameState;
+    use Flixball/Core.Direction;
     use Flixball/Core.GameState.GameState;
-    use Flixball/Core.Move;
+    use Flixball/Core.GameState;
     use Flixball/Core.Move.Shoot;
     use Flixball/Core.Move.Turn;
     use Flixball/Core.Move.Walk;
-    use Flixball/Core.MoveLogic;
+    use Flixball/Core.Move;
     use Flixball/Core.MoveLogic.{MoveLogic};
+    use Flixball/Core.MoveLogic;
     use Flixball/Core.PlayerId;
-    use Flixball/Core.Position;
     use Flixball/Core.Position.Position;
-    use Flixball/Core.Rotation;
+    use Flixball/Core.Position;
     use Flixball/Core.Rotation.Clockwise;
     use Flixball/Core.Rotation.Counterclockwise;
-    use Flixball/Core.Tile;
+    use Flixball/Core.Rotation;
     use Flixball/Core.Tile.Person;
     use Flixball/Core.Tile.Wall;
+    use Flixball/Core.Tile;
     use Flixball/Core/Board.{get_, players};
+    use Flixball/GridGraph.raytraceEx;
+    use Flixball/GridGraph.step;
 
     ///
     /// resolves one step of the GameState.
@@ -111,47 +113,10 @@ namespace Flixball/Engine {
         let GameState(_, _, _, board) = state;
         use Option.flatMap;
         let* Position(coords0, dir) = getPosition(shooter, state);
-        let coords = step(coords0, dir);
-        match raytrace(dir, coords, board) {
+        match raytraceEx(dir, coords0, board) {
             case Some(Person(id, _)) => Some(id)
             case Some(Wall) => None
             case None => None
-        }
-    }
-
-    ///
-    /// Returns the coordinates one step in the given direction.
-    ///
-    def step(coords: Coordinates, dir: Direction): (Int32, Int32) = {
-        let (row, col) = coords;
-        match dir {
-            case North => (row - 1, col)
-            case East => (row, col + 1)
-            case South => (row + 1, col)
-            case West => (row, col - 1)
-        }
-    }
-
-    ///
-    /// Finds the first nonempty tile tracing in the given direction.
-    ///
-    def raytrace(dir: Direction, coords0: Coordinates, board: Board): Option[Tile] = {
-        let (row, col) = coords0;
-        let Board(rec) = board;
-        let rows = rec.rows;
-        let cols = rec.cols;
-        let tiles = rec.tiles;
-        if (row < 0 or row >= rows) {
-            None
-        } else if (col < 0 or col >= cols) {
-            None
-        } else {
-            match (tiles |> Map.get(coords0)) {
-                case None =>
-                    let coords = step(coords0, dir);
-                    raytrace(dir, coords, board)
-                case Some(tile) => Some(tile)
-            }
         }
     }
 
