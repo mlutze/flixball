@@ -1,25 +1,26 @@
 namespace Flixball/AiLibrary {
-    use Flixball/Core.GameState;
-    use Flixball/Core.GameState.{GameState};
-    use Flixball/Core.Board;
+    use Flixball/Core.AiState;
     use Flixball/Core.Board.{Board};
-    use Flixball/Core.Coordinates;
+    use Flixball/Core.Board;
     use Flixball/Core.Coordinates.Coordinates;
-    use Flixball/Core.Move;
-    use Flixball/Core.Move.{Turn, Shoot, Walk};
-    use Flixball/Core.Position;
-    use Flixball/Core.Position.{Position};
-    use Flixball/Core.MoveLogic;
-    use Flixball/Core.MoveLogic.{MoveLogic};
-    use Flixball/Core.Rotation;
-    use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
-    use Flixball/Core.Direction;
+    use Flixball/Core.Coordinates;
     use Flixball/Core.Direction.{North, South, West, East};
+    use Flixball/Core.Direction;
+    use Flixball/Core.GameState.{GameState};
+    use Flixball/Core.GameState;
+    use Flixball/Core.Move.{Turn, Shoot, Walk};
+    use Flixball/Core.Move;
+    use Flixball/Core.MoveLogic.{MoveLogic};
+    use Flixball/Core.MoveLogic;
+    use Flixball/Core.Position.{Position};
+    use Flixball/Core.Position;
+    use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
+    use Flixball/Core.Rotation;
 
     use Flixball/GridGraph.findShortestPath;
 
     def constantAction(m: Move): MoveLogic =
-        ((_, state) -> (m, state)) |> MoveLogic
+        ((_, _, state) -> (m, state)) |> MoveLogic
 
     pub def shoot(): MoveLogic = constantAction(Shoot)
 
@@ -28,14 +29,14 @@ namespace Flixball/AiLibrary {
     pub def rotate(r: Rotation): MoveLogic = constantAction(Turn(r))
 
     pub def spinAndShoot(r: Rotation): MoveLogic =
-        MoveLogic(_ -> match (i0, m0) -> {
+        MoveLogic((_, _) -> match (i0, m0) -> {
             if (i0 == 0) (Turn(r), (1, m0))
             else (Shoot, (0, m0))
         })
 
-    pub def goAndSpin(id: {id::Int32}, coords: Coordinates): MoveLogic =
-        MoveLogic(match GameState(_, _, playerMap, board) -> state -> {
-            let currentPosition = match playerMap |> Map.get(id.id) {
+    pub def goAndSpin(coords: Coordinates): MoveLogic =
+        MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
+            let currentPosition = match playerMap |> Map.get(id) {
                 case None => ?unreachable
                 case Some(v) => v
             };

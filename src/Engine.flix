@@ -38,7 +38,7 @@ namespace Flixball/Engine {
                 use Option.flatMap;
                 let* MoveLogic(move) = Map.get(id, moveLogics);
                 let* state0 = Map.get(id, states0);
-                let (moveToDo, state) = move(gs, state0);
+                let (moveToDo, state) = move(gs, id, state0);
                 MutMap.put!(id, state, newStates);
                 Some((id, moveToDo))
             ) |>

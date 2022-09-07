@@ -52,7 +52,7 @@ namespace Flixball {
         }
 
         pub enum MoveLogic(
-            (GameState, AiState) ->
+            (GameState, PlayerId, AiState) ->
             (Move, AiState)
         )
 
