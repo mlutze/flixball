@@ -12,13 +12,29 @@ namespace RegionedRandom {
     ///
     /// Returns `None` if the given array `a` is empty.
     ///
-    pub def choose(ran: Random[r1], a: Array[a, r2]): Option[a] & r1 and r2 =
+    pub def chooseArray(ran: Random[r1], a: Array[a, r2]): Option[a] & r1 and r2 =
         if (a.length == 0) {
             None
         } else {
             let m = a.length;
             let i = nextNatWithMax(ran, m);
             Some(a[i])
+        }
+
+    ///
+    /// Returns a pseudorandom element from the given non-empty list `l` using the random number generator `r`.
+    ///
+    pub def chooseNel(ran: Random[r1], l: Nel[a]): a & r1 =
+        let m = Nel.length(l);
+        let i = nextNatWithMax(ran, m);
+        l |> nelUnsafeNth(i)
+
+    def nelUnsafeNth(n: Int32, l: Nel[a]): a =
+        if (n <= 0)
+            Nel.head(l)
+        else match Nel.tail(l) {
+            case hd :: tl => Nel(hd, tl) |> nelUnsafeNth(n-1)
+            case Nil => ?unreachable
         }
 
     ///
