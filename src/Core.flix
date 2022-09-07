@@ -28,7 +28,7 @@ namespace Flixball {
         /// 
         pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[Coordinates, Tile]})
 
-        pub enum Direction with Eq {
+        pub enum Direction with Eq, ToString {
             case North
             case East
             case South
@@ -46,7 +46,7 @@ namespace Flixball {
             case Walk
         }
 
-        pub enum Tile {
+        pub enum Tile with Eq, ToString {
             case Wall
             case Person(PlayerId, Direction)
         }

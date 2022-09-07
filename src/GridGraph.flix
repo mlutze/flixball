@@ -76,7 +76,15 @@ namespace Flixball/GridGraph {
     /// Excludes the given tile.
     ///
     // TODO: make it board-agnostic
-    pub def raytrace(dir: Direction, coords0: Coordinates, board: Board): Option[Tile] = {
+    pub def raytraceEx(dir: Direction, coords0: Coordinates, board: Board): Option[Tile] = {
+        raytraceIn(dir, step(coords0, dir), board)
+    }
+
+    ///
+    /// Finds the first nonempty tile tracing in the given direction.
+    /// Includes the given tile.
+    ///
+    pub def raytraceIn(dir: Direction, coords0: Coordinates, board: Board): Option[Tile] = {
         let (row, col) = coords0;
         let Board(rec) = board;
         let rows = rec.rows;
@@ -90,7 +98,7 @@ namespace Flixball/GridGraph {
             match (tiles |> Map.get(coords0)) {
                 case None =>
                     let coords = step(coords0, dir);
-                    raytrace(dir, coords, board)
+                    raytraceIn(dir, coords, board)
                 case Some(tile) => Some(tile)
             }
         }

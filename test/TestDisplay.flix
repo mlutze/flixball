@@ -19,7 +19,7 @@ namespace TestDisplay {
     use Flixball/Core.Tile.{Wall, Person};
     use Flixball/Core/GameState.mkGameState;
 
-    use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot, goAndSpin};
+    use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot, goAndSpin, naiveSearchAndDestroy};
 
     def testBoard01(): (Board, Map[PlayerId, MoveLogic]) =
         let board = Board({rows = 5, cols = 5, tiles = Map#{
@@ -87,6 +87,14 @@ namespace TestDisplay {
     pub def testBoard05(): Board =
         automataBoard(285_041_125i64, rows=25, 40, 0.38, 3)
 
+    pub def testBoard06(): (Board, Map[PlayerId, MoveLogic]) =
+        let board = Board({rows = 10, cols = 10, tiles = Map#{
+            (0, 0) => Person(0, North),
+            (9, 9) => Person(1, South)
+        }}) |> Flixball/Core/Board.addBorder;
+        let moveLogics = Map#{0 => naiveSearchAndDestroy(), 1 => rotate(Clockwise)};
+        (board, moveLogics)
+
     // Test Scenarios
 
     pub def testDisplayBoard01(): Unit & Impure =
@@ -112,4 +120,7 @@ namespace TestDisplay {
 
     pub def testDisplayBoard05(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard05())
+
+    pub def testRunBoard06(): Unit & Impure =
+        Flixball/Display.runGameState(500i64, testBoard06() ||> mkGameState)
 }

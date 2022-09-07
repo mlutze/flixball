@@ -26,7 +26,7 @@ namespace Flixball/Engine {
     use Flixball/Core.Tile.Wall;
     use Flixball/Core.Tile;
     use Flixball/Core/Board.{get_, players};
-    use Flixball/GridGraph.raytrace;
+    use Flixball/GridGraph.raytraceEx;
     use Flixball/GridGraph.step;
 
     ///
@@ -113,7 +113,7 @@ namespace Flixball/Engine {
         let GameState(_, _, _, board) = state;
         use Option.flatMap;
         let* Position(coords0, dir) = getPosition(shooter, state);
-        match raytrace(dir, coords0, board) {
+        match raytraceEx(dir, coords0, board) {
             case Some(Person(id, _)) => Some(id)
             case Some(Wall) => None
             case None => None

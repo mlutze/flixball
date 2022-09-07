@@ -4,7 +4,7 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.Board;
     use Flixball/Core.Coordinates.Coordinates;
     use Flixball/Core.Coordinates;
-    use Flixball/GridGraph.raytrace;
+    use Flixball/GridGraph.raytraceEx;
     use Flixball/Core.Direction.{North, South, West, East};
     use Flixball/Core.Direction;
     use Flixball/Core.GameState.{GameState};
@@ -17,7 +17,7 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.Position;
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
     use Flixball/Core.Rotation;
-    use Flixball/Core.Tile.Person;
+    use Flixball/Core.Tile.{Person, Wall};
 
     use Flixball/GridGraph.findShortestPath;
 
@@ -63,7 +63,7 @@ namespace Flixball/AiLibrary {
             let move = match target {
                 case None => Turn(Clockwise)
                 case Some((targetId, Position(targetCoords, _))) =>
-                    match raytrace(dir, coords, board) {
+                    match (raytraceEx(dir, coords, board) |> Utils.dbg) {
                         // Case 1: Looking at my target. Shoot.
                         case Some(Person(viewId, _)) if viewId == targetId => Shoot 
                         // Case 2: Not looking at my target. Keep moving.
@@ -82,7 +82,7 @@ namespace Flixball/AiLibrary {
         let Position(coordsFrom, direction) = p;
         
         let* path = findShortestPath(
-            c -> Option.isEmpty(Map.get(c, br.tiles)),
+            c -> Map.get(c, br.tiles) != Some(Wall),
             start=coordsFrom, coords);
         let* (xNext, yNext) = List.head(path);
         let (xFrom, yFrom) = coordsFrom;
