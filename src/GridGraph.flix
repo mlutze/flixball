@@ -1,7 +1,12 @@
 namespace Flixball/GridGraph {
 
+    use Flixball/Core.Board;
+    use Flixball/Core.Board.Board;
     use Flixball/Core.Coordinates;
     use Flixball/Core.Coordinates.Coordinates;
+    use Flixball/Core.Direction;
+    use Flixball/Core.Direction.{North, East, South, West};
+    use Flixball/Core.Tile;
 
     ///
     /// It is assumed that `available` keeps the search space finite.
@@ -64,5 +69,44 @@ namespace Flixball/GridGraph {
         let y = snd(c);
         let coordinates = (x, y+1) :: (x, y-1) :: (x+1, y) :: (x-1, y) :: Nil;
         List.iterator(r, coordinates)
+
+
+    ///
+    /// Finds the first nonempty tile tracing in the given direction.
+    /// Excludes the given tile.
+    ///
+    // TODO: make it board-agnostic
+    pub def raytrace(dir: Direction, coords0: Coordinates, board: Board): Option[Tile] = {
+        let (row, col) = coords0;
+        let Board(rec) = board;
+        let rows = rec.rows;
+        let cols = rec.cols;
+        let tiles = rec.tiles;
+        if (row < 0 or row >= rows) {
+            None
+        } else if (col < 0 or col >= cols) {
+            None
+        } else {
+            match (tiles |> Map.get(coords0)) {
+                case None =>
+                    let coords = step(coords0, dir);
+                    raytrace(dir, coords, board)
+                case Some(tile) => Some(tile)
+            }
+        }
+    }
+
+    ///
+    /// Returns the coordinates one step in the given direction.
+    ///
+    pub def step(coords: Coordinates, dir: Direction): (Int32, Int32) = {
+        let (row, col) = coords;
+        match dir {
+            case North => (row - 1, col)
+            case East => (row, col + 1)
+            case South => (row + 1, col)
+            case West => (row, col - 1)
+        }
+    }
 
 }

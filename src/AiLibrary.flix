@@ -4,6 +4,7 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.Board;
     use Flixball/Core.Coordinates.Coordinates;
     use Flixball/Core.Coordinates;
+    use Flixball/GridGraph.raytrace;
     use Flixball/Core.Direction.{North, South, West, East};
     use Flixball/Core.Direction;
     use Flixball/Core.GameState.{GameState};
@@ -16,6 +17,7 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.Position;
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
     use Flixball/Core.Rotation;
+    use Flixball/Core.Tile.Person;
 
     use Flixball/GridGraph.findShortestPath;
 
@@ -41,6 +43,33 @@ namespace Flixball/AiLibrary {
                 case Some(v) => v
             };
             let move = goTo(currentPosition, coords, board) |> Option.getWithDefault(Turn(Clockwise));
+            (move, state)
+        })
+    
+    ///
+    /// Go to the next player on the list and shoot them.
+    /// Doesn't necessarily take the shortest path to find a shooting angle.
+    ///
+    pub def naiveSearchAndDestroy(): MoveLogic =
+        MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
+            let target = playerMap 
+                |> Map.filterWithKey((id2, _) -> id != id2) 
+                |> Map.toList
+                |> List.head;
+            let Position(coords, dir) = match playerMap |> Map.get(id) {
+                case None => unreachable!()
+                case Some(v) => v
+            };
+            let move = match target {
+                case None => Turn(Clockwise)
+                case Some((targetId, Position(targetCoords, _))) =>
+                    match raytrace(dir, coords, board) {
+                        // Case 1: Looking at my target. Shoot.
+                        case Some(Person(viewId, _)) if viewId == targetId => Shoot 
+                        // Case 2: Not looking at my target. Keep moving.
+                        case _ => goTo(Position(coords, dir), targetCoords, board) |> Option.getWithDefault(Turn(Clockwise))
+                    }
+            };
             (move, state)
         })
 
