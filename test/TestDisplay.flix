@@ -132,7 +132,7 @@ namespace TestDisplay {
         Flixball/Display.displayBoard(fst(testBoard03()))
 
     pub def testRunBoard03(): Unit & Impure =
-        Flixball/Display.runGameState(500i64, testBoard03() ||> mkGameState)
+        Flixball/Display.runGameState(200i64, testBoard03() ||> mkGameState)
 
     pub def testDisplayBoard04(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard04())

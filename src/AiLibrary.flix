@@ -52,7 +52,7 @@ namespace Flixball/AiLibrary {
                 case None => ?unreachable
                 case Some(v) => v
             };
-            let move = goTo(currentPosition, coords, board) |> Option.getWithDefault(Turn(Clockwise));
+            let move = goTo(currentPosition, Eq.eq(coords), board) |> Option.getWithDefault(Turn(Clockwise));
             (move, state)
         })
     
@@ -86,7 +86,7 @@ namespace Flixball/AiLibrary {
                         // Case 2.1: Looking at my target. Shoot.
                         case Some(Person(viewId, _)) if viewId == targetId => Shoot 
                         // Case 2.2: Not looking at my target. Keep moving.
-                        case _ => goTo(Position(coords, dir), targetCoords, board) |> Option.getWithDefault(Turn(Clockwise))
+                        case _ => goTo(Position(coords, dir), Eq.eq(targetCoords), board) |> Option.getWithDefault(Turn(Clockwise))
                             // TODO pick another target if this one is inaccessible
                     }
             };
@@ -96,9 +96,10 @@ namespace Flixball/AiLibrary {
     // Utilities
 
     ///
-    /// Selects a move based on the shortest path from position p to the given coords.
+    /// Selects a move based on the shortest path from position p to a
+    /// coordinate where `goal` is true.
     ///
-    def goTo(p: Position, coords: Coordinates, b: Board): Option[Move] = {
+    def goTo(p: Position, goal: Coordinates -> Bool \ ef, b: Board): Option[Move] \ ef = {
         use Option.flatMap;
 
         let Board(br) = b;
@@ -106,7 +107,7 @@ namespace Flixball/AiLibrary {
         
         let* path = findShortestPath(
             c -> Map.get(c, br.tiles) != Some(Wall),
-            start=coordsFrom, coords);
+            start=coordsFrom, goal);
         let* (xNext, yNext) = List.head(path);
         let (xFrom, yFrom) = coordsFrom;
 

@@ -9,21 +9,24 @@ namespace Flixball/GridGraph {
     use Flixball/Core.Tile;
 
     ///
-    /// It is assumed that `available` keeps the search space finite.
+    /// It is assumed that `available` keeps the search space finite or
+    /// that `goal` returns true for a reachable coordinate.
     /// This function might otherwise not halt.
     ///
-    pub def findShortestPath(available: Coordinates -> Bool \ ef,
-        start: {start :: Coordinates}, end: Coordinates): Option[List[Coordinates]] \ ef =
-    region r { if (start.start == end) Some(Nil) else {
+    pub def findShortestPath(available: Coordinates -> Bool \ ef1,
+        start: {start :: Coordinates}, goal: Coordinates -> Bool \ ef2): Option[List[Coordinates]] & ef1 and ef2 =
+    region r { if (goal(start.start)) Some(Nil) else {
         // bfs
         let dists: MutMap[Coordinates, Int32, r] = new MutMap(r);
         MutMap.put!(start.start, 0, dists);
         let taskList = new MutDeque(r);
+        let foundGoal = ref None;
         MutDeque.pushBack(start.start, taskList);
         def bfsLoop() = match MutDeque.popFront(taskList) {
             case Some(current) =>
                 foreach(next <- possibleMoves(r, current)) {
                     if (available(next)) {
+                        if (goal(next)) foundGoal := Some(next) else ();
                         let currentLength = match MutMap.get(current, dists) {
                             case None => ?unreachable
                             case Some(v) => v
@@ -34,34 +37,36 @@ namespace Flixball/GridGraph {
                         } else ()
                     } else ()
                 };
-                bfsLoop()
+                if (Option.isEmpty(deref foundGoal)) bfsLoop() else ()
             case None => ()
         };
         bfsLoop();
 
         // return none if not reachable
-        if (MutMap.get(end, dists) |> Option.isEmpty) None else
-        
-        // construct the path list, end to start
-        def stepBack(c) = {
-            let cLength = match MutMap.get(c, dists) {
-                case None => ?unreachable
-                case Some(l) => l
-            };
-            if (cLength == 1) None else
+        match deref foundGoal {
+            case None => None // no reachable goal
+            case Some(end) =>
+                // construct the path list, end to start
+                def stepBack(c) = {
+                    let cLength = match MutMap.get(c, dists) {
+                        case None => ?unreachable
+                        case Some(l) => l
+                    };
+                    if (cLength == 1) None else
 
-            let res = ref None;
-            foreach(next <- possibleMoves(r, c)) {
-                MutMap.get(next, dists) |>
-                    Option.foreach(d -> if (d == cLength - 1) res := Some(next) else ())
-            };
-            match deref res {
-                case None => ?unreachable
-                case Some(value) => Some(value)
-            }
-        };
-        let revPathList = List.unfold(c ->  stepBack(c) |> Option.map(next -> (next, next)), end);
-        Some(List.reverse(end :: revPathList))
+                    let res = ref None;
+                    foreach(next <- possibleMoves(r, c)) {
+                        MutMap.get(next, dists) |>
+                            Option.foreach(d -> if (d == cLength - 1) res := Some(next) else ())
+                    };
+                    match deref res {
+                        case None => ?unreachable
+                        case Some(value) => Some(value)
+                    }
+                };
+                let revPathList = List.unfold(c ->  stepBack(c) |> Option.map(next -> (next, next)), end);
+                Some(List.reverse(end :: revPathList))
+        }
     }}
 
     def possibleMoves(r: Region[r], c: Coordinates): Iterator[Coordinates, r] \ r =
