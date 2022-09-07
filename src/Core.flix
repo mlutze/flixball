@@ -164,10 +164,10 @@ namespace Flixball {
             pub def mkGameState(b: Board, moveLogics: Map[PlayerId, MoveLogic]): GameState =
                 let states = b |>
                     Flixball/Core/Board.players |>
-                    List.map(fst) |>
+                    List.map(match (id, _) -> id) |>
                     initialStates;
-                let players = Flixball/Core/Board.playerMap(b);
-                GameState(states, moveLogics, players, b)
+                let playerMap = Flixball/Core/Board.players(b) |> List.toMap;
+                GameState(states, moveLogics, playerMap, b)
         }
 
         namespace Board {
@@ -258,20 +258,13 @@ namespace Flixball {
                 };
                 MutMap.toMap(mutTiles)
 
-            pub def players(b: Board): List[(PlayerId, Direction)] =
+            pub def players(b: Board): List[(PlayerId, Position)] =
                 let Board(br) = b;
-                br.tiles |> Map.valuesOf |> List.filterMap(t -> match t {
-                    case Person(id, dir) => Some(id, dir)
+                br.tiles |> Map.toList |> List.filterMap(match (coords, t) -> match t {
+                    case Person(id, dir) => Some(id, Position(coords, dir))
                     case _ => None
                 })
 
-            pub def playerMap(b: Board): Map[PlayerId, Position] =
-                let Board(br) = b;
-                br.tiles |> Map.toList |> List.filterMap(match (coords, t) -> match t {
-                    case Person(id, direction) =>
-                        Some((id, Position(coords, direction)))
-                    case _ => None
-                }) |> List.toMap
         }
     }
 }
