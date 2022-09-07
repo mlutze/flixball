@@ -37,9 +37,9 @@ namespace Flixball/Engine {
             List.map(match (id, _) ->
                 use Option.flatMap;
                 let* MoveLogic(move) = Map.get(id, moveLogics);
-                let* (i0, m0) = Map.get(id, states0);
-                let (moveToDo, i, m) = move(gs, i0, m0);
-                MutMap.put!(id, (i, m), newStates);
+                let* state0 = Map.get(id, states0);
+                let (moveToDo, state) = move(gs, state0);
+                MutMap.put!(id, state, newStates);
                 Some((id, moveToDo))
             ) |>
             List.map(opt -> match opt {

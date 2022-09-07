@@ -5,6 +5,8 @@ namespace Flixball {
 
         pub type alias Coordinates = (Int32, Int32)
 
+        pub type alias AiState = (Int32, Map[String, String])
+
 
         ///
         /// Board uses matrix-like index ordering. Map entries should not be out
@@ -50,20 +52,20 @@ namespace Flixball {
         }
 
         pub enum MoveLogic(
-            (GameState, Int32, Map[String, String]) ->
-            (Move, Int32, Map[String, String])
+            (GameState, AiState) ->
+            (Move, AiState)
         )
 
         pub enum Position(Coordinates, Direction)
 
         pub enum GameState(
-            Map[PlayerId, (Int32, Map[String, String])],
+            Map[PlayerId, AiState],
             Map[PlayerId, MoveLogic],
             Map[PlayerId, Position],
             Board
         )
 
-        pub def initialPlayerState(): (Int32, Map[String, String]) = (0, Map.empty())
+        pub def initialPlayerState(): AiState = (0, Map.empty())
 
         pub def rotateDir(rot: Rotation, dir: Direction): Direction = match (rot, dir) {
             case (Clockwise, North) => East
@@ -78,23 +80,23 @@ namespace Flixball {
         }
 
         namespace GameState {
+            use Flixball/Core.AiState;
             use Flixball/Core.Board;
-            use Flixball/Core.Coordinates;
             use Flixball/Core.Coordinates.Coordinates;
-            use Flixball/Core.GameState;
+            use Flixball/Core.Coordinates;
             use Flixball/Core.GameState.GameState;
+            use Flixball/Core.GameState;
             use Flixball/Core.MoveLogic;
             use Flixball/Core.PlayerId;
-            use Flixball/Core.Position;
             use Flixball/Core.Position.{Position};
-            use Flixball/Core.rotateDir;
+            use Flixball/Core.Position;
             use Flixball/Core.Rotation;
-            use Flixball/Core.Tile;
             use Flixball/Core.Tile.Person;
+            use Flixball/Core.Tile;
+            use Flixball/Core.rotateDir;
             use Flixball/Core/Board.adjust;
             use Flixball/Core/Board.get_;
             use Flixball/Core/Board.set_;
-            use Utils.{|||>};
 
             /// Removes a player from the game.
             /// Does nothing if the player does not exist in the game.
@@ -154,7 +156,7 @@ namespace Flixball {
                 }
             }
 
-            pub def initialStates(players: List[PlayerId]): Map[PlayerId, (Int32, Map[String, String])] =
+            pub def initialStates(players: List[PlayerId]): Map[PlayerId, AiState] =
                 players |> List.map(p -> {
                     (p, Flixball/Core.initialPlayerState())
                 }) |> List.toMap
