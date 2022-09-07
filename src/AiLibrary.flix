@@ -30,6 +30,21 @@ namespace Flixball/AiLibrary {
 
     pub def rotate(r: Rotation): MoveLogic = constantAction(Turn(r))
 
+    pub def wander(): MoveLogic =
+        MoveLogic((_, _) -> match (i0, m0) -> {
+            match i0 mod 2 {
+                case 0 => (Walk, (nextRandom(i0), m0))
+                case 1 =>
+                    let i1 = nextRandom(i0);
+                    match i1 mod 2 {
+                        case 0 => (Turn(Clockwise), (nextRandom(i1), m0))
+                        case 1 => (Turn(Counterclockwise), (nextRandom(i1), m0))
+                        case _ => unreachable!()
+                    }
+                case _ => unreachable!()
+            }
+        })
+
     pub def spinAndShoot(r: Rotation): MoveLogic =
         MoveLogic((_, _) -> match (i0, m0) -> {
             if (i0 == 0) (Turn(r), (1, m0))
@@ -88,7 +103,7 @@ namespace Flixball/AiLibrary {
     ///
     /// Selects a move based on the shortest path from position p to the given coords.
     ///
-    pub def goTo(p: Position, coords: Coordinates, b: Board): Option[Move] = {
+    def goTo(p: Position, coords: Coordinates, b: Board): Option[Move] = {
         use Option.flatMap;
 
         let Board(br) = b;
@@ -143,4 +158,9 @@ namespace Flixball/AiLibrary {
             case (West, South) => MustTurn(Counterclockwise)
             case (West, West ) => Nothing
         }
+    
+    def nextRandom(i: Int32): Int32 = {
+        let r = Random.newWithSeed(Int32.toInt64(i));
+        Random.nextInt32(r)
+    } as \ {}
 }
