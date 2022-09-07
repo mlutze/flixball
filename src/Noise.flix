@@ -12,12 +12,9 @@ namespace Flixball/Noise {
     /// Returns a two-dimensional array of random values >= 0.
     ///
     pub def int32Noise2d(r: Region[r], d: Dimensions, seed: Int64): Grid[Int32, r] \ Write(r) = region r1 {
-        // avoid r1 being unused
-        let _ = r1;
-        // This is a safe cast to r since the call sequence to rand is fixed.
-        let rand = Random.newWithSeed(seed) as \ r1;
-        let next = Random.nextInt32 as Random.Random -> Int32 \ r1;
-        createGrid(r, (_, _) -> Int32.abs(next(rand)), d)
+        use RegionedRandom.nextInt32;
+        let rand = RegionedRandom.newWithSeed(r1, seed);
+        createGrid(r, (_, _) -> Int32.abs(nextInt32(rand)), d)
     }
 
     ///
@@ -25,16 +22,13 @@ namespace Flixball/Noise {
     /// prob is between 0 and 1 inclusive.
     ///
     pub def boolNoise2d(r: Region[r], d: Dimensions, seed: Int64, prob: Float64): Grid[Bool, r] \ Write(r) = region r1 {
-        // avoid r1 being unused
-        let _ = r1;
-        // This is a safe cast to r since the call sequence to rand is fixed.
-        let rand = Random.newWithSeed(seed) as \ Write(r1);
-        let next = x -> Random.nextFloat64(x) as \ {Read(r1), Write(r1)};
+        use RegionedRandom.nextFloat64;
+        let rand = RegionedRandom.newWithSeed(r1, seed);
 
         // sample function
         let clampedProb = prob |> Float64.min(1.0) |> Float64.max(0.0);
         def sample() = {
-            let randPosFloat = next(rand) |> Float64.abs;
+            let randPosFloat = nextFloat64(rand) |> Float64.abs;
             randPosFloat < clampedProb
         };
         createGrid(r, (_, _) -> sample(), d)
