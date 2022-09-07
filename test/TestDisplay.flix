@@ -21,7 +21,7 @@ namespace TestDisplay {
 
     use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot, goAndSpin, naiveSearchAndDestroy, wander};
 
-    def testBoard01(): (Board, Map[PlayerId, MoveLogic]) =
+    def testBoard01(): (Board, Map[PlayerId, MoveLogic[reg]]) =
         let board = Board({rows = 5, cols = 5, tiles = Map#{
             (2, 2) => Person(0, South),
             (3, 3) => Person(1, West)
@@ -32,7 +32,7 @@ namespace TestDisplay {
         };
         (board, moveLogics)
     
-    def testBoard02(): (Board, Map[PlayerId, MoveLogic]) =
+    def testBoard02(): (Board, Map[PlayerId, MoveLogic[reg]]) =
         let board = Board({rows = 3, cols = 15, tiles = Map#{
             (1, 1) => Person(0, East),
             (1, 3) => Person(1, North),
@@ -58,7 +58,7 @@ namespace TestDisplay {
         };
         (board, moveLogics)
 
-    def testBoard03(): (Board, Map[PlayerId, MoveLogic]) =
+    def testBoard03(): (Board, Map[PlayerId, MoveLogic[reg]]) =
         let board = Board({rows = 10, cols = 10, tiles = Map#{
             (0, 0) => Person(0, North),
             (0, 2) => Wall,
@@ -87,7 +87,7 @@ namespace TestDisplay {
     pub def testBoard05(): Board =
         automataBoard(285_041_125i64, rows=25, 40, 0.38, 3)
 
-    pub def testBoard06(): (Board, Map[PlayerId, MoveLogic]) =
+    pub def testBoard06(): (Board, Map[PlayerId, MoveLogic[r]]) =
         let board = Board({rows = 10, cols = 10, tiles = Map#{
             (0, 0) => Person(0, North),
             (1, 1) => Person(1, South),
@@ -102,15 +102,15 @@ namespace TestDisplay {
         }}) |> Flixball/Core/Board.addBorder;
         let moveLogics = Map#{
             0 => naiveSearchAndDestroy(), 
-            1 => wander(), 
-            2 => wander(),
-            3 => wander(),
-            4 => wander(),
-            5 => wander(),
-            6 => wander(),
-            7 => wander(),
-            8 => wander(),
-            9 => wander()
+            1 => wander(0i64), 
+            2 => wander(1i64),
+            3 => wander(2i64),
+            4 => wander(3i64),
+            5 => wander(4i64),
+            6 => wander(5i64),
+            7 => wander(6i64),
+            8 => wander(7i64),
+            9 => wander(8i64)
         };
         (board, moveLogics)
 
@@ -119,20 +119,23 @@ namespace TestDisplay {
     pub def testDisplayBoard01(): Unit & Impure =
         Flixball/Display.displayBoard(fst(testBoard01()))
 
-    pub def testRunBoard01(): Unit & Impure =
-        Flixball/Display.runGameState(500i64, testBoard01() ||> mkGameState)
+    pub def testRunBoard01(): Unit & Impure = region reg {
+        Flixball/Display.runGameState(500i64, testBoard01() ||> mkGameState(reg))
+    }
 
     pub def testDisplayBoard02(): Unit & Impure =
         Flixball/Display.displayBoard(fst(testBoard02()))
 
-    pub def testRunBoard02(): Unit & Impure =
-        Flixball/Display.runGameState(500i64, testBoard02() ||> mkGameState)
+    pub def testRunBoard02(): Unit & Impure = region reg {
+        Flixball/Display.runGameState(500i64, testBoard02() ||> mkGameState(reg))
+    }
 
     pub def testDisplayBoard03(): Unit & Impure =
         Flixball/Display.displayBoard(fst(testBoard03()))
 
-    pub def testRunBoard03(): Unit & Impure =
-        Flixball/Display.runGameState(500i64, testBoard03() ||> mkGameState)
+    pub def testRunBoard03(): Unit & Impure = region reg {
+        Flixball/Display.runGameState(500i64, testBoard03() ||> mkGameState(reg))
+    }
 
     pub def testDisplayBoard04(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard04())
@@ -140,6 +143,7 @@ namespace TestDisplay {
     pub def testDisplayBoard05(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard05())
 
-    pub def testRunBoard06(): Unit & Impure =
-        Flixball/Display.runGameState(500i64, testBoard06() ||> mkGameState)
+    pub def testRunBoard06(): Unit & Impure = region reg {
+        Flixball/Display.runGameState(500i64, testBoard06() ||> mkGameState(reg))
+    }
 }

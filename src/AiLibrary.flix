@@ -1,97 +1,132 @@
 namespace Flixball/AiLibrary {
     use Flixball/Core.AiState;
-    use Flixball/Core.Board.{Board};
     use Flixball/Core.Board;
-    use Flixball/Core.Coordinates.Coordinates;
+    use Flixball/Core.Board.{Board};
     use Flixball/Core.Coordinates;
-    use Flixball/GridGraph.raytraceEx;
-    use Flixball/Core.Direction.{North, South, West, East};
+    use Flixball/Core.Coordinates.Coordinates;
     use Flixball/Core.Direction;
-    use Flixball/Core.GameState.{GameState};
+    use Flixball/Core.Direction.{North, South, West, East};
     use Flixball/Core.GameState;
-    use Flixball/Core.Move.{Turn, Shoot, Walk};
+    use Flixball/Core.GameState.{GameState};
     use Flixball/Core.Move;
-    use Flixball/Core.MoveLogic.{MoveLogic};
+    use Flixball/Core.Move.{Turn, Shoot, Walk};
     use Flixball/Core.MoveLogic;
-    use Flixball/Core.Position.{Position};
+    use Flixball/Core.PlayerId;
     use Flixball/Core.Position;
-    use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
+    use Flixball/Core.Position.{Position};
     use Flixball/Core.Rotation;
+    use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
     use Flixball/Core.Tile.{Person, Wall};
-
     use Flixball/GridGraph.findShortestPath;
+    use Flixball/GridGraph.raytraceEx;
 
-    def constantAction(m: Move): MoveLogic =
-        ((_, _, state) -> (m, state)) |> MoveLogic
+    def constantAction(m: Move): MoveLogic[reg] =
+        // TODO: this should use the upcast keyword at 0.31.0
+        _reg -> upcast(_id -> upcast(_b -> m))
+    
+    pub def shoot(): MoveLogic[reg] = constantAction(Shoot)
 
-    pub def shoot(): MoveLogic = constantAction(Shoot)
+    pub def walk(): MoveLogic[reg] = constantAction(Walk)
 
-    pub def walk(): MoveLogic = constantAction(Walk)
+    pub def rotate(r: Rotation): MoveLogic[reg] = constantAction(Turn(r))
 
-    pub def rotate(r: Rotation): MoveLogic = constantAction(Turn(r))
+    pub def wander(seed: Int64): MoveLogic[reg] = wanderAux(seed)
 
-    pub def wander(): MoveLogic =
-        use RegionedRandom.{nextInt32};
-        MoveLogic((_, _) -> match (i0, m0) -> region r {
-            let ran = RegionedRandom.newWithSeed(r, Int32.toInt64(i0));
-            let roll = ref nextInt32(ran) @ r;
+    def wanderAux(seed: Int64, reg: Region[reg], _id: PlayerId): (Board -> Move & reg) & reg =
+        use RegionedRandom.{nextInt32, newWithSeed};
+        let random = newWithSeed(reg, seed);
+
+        def moveFunction(_b: Board) = {
             let choices = Nel(Walk, Walk :: Turn(Clockwise) :: Turn(Counterclockwise) :: Nil);
-            let move = RegionedRandom.chooseNel(ran, choices);
-            (move, (deref roll, m0))
-        })
+            RegionedRandom.chooseNel(random, choices)
+        };
+        moveFunction
 
-    pub def spinAndShoot(r: Rotation): MoveLogic =
-        MoveLogic((_, _) -> match (i0, m0) -> {
-            if (i0 == 0) (Turn(r), (1, m0))
-            else (Shoot, (0, m0))
-        })
+    pub def spinAndShoot(r: Rotation): MoveLogic[reg] = spinAndShootAux(r)
 
-    pub def goAndSpin(coords: Coordinates): MoveLogic =
-        MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
-            let currentPosition = match playerMap |> Map.get(id) {
-                case None => ?unreachable
-                case Some(v) => v
+    def spinAndShootAux(r: Rotation, reg: Region[reg], _id: PlayerId): (Board -> Move & reg) & reg =
+        let shouldTurn = ref true @ reg;
+        def changeAction() = shouldTurn := not deref shouldTurn;
+
+        def moveFunction(_b: Board) = {
+            changeAction();
+            if (deref shouldTurn) Turn(r) else Shoot
+        };
+        moveFunction
+
+    pub def goAndSpin(coords: Coordinates): MoveLogic[reg] = goAndSpinAux(coords)
+
+    def goAndSpinAux(coords: Coordinates, _reg: Region[reg], id: PlayerId): (Board -> Move & reg) & reg =
+        // Here the whole plan could be cached once computed
+        // instead of full recomputation on each step.
+        def moveFunction(b: Board) = {
+            use Option.flatMap;
+            let optMove = {
+                let* pos = Flixball/Core/Board.player(b, id);
+                goTo(pos, coords, b)
             };
-            let move = goTo(currentPosition, coords, board) |> Option.getWithDefault(Turn(Clockwise));
-            (move, state)
-        })
+            match optMove {
+                case Some(m) => m
+                case None => Turn(Clockwise)
+            }
+        };
+        // sadly things are messy because of subtype-less effects
+        upcast(moveFunction) as & reg
     
     ///
     /// Go to the next player on the list and shoot them.
     /// Doesn't necessarily take the shortest path to find a shooting angle.
     ///
-    pub def naiveSearchAndDestroy(): MoveLogic =
-        MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
+    pub def naiveSearchAndDestroy(): MoveLogic[r] = naiveSearchAndDestroyAux
 
-            // Pick a target from among the players (lowest ID except me)
-            let target = playerMap 
-                |> Map.filterWithKey((id2, _) -> id != id2) 
-                |> Map.toList
-                |> List.head;
+    def naiveSearchAndDestroyAux(reg: Region[reg], myId: PlayerId): (Board -> Move & reg) & reg =
+        let target = ref None @ reg;
+
+        def moveFunction(b: Board) = {
+
+            let playerMap = Flixball/Core/Board.players(b) |> List.toMap;
 
             // Get my own position
-            let Position(coords, dir) = match playerMap |> Map.get(id) {
+            let Position(coords, dir) = match playerMap |> Map.get(myId) {
                 case None => unreachable!()
                 case Some(v) => v
             };
 
-            // Pick a move
-            let move = match target {
+            // find out if we need a new target and update living target position
+            let needNewTarget = match deref target {
+                case Some((targetId, _)) =>
+                    match Map.find((id, _) -> targetId == id, playerMap) {
+                        case None => true // target is dead
+                        case Some((_, pos)) =>
+                            // target is alive, update position
+                            target := Some((targetId, pos));
+                            false
+                    }
+                case None => true
+            };
+
+            // try to find a new target
+            if (needNewTarget) {
+                // Pick a target from among the players (lowest ID except me)
+                target := playerMap |> Map.find((id, _) -> myId != id) 
+            } else ();
+
+            match deref target {
                 // Case 1: No target. Just spin for fun.
                 case None => Turn(Clockwise)
 
                 // Case 2: Some target. Hunt them down.
                 case Some((targetId, Position(targetCoords, _))) =>
-                    match raytraceEx(dir, coords, board) {
+                    match raytraceEx(dir, coords, b) {
                         // Case 2.1: Looking at my target. Shoot.
                         case Some(Person(viewId, _)) if viewId == targetId => Shoot 
                         // Case 2.2: Not looking at my target. Keep moving.
-                        case _ => goTo(Position(coords, dir), targetCoords, board) |> Option.getWithDefault(Turn(Clockwise))
+                        case _ => goTo(Position(coords, dir), targetCoords, b) |> Option.getWithDefault(Turn(Clockwise))
                             // TODO pick another target if this one is inaccessible
                     }
-            };
-            (move, state)
-        })
+            }
+        };
+        moveFunction
 
     // Utilities
 

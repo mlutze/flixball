@@ -51,16 +51,13 @@ namespace Flixball {
             case Person(PlayerId, Direction)
         }
 
-        pub enum MoveLogic(
-            (GameState, PlayerId, AiState) ->
-            (Move, AiState)
-        )
+        pub type alias MoveLogic[r: Region] =
+            Region[r] -> PlayerId -> (Board -> Move & r) & r
 
         pub enum Position(Coordinates, Direction)
 
-        pub enum GameState(
-            Map[PlayerId, AiState],
-            Map[PlayerId, MoveLogic],
+        pub enum GameState[r: Region](
+            Map[PlayerId, Board -> Move & r],
             Map[PlayerId, Position],
             Board
         )
@@ -93,6 +90,7 @@ namespace Flixball {
             use Flixball/Core.Rotation;
             use Flixball/Core.Tile.Person;
             use Flixball/Core.Tile;
+            use Flixball/Core.Move;
             use Flixball/Core.rotateDir;
             use Flixball/Core/Board.adjust;
             use Flixball/Core/Board.get_;
@@ -100,8 +98,8 @@ namespace Flixball {
 
             /// Removes a player from the game.
             /// Does nothing if the player does not exist in the game.
-            pub def removePlayer(id: PlayerId, state0: GameState): GameState = {
-                let GameState(states0, moveLogics, playerPositions0, board0) = state0;
+            pub def removePlayer(id: PlayerId, state0: GameState[r]): GameState[r] = {
+                let GameState(moveLogics, playerPositions0, board0) = state0;
                 match (playerPositions0 |> Map.get(id)) {
                     // Case 1: No such player. Do nothing.
                     case None => state0
@@ -109,16 +107,15 @@ namespace Flixball {
                     // Case 2: Found the player. Remove from the map, the board, and the states.
                     case Some(Position(coords, _)) =>
                         let playerPositions = playerPositions0 |> Map.remove(id);
-                        let states = states0 |> Map.remove(id);
                         let board = board0 |> set_(coords, None);
-                        GameState(states, moveLogics, playerPositions, board)
+                        GameState(moveLogics, playerPositions, board)
                 }
             }
 
             /// Rotates a player with the given rotation.
             /// Does nothing if the player does not exist in the game.
-            pub def rotatePlayer(id: PlayerId, rot: Rotation, state0: GameState): GameState = {
-                let GameState(states, moveLogics, playerPositions0, board0) = state0;
+            pub def rotatePlayer(id: PlayerId, rot: Rotation, state0: GameState[r]): GameState[r] = {
+                let GameState(moveLogics, playerPositions0, board0) = state0;
                 match (playerPositions0 |> Map.get(id)) {
                     // Case 1: No such player. Do nothing.
                     case None => state0
@@ -132,14 +129,14 @@ namespace Flixball {
                                 case other => other
                             }
                         );
-                        GameState(states, moveLogics, playerPositions, board)
+                        GameState(moveLogics, playerPositions, board)
                 }
             }
 
             /// Moves a player to a new position.
             /// Does not change the direction of the player.
-            pub def movePlayer(id: PlayerId, coords: Coordinates, state0: GameState): GameState = {
-                let GameState(states, moveLogics, playerPositions0, board0) = state0;
+            pub def movePlayer(id: PlayerId, coords: Coordinates, state0: GameState[r]): GameState[r] = {
+                let GameState(moveLogics, playerPositions0, board0) = state0;
                 match (playerPositions0 |> Map.get(id)) {
                     // Case 1: No such player. Do nothing.
                     case None => state0
@@ -151,23 +148,15 @@ namespace Flixball {
                             case None => bug!("invalid game state")
                             case Some(person) =>
                                 let board = board0 |> set_(coords0, None) |> set_(coords, Some(person));
-                                GameState(states, moveLogics, playerPositions, board)
+                                GameState(moveLogics, playerPositions, board)
                         }
                 }
             }
 
-            pub def initialStates(players: List[PlayerId]): Map[PlayerId, AiState] =
-                players |> List.map(p -> {
-                    (p, Flixball/Core.initialPlayerState())
-                }) |> List.toMap
-            
-            pub def mkGameState(b: Board, moveLogics: Map[PlayerId, MoveLogic]): GameState =
-                let states = b |>
-                    Flixball/Core/Board.players |>
-                    List.map(match (id, _) -> id) |>
-                    initialStates;
-                let playerMap = Flixball/Core/Board.players(b) |> List.toMap;
-                GameState(states, moveLogics, playerMap, b)
+            pub def mkGameState(r: Region[reg], b: Board, moveLogics: Map[PlayerId, MoveLogic[reg]]): GameState[reg] & reg =
+                let players = Flixball/Core/Board.players(b) |> List.toMap;
+                let agents = moveLogics |> Map.mapWithKey((id, ml) -> ml(r, id));
+                GameState(agents, players, b)
         }
 
         namespace Board {
