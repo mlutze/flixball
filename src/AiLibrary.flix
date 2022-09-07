@@ -19,7 +19,7 @@ namespace Flixball/AiLibrary {
     use Flixball/GridGraph.findShortestPath;
 
     def constantAction(m: Move): MoveLogic =
-        ((_, i, map) -> (m, i, map)) |> MoveLogic
+        ((_, state) -> (m, state)) |> MoveLogic
 
     pub def shoot(): MoveLogic = constantAction(Shoot)
 
@@ -28,19 +28,19 @@ namespace Flixball/AiLibrary {
     pub def rotate(r: Rotation): MoveLogic = constantAction(Turn(r))
 
     pub def spinAndShoot(r: Rotation): MoveLogic =
-        MoveLogic((_, i0, m0) -> {
-            if (i0 == 0) (Turn(r), 1, m0)
-            else (Shoot, 0, m0)
+        MoveLogic(_ -> match (i0, m0) -> {
+            if (i0 == 0) (Turn(r), (1, m0))
+            else (Shoot, (0, m0))
         })
 
     pub def goAndSpin(id: {id::Int32}, coords: Coordinates): MoveLogic =
-        MoveLogic(match GameState(_, _, playerMap, board) -> (i0, m0) -> {
+        MoveLogic(match GameState(_, _, playerMap, board) -> state -> {
             let currentPosition = match playerMap |> Map.get(id.id) {
                 case None => ?unreachable
                 case Some(v) => v
             };
             let move = goTo(currentPosition, coords, board) |> Option.getWithDefault(Turn(Clockwise));
-            (move, i0, m0)
+            (move, state)
         })
 
     // Utilities
