@@ -1,22 +1,10 @@
 namespace TestDisplay {
-    use Flixball/Core.Board;
-    use Flixball/Core.Board.{Board};
-    use Flixball/Core/Board.{randomBoard, automataBoard};
-    use Flixball/Core.Direction;
-    use Flixball/Core.Direction.{North, West, South, East};
-    use Flixball/Core.GameState;
-    use Flixball/Core.GameState.{GameState};
-    use Flixball/Core.Move;
-    use Flixball/Core.Move.{Turn, Shoot, Walk};
-    use Flixball/Core.MoveLogic;
-    use Flixball/Core.MoveLogic.{MoveLogic};
-    use Flixball/Core.PlayerId;
-    use Flixball/Core.Position;
-    use Flixball/Core.Position.{Position};
-    use Flixball/Core.Rotation;
+    use Flixball/Core.{Board, MoveLogic, PlayerId};
+    use Flixball/Core.Board.Board;
+    use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
-    use Flixball/Core.Tile;
-    use Flixball/Core.Tile.{Wall, Person};
+    use Flixball/Core.Tile.{Person, Wall};
+    use Flixball/Core/Board.{automataBoard, randomBoard};
     use Flixball/Core/GameState.mkGameState;
 
     use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot, goAndSpin, naiveSearchAndDestroy, wander};
