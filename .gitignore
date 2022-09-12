@@ -7,7 +7,7 @@ target/
 crash_report_*.txt
 
 # Custom flix jar and build jars
-*.jar
+# *.jar
 
 # Flix package
 *.fpkg
