@@ -14,7 +14,7 @@ namespace Flixball/GridGraph {
     /// This function might otherwise not halt.
     ///
     pub def findShortestPath(available: Coordinates -> Bool \ ef1,
-        start: {start :: Coordinates}, goal: Coordinates -> Bool \ ef2): Option[List[Coordinates]] & ef1 and ef2 =
+        start: {start :: Coordinates}, goal: Coordinates -> Bool \ ef2): Option[List[Coordinates]] \ {ef1, ef2} =
     region r { if (goal(start.start)) Some(Nil) else {
         // bfs
         let dists: MutMap[Coordinates, Int32, r] = new MutMap(r);
