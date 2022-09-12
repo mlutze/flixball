@@ -9,7 +9,7 @@ namespace Flixball/Terminal {
     ///
     /// Upper left corner is coordinate `x=0`, `y=0`.
     ///
-    pub def setCursor(x: {x::Int32}, y: Int32): String = csi("${y+1};${x.x+1}H")
+    pub def setCursor(x: {x=Int32}, y: Int32): String = csi("${y+1};${x.x+1}H")
 
     ///
     /// Clears the terminal screen without changing the cursor position.

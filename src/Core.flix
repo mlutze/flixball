@@ -26,7 +26,7 @@ namespace Flixball {
         /// North, East, South, West correspond to the drawing above, likewise
         /// with Clockwise and Counterclockwise.
         /// 
-        pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[Coordinates, Tile]})
+        pub enum Board({rows = Int32, cols = Int32, tiles = Map[Coordinates, Tile]})
 
         pub enum Direction with Eq, ToString {
             case North
@@ -232,7 +232,7 @@ namespace Flixball {
             /// density of `density` in the range [0.0, 1.0]. The map will have
             /// an encompasing border.  
             ///
-            pub def randomBoard(seed: Int64, rows: {rows::Int32}, cols: Int32, density: Float64): Board = region r {
+            pub def randomBoard(seed: Int64, rows: {rows=Int32}, cols: Int32, density: Float64): Board = region r {
                 let grid = Flixball/Noise.boolNoise2d(r, {width=rows.rows, height=cols}, seed, density);
                 Board({rows=rows.rows, cols=cols, tiles=gridToMap(grid)}) |> addBorder
             }
@@ -241,7 +241,7 @@ namespace Flixball {
             /// Cellular Automata Refinement.
             /// sensible defaults, prob=0.40, iterations=3
             ///
-            pub def automataBoard(seed: Int64, rows: {rows::Int32}, cols: Int32, density: Float64, iterations: Int32): Board = region r {
+            pub def automataBoard(seed: Int64, rows: {rows=Int32}, cols: Int32, density: Float64, iterations: Int32): Board = region r {
                 let grid = Flixball/Noise.cellularGeneration(r, {width=rows.rows, height=cols}, seed, density, iterations);
                 Board({rows=rows.rows, cols=cols, tiles=gridToMap(grid)}) |> addBorder
             }

@@ -13,7 +13,7 @@ namespace Flixball/Display {
     /// Clears then screen and then displays the board. The cursor will be left
     /// at the end.
     ///
-    pub def displayBoard(b: Board): Unit & Impure =
+    pub def displayBoard(b: Board): Unit \ IO =
         Flixball/Terminal.resetTerminal() |> print;
         b |> boardLines |> List.foreach(println)
 
@@ -21,8 +21,8 @@ namespace Flixball/Display {
     /// Continously simulates the game state and drawing it between each step with a
     /// set delay. One second is `1000i64`.
     ///
-    pub def runGameState(delayDuration: Int64, gs: GameState): Unit & Impure =
-        import static java.lang.Thread.sleep(Int64): Unit & Impure;
+    pub def runGameState(delayDuration: Int64, gs: GameState): Unit \ IO =
+        import static java.lang.Thread.sleep(Int64): Unit \ IO;
         let GameState(_, _, _, board) = gs;
         displayBoard(board);
         sleep(delayDuration);
@@ -66,7 +66,7 @@ namespace Flixball/Display {
         case East => ">"
     }
 
-    def print(s: s): Unit & Impure with ToString[s] = Console.print(s)
+    def print(s: s): Unit \ IO with ToString[s] = Console.print(s)
 
-    def println(s: s): Unit & Impure with ToString[s] = Console.printLine(s)
+    def println(s: s): Unit \ IO with ToString[s] = Console.printLine(s)
 }

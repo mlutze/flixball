@@ -1,5 +1,4 @@
 namespace Flixball/GridGraph {
-
     use Flixball/Core.Board;
     use Flixball/Core.Board.Board;
     use Flixball/Core.Coordinates;
@@ -13,7 +12,7 @@ namespace Flixball/GridGraph {
     /// This function might otherwise not halt.
     ///
     pub def findShortestPath(available: Coordinates -> Bool \ ef,
-        start: {start :: Coordinates}, end: Coordinates): Option[List[Coordinates]] \ ef =
+        start: {start = Coordinates}, end: Coordinates): Option[List[Coordinates]] \ ef =
     region r { if (start.start == end) Some(Nil) else {
         // bfs
         let dists: MutMap[Coordinates, Int32, r] = new MutMap(r);

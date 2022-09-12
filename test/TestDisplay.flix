@@ -116,30 +116,30 @@ namespace TestDisplay {
 
     // Test Scenarios
 
-    pub def testDisplayBoard01(): Unit & Impure =
+    pub def testDisplayBoard01(): Unit \ IO =
         Flixball/Display.displayBoard(fst(testBoard01()))
 
-    pub def testRunBoard01(): Unit & Impure =
+    pub def testRunBoard01(): Unit \ IO =
         Flixball/Display.runGameState(500i64, testBoard01() ||> mkGameState)
 
-    pub def testDisplayBoard02(): Unit & Impure =
+    pub def testDisplayBoard02(): Unit \ IO =
         Flixball/Display.displayBoard(fst(testBoard02()))
 
-    pub def testRunBoard02(): Unit & Impure =
+    pub def testRunBoard02(): Unit \ IO =
         Flixball/Display.runGameState(500i64, testBoard02() ||> mkGameState)
 
-    pub def testDisplayBoard03(): Unit & Impure =
+    pub def testDisplayBoard03(): Unit \ IO =
         Flixball/Display.displayBoard(fst(testBoard03()))
 
-    pub def testRunBoard03(): Unit & Impure =
+    pub def testRunBoard03(): Unit \ IO =
         Flixball/Display.runGameState(500i64, testBoard03() ||> mkGameState)
 
-    pub def testDisplayBoard04(): Unit & Impure =
+    pub def testDisplayBoard04(): Unit \ IO =
         Flixball/Display.displayBoard(testBoard04())
 
-    pub def testDisplayBoard05(): Unit & Impure =
+    pub def testDisplayBoard05(): Unit \ IO =
         Flixball/Display.displayBoard(testBoard05())
 
-    pub def testRunBoard06(): Unit & Impure =
+    pub def testRunBoard06(): Unit \ IO =
         Flixball/Display.runGameState(500i64, testBoard06() ||> mkGameState)
 }

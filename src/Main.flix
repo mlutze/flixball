@@ -4,7 +4,7 @@ namespace Flixball/Main {
     use Flixball/Options.Action;
     use Flixball/Version.version;
 
-    pub def main(): Unit \ Impure = {
+    pub def main(): Unit \ IO = {
         let args = Environment.getArgs();
         match parse(args) {
             case Action.Version => println(version())

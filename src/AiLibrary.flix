@@ -131,7 +131,7 @@ namespace Flixball/AiLibrary {
         case MustTurn(Rotation)
     }
 
-    def rotateTowardsDir(current: {current::Direction}, target: Direction): DirectionChoice =
+    def rotateTowardsDir(current: {current=Direction}, target: Direction): DirectionChoice =
         match (current.current, target) {
             case (North, North) => Nothing
             case (North, East ) => MustTurn(Clockwise)
