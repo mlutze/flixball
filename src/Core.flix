@@ -80,23 +80,11 @@ namespace Flixball {
         }
 
         namespace GameState {
-            use Flixball/Core.AiState;
-            use Flixball/Core.Board;
-            use Flixball/Core.Coordinates.Coordinates;
-            use Flixball/Core.Coordinates;
+            use Flixball/Core.{AiState, Board, Coordinates, GameState, MoveLogic, PlayerId, rotateDir, Rotation};
             use Flixball/Core.GameState.GameState;
-            use Flixball/Core.GameState;
-            use Flixball/Core.MoveLogic;
-            use Flixball/Core.PlayerId;
-            use Flixball/Core.Position.{Position};
-            use Flixball/Core.Position;
-            use Flixball/Core.Rotation;
+            use Flixball/Core.Position.Position;
             use Flixball/Core.Tile.Person;
-            use Flixball/Core.Tile;
-            use Flixball/Core.rotateDir;
-            use Flixball/Core/Board.adjust;
-            use Flixball/Core/Board.get_;
-            use Flixball/Core/Board.set_;
+            use Flixball/Core/Board.{adjust, get_, set_};
 
             /// Removes a player from the game.
             /// Does nothing if the player does not exist in the game.
@@ -171,15 +159,9 @@ namespace Flixball {
         }
 
         namespace Board {
-            use Flixball/Core.Board;
+            use Flixball/Core.{Board, Coordinates, PlayerId, Position, Tile};
             use Flixball/Core.Board.Board;
-            use Flixball/Core.Coordinates;
-            use Flixball/Core.Coordinates.Coordinates;
-            use Flixball/Core.Direction;
-            use Flixball/Core.PlayerId;
-            use Flixball/Core.Position;
-            use Flixball/Core.Position.{Position};
-            use Flixball/Core.Tile;
+            use Flixball/Core.Position.Position;
             use Flixball/Core.Tile.{Person, Wall};
 
             pub def set_(coords: Coordinates, tile: Option[Tile], board0: Board): Board = {

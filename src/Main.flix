@@ -1,7 +1,7 @@
 namespace Flixball/Main {
+    use Flixball/Options.Action;
     use Flixball/Options.parse;
     use Flixball/Options.usage;
-    use Flixball/Options.Action;
     use Flixball/Version.version;
 
     pub def main(): Unit \ Impure = {
