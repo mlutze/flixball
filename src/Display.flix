@@ -1,13 +1,9 @@
 namespace Flixball/Display {
-    use Flixball/Core.Board;
-    use Flixball/Core.Board.{Board};
-    use Flixball/Core.Direction;
-    use Flixball/Core.Direction.{North, East, South, West};
-    use Flixball/Core.GameState;
+    use Flixball/Core.{Board, Direction, GameState, Tile};
+    use Flixball/Core.Board.Board;
+    use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.GameState.GameState;
-    use Flixball/Core.Player;
-    use Flixball/Core.Tile;
-    use Flixball/Core.Tile.{Wall, Person};
+    use Flixball/Core.Tile.{Person, Wall};
 
     ///
     /// Clears then screen and then displays the board. The cursor will be left

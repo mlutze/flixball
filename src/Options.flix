@@ -1,9 +1,8 @@
 namespace Flixball/Options {
-    use GetOpt.{ArgDescr, OptionDescr};
-    use GetOpt.ArgDescr.{NoArg, ReqArg, OptArg};
-    use GetOpt.ArgOrder.{RequireOrder, Permute, ReturnInOrder};
-
     use GetOpt.{getOpt, usageInfo};
+    use GetOpt.OptionDescr;
+    use GetOpt.ArgDescr.{NoArg, ReqArg};
+    use GetOpt.ArgOrder.Permute;
 
     /// The action to run after parsing the arguments
     pub enum Action {

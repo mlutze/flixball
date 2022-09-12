@@ -1,11 +1,9 @@
 namespace Flixball/GridGraph {
-
     use Flixball/Core.Board;
     use Flixball/Core.Board.Board;
     use Flixball/Core.Coordinates;
-    use Flixball/Core.Coordinates.Coordinates;
     use Flixball/Core.Direction;
-    use Flixball/Core.Direction.{North, East, South, West};
+    use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.Tile;
 
     ///

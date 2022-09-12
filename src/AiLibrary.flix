@@ -1,25 +1,15 @@
 namespace Flixball/AiLibrary {
-    use Flixball/Core.AiState;
-    use Flixball/Core.Board.{Board};
-    use Flixball/Core.Board;
-    use Flixball/Core.Coordinates.Coordinates;
-    use Flixball/Core.Coordinates;
-    use Flixball/GridGraph.raytraceEx;
-    use Flixball/Core.Direction.{North, South, West, East};
-    use Flixball/Core.Direction;
-    use Flixball/Core.GameState.{GameState};
-    use Flixball/Core.GameState;
-    use Flixball/Core.Move.{Turn, Shoot, Walk};
-    use Flixball/Core.Move;
-    use Flixball/Core.MoveLogic.{MoveLogic};
-    use Flixball/Core.MoveLogic;
-    use Flixball/Core.Position.{Position};
-    use Flixball/Core.Position;
-    use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
-    use Flixball/Core.Rotation;
+    use Flixball/Core.{Board, Coordinates, Direction, Move, MoveLogic, Position, Rotation};
+    use Flixball/Core.Board.Board;
+    use Flixball/Core.Direction.{East, North, South, West};
+    use Flixball/Core.GameState.GameState;
+    use Flixball/Core.Move.{Shoot, Turn, Walk};
+    use Flixball/Core.MoveLogic.MoveLogic;
+    use Flixball/Core.Position.Position;
+    use Flixball/Core.Rotation.Clockwise;
+    use Flixball/Core.Rotation.Counterclockwise;
     use Flixball/Core.Tile.{Person, Wall};
-
-    use Flixball/GridGraph.findShortestPath;
+    use Flixball/GridGraph.{findShortestPath, raytraceEx};
 
     def constantAction(m: Move): MoveLogic =
         ((_, _, state) -> (m, state)) |> MoveLogic
@@ -31,7 +21,7 @@ namespace Flixball/AiLibrary {
     pub def rotate(r: Rotation): MoveLogic = constantAction(Turn(r))
 
     pub def wander(): MoveLogic =
-        use RegionedRandom.{nextInt32};
+        use RegionedRandom.nextInt32;
         MoveLogic((_, _) -> match (i0, m0) -> region r {
             let ran = RegionedRandom.newWithSeed(r, Int32.toInt64(i0));
             let roll = ref nextInt32(ran) @ r;
