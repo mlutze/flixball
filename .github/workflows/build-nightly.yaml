@@ -1,4 +1,4 @@
-name: Build on nightly
+name: Build on Nightly
 
 # Controls when the workflow will run
 on:
@@ -8,7 +8,7 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-  build:
+  build-nightly:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
