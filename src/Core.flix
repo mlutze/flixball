@@ -264,7 +264,7 @@ namespace Flixball {
             use Flixball/Core.AiState.Collection;
 
             pub def toInt32(s: AiState): Int32 = match s {
-                case Value(x) => Int32.fromString(x) |> Result.getWithDefault(0)
+                case Value(x) => Int32.fromString(x) |> Option.getWithDefault(0)
                 case Collection(_) => 0
             }
 
@@ -273,7 +273,7 @@ namespace Flixball {
             }
 
             pub def toInt64(s: AiState): Int64 = match s {
-                case Value(x) => Int64.fromString(x) |> Result.getWithDefault(0i64)
+                case Value(x) => Int64.fromString(x) |> Option.getWithDefault(0i64)
                 case Collection(_) => 0i64
             }
 
