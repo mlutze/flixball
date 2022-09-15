@@ -9,7 +9,7 @@ namespace Flixball {
 
     pub class MutState[m: Region -> Type] {
         pub def toState(x: m[r]): AiState \ r
-        pub def fromState(r: Region[r], x: AiState): m[r] \ r
+        pub def fromState(r: Region[r], x: AiState): Option[m[r]] \ r
     }
 
     instance State[Bool] {
@@ -30,4 +30,11 @@ namespace Flixball {
             case _ => None
         }
     }
+
+    instance MutState[Ref[a]] with State[a] {
+        pub def toState(x: Ref[a, r]): AiState \ r = Flixball/State.toState(deref x)
+    
+        pub def fromState(r: Region[r], x: AiState): Option[Ref[a, r]] \ r = Flixball/State.fromState(x) |> Option.map(y -> ref y @ r)
+    }
+    
 }
