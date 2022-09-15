@@ -1,5 +1,5 @@
 namespace Flixball/AiLibrary {
-    use Flixball/Core/AiState.{toInt64, fromInt64, toBool, fromBool};
+    use Flixball/State.{toState, fromState};
     use Flixball/Core.Board.Board;
     use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.GameState.GameState;
@@ -25,18 +25,18 @@ namespace Flixball/AiLibrary {
         use RegionedRandom.nextInt64;
         MoveLogic((_, _) -> state -> region r {
             // use "0" if there's a bad encoding
-            let ran = RegionedRandom.newWithSeed(r, toInt64(state) |> Option.getWithDefault(0i64));
+            let ran = RegionedRandom.newWithSeed(r, fromState(state) |> Option.getWithDefault(0i64));
             let roll = ref nextInt64(ran) @ r;
             let choices = Nel(Walk, Walk :: Turn(Clockwise) :: Turn(Counterclockwise) :: Nil);
             let move = RegionedRandom.chooseNel(ran, choices);
-            (move, fromInt64(deref roll))
+            (move, toState(deref roll))
         })
 
     pub def spinAndShoot(r: Rotation): MoveLogic =
         MoveLogic((_, _, state) -> {
             // use "false" if there's a bad encoding
-            if (not (toBool(state) |> Option.getWithDefault(false))) (Turn(r), fromBool(true))
-            else (Shoot, fromBool(false))
+            if (not (fromState(state) |> Option.getWithDefault(false))) (Turn(r), toState(true))
+            else (Shoot, toState(false))
         })
 
     pub def goAndSpin(coords: Coordinates): MoveLogic =
