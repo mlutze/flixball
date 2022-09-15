@@ -1,5 +1,5 @@
 namespace Flixball/AiLibrary {
-    use Flixball/Core.{Board, Coordinates, Direction, Move, MoveLogic, Position, Rotation};
+    use Flixball/Core/AiState.{toInt64, fromInt64, toBool, fromBool};
     use Flixball/Core.Board.Board;
     use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.GameState.GameState;
@@ -9,6 +9,7 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.Rotation.Clockwise;
     use Flixball/Core.Rotation.Counterclockwise;
     use Flixball/Core.Tile.{Person, Wall};
+    use Flixball/Core.{Board, Coordinates, Direction, Move, MoveLogic, Position, Rotation};
     use Flixball/GridGraph.{findShortestPath, raytraceEx};
 
     def constantAction(m: Move): MoveLogic =
@@ -21,19 +22,21 @@ namespace Flixball/AiLibrary {
     pub def rotate(r: Rotation): MoveLogic = constantAction(Turn(r))
 
     pub def wander(): MoveLogic =
-        use RegionedRandom.nextInt32;
-        MoveLogic((_, _) -> match (i0, m0) -> region r {
-            let ran = RegionedRandom.newWithSeed(r, Int32.toInt64(i0));
-            let roll = ref nextInt32(ran) @ r;
+        use RegionedRandom.nextInt64;
+        MoveLogic((_, _) -> state -> region r {
+            // use "0" if there's a bad encoding
+            let ran = RegionedRandom.newWithSeed(r, toInt64(state) |> Option.getWithDefault(0i64));
+            let roll = ref nextInt64(ran) @ r;
             let choices = Nel(Walk, Walk :: Turn(Clockwise) :: Turn(Counterclockwise) :: Nil);
             let move = RegionedRandom.chooseNel(ran, choices);
-            (move, (deref roll, m0))
+            (move, fromInt64(deref roll))
         })
 
     pub def spinAndShoot(r: Rotation): MoveLogic =
-        MoveLogic((_, _) -> match (i0, m0) -> {
-            if (i0 == 0) (Turn(r), (1, m0))
-            else (Shoot, (0, m0))
+        MoveLogic((_, _, state) -> {
+            // use "false" if there's a bad encoding
+            if (not (toBool(state) |> Option.getWithDefault(false))) (Turn(r), fromBool(true))
+            else (Shoot, fromBool(false))
         })
 
     pub def goAndSpin(coords: Coordinates): MoveLogic =

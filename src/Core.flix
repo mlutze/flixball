@@ -5,7 +5,10 @@ namespace Flixball {
 
         pub type alias Coordinates = (Int32, Int32)
 
-        pub type alias AiState = (Int32, Map[String, String])
+        pub enum AiState {
+            case Value(String)
+            case Collection(List[AiState])
+        }
 
 
         ///
@@ -65,7 +68,7 @@ namespace Flixball {
             Board
         )
 
-        pub def initialPlayerState(): AiState = (0, Map.empty())
+        pub def initialPlayerState(): AiState = Value("") 
 
         pub def rotateDir(rot: Rotation, dir: Direction): Direction = match (rot, dir) {
             case (Clockwise, North) => East
@@ -252,6 +255,41 @@ namespace Flixball {
                     List.find(match (foundId, _) -> foundId == id) |>
                     Option.map(match (_, pos) -> pos)
 
+        }
+
+        namespace AiState {
+            // TODO all this should be in the type class
+            use Flixball/Core.AiState;
+            use Flixball/Core.AiState.Value;
+            use Flixball/Core.AiState.Collection;
+
+            pub def toInt32(s: AiState): Option[Int32] = match s {
+                case Value(x) => Int32.fromString(x)
+                case Collection(_) => None
+            }
+
+            pub def fromInt32(i: Int32): AiState = {
+                Value("${i}")
+            }
+
+            pub def toInt64(s: AiState): Option[Int64] = match s {
+                case Value(x) => Int64.fromString(x)
+                case Collection(_) => None
+            }
+
+            pub def fromInt64(i: Int64): AiState = {
+                Value("${i}")
+            }
+
+            pub def toBool(s: AiState): Option[Bool] = match s {
+                case Value("true") => Some(true)
+                case Value("false") => Some(false)
+                case _ => None
+            }
+
+            pub def fromBool(b: Bool): AiState = {
+                Value("${b}")
+            }
         }
     }
 }
