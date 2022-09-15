@@ -16,8 +16,7 @@ namespace Flixball {
         pub def toState(x: Bool): AiState = Value("${x}")
 
         pub def fromState(x: AiState): Option[Bool] = match x {
-            case Value("true") => Some(true)
-            case Value("false") => Some(false)
+            case Value(b) => FromString.fromString(b)
             case _ => None
         }
     }
@@ -26,7 +25,7 @@ namespace Flixball {
         pub def toState(x: Int64): AiState = Value("${x}")
 
         pub def fromState(x: AiState): Option[Int64] = match x {
-            case Value(n) => Int64.fromString(n)
+            case Value(n) => FromString.fromString(n)
             case _ => None
         }
     }
