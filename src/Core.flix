@@ -263,27 +263,28 @@ namespace Flixball {
             use Flixball/Core.AiState.Value;
             use Flixball/Core.AiState.Collection;
 
-            pub def toInt32(s: AiState): Int32 = match s {
-                case Value(x) => Int32.fromString(x) |> Option.getWithDefault(0)
-                case Collection(_) => 0
+            pub def toInt32(s: AiState): Option[Int32] = match s {
+                case Value(x) => Int32.fromString(x)
+                case Collection(_) => None
             }
 
             pub def fromInt32(i: Int32): AiState = {
                 Value("${i}")
             }
 
-            pub def toInt64(s: AiState): Int64 = match s {
-                case Value(x) => Int64.fromString(x) |> Option.getWithDefault(0i64)
-                case Collection(_) => 0i64
+            pub def toInt64(s: AiState): Option[Int64] = match s {
+                case Value(x) => Int64.fromString(x)
+                case Collection(_) => None
             }
 
             pub def fromInt64(i: Int64): AiState = {
                 Value("${i}")
             }
 
-            pub def toBool(s: AiState): Bool = match s {
-                case Value("true") => true
-                case _ => false
+            pub def toBool(s: AiState): Option[Bool] = match s {
+                case Value("true") => Some(true)
+                case Value("false") => Some(false)
+                case _ => None
             }
 
             pub def fromBool(b: Bool): AiState = {

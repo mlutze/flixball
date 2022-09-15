@@ -24,7 +24,8 @@ namespace Flixball/AiLibrary {
     pub def wander(): MoveLogic =
         use RegionedRandom.nextInt64;
         MoveLogic((_, _) -> state -> region r {
-            let ran = RegionedRandom.newWithSeed(r, toInt64(state));
+            // use "0" if there's a bad encoding
+            let ran = RegionedRandom.newWithSeed(r, toInt64(state) |> Option.getWithDefault(0i64));
             let roll = ref nextInt64(ran) @ r;
             let choices = Nel(Walk, Walk :: Turn(Clockwise) :: Turn(Counterclockwise) :: Nil);
             let move = RegionedRandom.chooseNel(ran, choices);
@@ -33,7 +34,8 @@ namespace Flixball/AiLibrary {
 
     pub def spinAndShoot(r: Rotation): MoveLogic =
         MoveLogic((_, _, state) -> {
-            if (not toBool(state)) (Turn(r), fromBool(true))
+            // use "false" if there's a bad encoding
+            if (not (toBool(state) |> Option.getWithDefault(false))) (Turn(r), fromBool(true))
             else (Shoot, fromBool(false))
         })
 
