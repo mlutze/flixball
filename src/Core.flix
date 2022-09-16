@@ -5,7 +5,10 @@ namespace Flixball {
 
         pub type alias Coordinates = (Int32, Int32)
 
-        pub type alias AiState = (Int32, Map[String, String])
+        pub enum AiState {
+            case Value(String)
+            case Collection(List[AiState])
+        }
 
 
         ///
@@ -65,7 +68,7 @@ namespace Flixball {
             Board
         )
 
-        pub def initialPlayerState(): AiState = (0, Map.empty())
+        pub def initialPlayerState(): AiState = Value("") 
 
         pub def rotateDir(rot: Rotation, dir: Direction): Direction = match (rot, dir) {
             case (Clockwise, North) => East
