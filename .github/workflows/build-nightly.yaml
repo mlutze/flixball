@@ -17,9 +17,15 @@ jobs:
           java-version: 17
           distribution: zulu
       - run: |
+          # download today's or yesterday's Flix JAR
           today=$(date -d today +%Y-%m-%d)
           yesterday=$(date -d yesterday +%Y-%m-%d)
           today_url="https://flix.dev/nightly/flix-${today}.jar"
           yesterday_url="https://flix.dev/nightly/flix-${yesterday}.jar"
           curl -L -f "${today_url}" > flix.jar || curl -L -f "${yesterday_url}" > flix.jar
+
+          # install dependencies
+          java -jar flix.jar install JonathanStarup/Flix-ANSI-Terminal
+
+          # run tests
           java -jar flix.jar test

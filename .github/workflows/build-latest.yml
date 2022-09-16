@@ -15,5 +15,11 @@ jobs:
           java-version: 17
           distribution: zulu
       - run: |
+          # download Flix JAR
           curl -L https://github.com/flix/flix/releases/latest/download/flix.jar > flix.jar
+
+          # install dependencies
+          java -jar flix.jar install JonathanStarup/Flix-ANSI-Terminal
+
+          # run tests
           java -jar flix.jar test
