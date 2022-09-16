@@ -10,7 +10,7 @@ namespace Flixball/Display {
     /// at the end.
     ///
     pub def displayBoard(b: Board): Unit & Impure =
-        Flixball/Terminal.resetTerminal() |> print;
+        Terminal.clearScreenAndReset();
         b |> boardLines |> List.foreach(println)
 
     ///
@@ -62,7 +62,4 @@ namespace Flixball/Display {
         case East => ">"
     }
 
-    def print(s: s): Unit & Impure with ToString[s] = Console.print(s)
-
-    def println(s: s): Unit & Impure with ToString[s] = Console.printLine(s)
 }
