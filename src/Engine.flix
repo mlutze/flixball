@@ -23,10 +23,7 @@ namespace Flixball/Engine {
                 MutMap.put!(id, state, newStates);
                 Some((id, moveToDo))
             ) |>
-            List.map(opt -> match opt {
-                case Some(v) => v
-                case None => ?unreachable
-            }) |> List.toMap;
+            List.map(Utils/Option.unsafeGet) |> List.toMap;
         // Everything in gamestate except the values in player states is handled in resolve.
         resolve(moves, GameState(MutMap.toMap(newStates), moveLogics, playerPositions, board))
     }

@@ -32,6 +32,7 @@ namespace Utils {
     }
 
     namespace Option {
+        @Unsafe
         pub def unsafeGet(o: Option[a]): a = match o {
             case None => ?unreachable
             case Some(v) => v
