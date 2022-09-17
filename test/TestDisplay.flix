@@ -56,7 +56,7 @@ namespace TestDisplay {
             "  #       " ::
             "  #  #    " ::
             "     #    " ::
-            "########  " ::
+            "########< " ::
             "          " ::
             "        ##" ::
             "          " ::
@@ -66,7 +66,9 @@ namespace TestDisplay {
             case Ok(b) => b
             case Err(msg) => bug!(msg)
         };
-        let moveLogics = Map#{0 => goAndSpin((10, 10))};
+        let moveLogics = Map#{
+            0 => goAndSpin((10, 10)),
+            1 => walk()};
         (board, moveLogics)
 
     pub def testBoard04(): Board =

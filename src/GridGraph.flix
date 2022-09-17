@@ -4,33 +4,41 @@ namespace Flixball/GridGraph {
     use Flixball/Core.Coordinates;
     use Flixball/Core.Direction;
     use Flixball/Core.Direction.{East, North, South, West};
+    use Flixball/Core.Move;
+    use Flixball/Core.Move.{Walk, Shoot, Turn};
+    use Flixball/Core.Position;
+    use Flixball/Core.Position.Position;
+    use Flixball/Core.Rotation;
+    use Flixball/Core.step;
     use Flixball/Core.Tile;
 
     ///
     /// It is assumed that `available` keeps the search space finite or
     /// that `goal` returns true for a reachable coordinate.
     /// This function might otherwise not halt.
+    /// The start coordinate will always be available no matter `available`.
     ///
     pub def findShortestPath(available: Coordinates -> Bool \ ef1,
-        start: {start :: Coordinates}, goal: Coordinates -> Bool \ ef2): Option[List[Coordinates]] \ {ef1, ef2} =
-    region r { if (goal(start.start)) Some(Nil) else {
+        start: Position, goal: Position -> Bool \ ef2): Option[List[Move]] \ {ef1, ef2} =
+    region r { if (goal(start)) Some(Nil) else {
         // bfs
-        let dists: MutMap[Coordinates, Int32, r] = new MutMap(r);
-        MutMap.put!(start.start, 0, dists);
+        let Position(startCoord, _) = start;
+        let dists: MutMap[Position, Int32, r] = new MutMap(r);
+        let backtracking: MutMap[Position, (Position, Move), r] = new MutMap(r);
+        MutMap.put!(start, 0, dists);
         let taskList = new MutDeque(r);
         let foundGoal = ref None;
-        MutDeque.pushBack(start.start, taskList);
+        MutDeque.pushBack(start, taskList);
         def bfsLoop() = match MutDeque.popFront(taskList) {
             case Some(current) =>
-                foreach(next <- possibleMoves(r, current)) {
-                    if (available(next)) {
+                foreach((next, move) <- possibleMoves(r, current)) {
+                    let Position(nextCoord, _) = next;
+                    if (nextCoord == startCoord or available(nextCoord)) {
                         if (goal(next)) foundGoal := Some(next) else ();
-                        let currentLength = match MutMap.get(current, dists) {
-                            case None => ?unreachable
-                            case Some(v) => v
-                        };
+                        let currentLength = MutMap.get(current, dists) |> Utils/Option.unsafeGet;
                         if (MutMap.get(next, dists) |> Option.isEmpty) {
                             MutMap.put!(next, currentLength + 1, dists);
+                            MutMap.put!(next, (current, move), backtracking);
                             MutDeque.pushBack(next, taskList)
                         } else ()
                     } else ()
@@ -45,34 +53,32 @@ namespace Flixball/GridGraph {
             case None => None // no reachable goal
             case Some(end) =>
                 // construct the path list, end to start
-                def stepBack(c) = {
-                    let cLength = match MutMap.get(c, dists) {
-                        case None => ?unreachable
-                        case Some(l) => l
-                    };
-                    if (cLength == 1) None else
-
-                    let res = ref None;
-                    foreach(next <- possibleMoves(r, c)) {
-                        MutMap.get(next, dists) |>
-                            Option.foreach(d -> if (d == cLength - 1) res := Some(next) else ())
-                    };
-                    match deref res {
-                        case None => ?unreachable
-                        case Some(value) => Some(value)
-                    }
+                def stepBack(pos) = {
+                    let pathLength = MutMap.get(pos, dists) |> Utils/Option.unsafeGet;
+                    if (pathLength == 0) None else
+                    MutMap.get(pos, backtracking) |> Utils/Option.unsafeGet |> Some
                 };
-                let revPathList = List.unfold(c ->  stepBack(c) |> Option.map(next -> (next, next)), end);
-                Some(List.reverse(end :: revPathList))
+                let revPathList = List.unfold(c -> stepBack(c) |> Option.map(match (prev, move) -> (move, prev)), end);
+                Some(List.reverse(revPathList))
         }
     }}
 
-    def possibleMoves(r: Region[r], c: Coordinates): Iterator[Coordinates, r] \ r =
-        let x = fst(c);
-        let y = snd(c);
-        let coordinates = (x, y+1) :: (x, y-1) :: (x+1, y) :: (x-1, y) :: Nil;
-        List.iterator(r, coordinates)
-
+    def possibleMoves(r: Region[r], p: Position): Iterator[(Position, Move), r] \ Write(r) =
+        use Flixball/Core.rotateDir;
+        let Position(coord, dir) = p;
+        let clockwise = (
+            Position(coord, rotateDir(Rotation.Clockwise, dir)),
+            Turn(Rotation.Clockwise)
+        );
+        let counterclockwise = (
+            Position(coord, rotateDir(Rotation.Counterclockwise, dir)),
+            Turn(Rotation.Counterclockwise)
+        );
+        let move = (
+            Position(Flixball/Core.step(coord, dir), dir),
+            Walk
+        );
+        (clockwise :: counterclockwise :: move :: Nil) |> List.iterator(r)
 
     ///
     /// Finds the first nonempty tile tracing in the given direction.
@@ -104,19 +110,6 @@ namespace Flixball/GridGraph {
                     raytraceIn(dir, coords, board)
                 case Some(tile) => Some(tile)
             }
-        }
-    }
-
-    ///
-    /// Returns the coordinates one step in the given direction.
-    ///
-    pub def step(coords: Coordinates, dir: Direction): (Int32, Int32) = {
-        let (row, col) = coords;
-        match dir {
-            case North => (row - 1, col)
-            case East => (row, col + 1)
-            case South => (row + 1, col)
-            case West => (row, col - 1)
         }
     }
 
