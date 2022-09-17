@@ -10,13 +10,16 @@ namespace TestDisplay {
     use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot, goAndSpin, naiveSearchAndDestroy, wander};
 
     def testBoard01(): (Board, Map[PlayerId, MoveLogic]) =
-        let board = Flixball/Core/Board.fromString(String.unlines(
+        let board = match Flixball/Core/Board.fromString(String.unlines(
             "     " ::
             "     " ::
             "  v  " ::
             "   < " ::
             Nil
-        ));
+        )) {
+            case Ok(b) => b
+            case Err(msg) => bug!(msg)
+        };
         let moveLogics = Map#{
             0 => walk(),
             1 => shoot()
@@ -24,12 +27,15 @@ namespace TestDisplay {
         (board, moveLogics)
     
     def testBoard02(): (Board, Map[PlayerId, MoveLogic]) =
-        let board = Flixball/Core/Board.fromString(String.unlines(
+        let board = match Flixball/Core/Board.fromString(String.unlines(
             "                  " ::
             " >  ^^^^^^^#  <   " ::
             "                  " ::
             Nil
-        ));
+        )) {
+            case Ok(b) => b
+            case Err(msg) => bug!(msg)
+        };
         let moveLogics = Map#{
             0 => shoot(),
             1 => rotate(Clockwise),
@@ -44,7 +50,7 @@ namespace TestDisplay {
         (board, moveLogics)
 
     def testBoard03(): (Board, Map[PlayerId, MoveLogic]) =
-        let board = Flixball/Core/Board.fromString(String.unlines(
+        let board = match Flixball/Core/Board.fromString(String.unlines(
             "^ #       " ::
             "  #       " ::
             "  #       " ::
@@ -56,7 +62,10 @@ namespace TestDisplay {
             "          " ::
             "          " ::
             Nil
-        ));
+        )) {
+            case Ok(b) => b
+            case Err(msg) => bug!(msg)
+        };
         let moveLogics = Map#{0 => goAndSpin((10, 10))};
         (board, moveLogics)
 
@@ -67,7 +76,7 @@ namespace TestDisplay {
         automataBoard(285_041_125i64, rows=25, 40, 0.38, 3)
 
     pub def testBoard06(): (Board, Map[PlayerId, MoveLogic]) =
-        let board = Flixball/Core/Board.fromString(String.unlines(
+        let board = match Flixball/Core/Board.fromString(String.unlines(
             "^         " ::
             " v        " ::
             "  <       " ::
@@ -79,7 +88,10 @@ namespace TestDisplay {
             "        v " ::
             "         >" ::
             Nil
-        ));
+        )) {
+            case Ok(b) => b
+            case Err(msg) => bug!(msg)
+        };
         let moveLogics = Map#{
             0 => naiveSearchAndDestroy(), 
             1 => wander(), 

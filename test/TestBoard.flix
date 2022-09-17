@@ -31,40 +31,48 @@ namespace TestBoard {
             0 <= col and col < br.cols;
         br.tiles |> Map.keysOf |> Set.forall(inbound)
 
-    def testBoard01(): Board =
+    def testBoard01(): Result[Board, String] =
         let rowStrings =
             "      " ::
             " #  v   # " ::
-            " ###@#### " ::
+            " ######## " ::
             " #  ^   # " ::
-            "" ::
+            " " ::
             Nil;
         let boardString = rowStrings |> String.unlines;
         Flixball/Core/Board.fromString(boardString)
 
     @test
-    def testDimensions(): Bool =
-        let Board(br) = testBoard01();
-        br.rows == 5+2 and br.cols == 10+2
+    def testDimensions(): Bool = match testBoard01() {
+        case Err(_) => false 
+        case Ok(Board(br)) =>
+            br.rows == 5+2 and br.cols == 10+2
+    }
 
     @test
-    def testTiles(): Bool =
-        let Board(br) = testBoard01();
-        // offset by 1 for the border
-        def check(row, col, tile) =
-            tile == Map.get((row+1, col+1), br.tiles);
-        check(1, 4, Tile.Person(0, Direction.South) |> Some) and
-        check(3, 4, Tile.Person(1, Direction.North) |> Some) and
-        check(2, 4, Tile.Wall |> Some) and
-        check(1, 8, Tile.Wall |> Some) and
-        check(3, 5, None)
+    def testTiles(): Bool = match testBoard01() {
+        case Err(_) => false
+        case Ok(Board(br)) => 
+            // offset by 1 for the border
+            def check(row, col, tile) =
+                tile == Map.get((row+1, col+1), br.tiles);
+            check(1, 4, Tile.Person(0, Direction.South) |> Some) and
+            check(3, 4, Tile.Person(1, Direction.North) |> Some) and
+            check(2, 4, Tile.Wall |> Some) and
+            check(1, 8, Tile.Wall |> Some) and
+            check(3, 5, None)
+    }
 
     @test
-    def testBorder(): Bool =
-        hasBorder(testBoard01())
+    def testBorder(): Bool = match testBoard01() {
+        case Err(_) => false
+        case Ok(b) => hasBorder(b)
+    }
 
     @test
-    def testInboundCoordinates(): Bool =
-        inboundTiles(testBoard01())
+    def testInboundCoordinates(): Bool = match testBoard01() {
+        case Err(_) => false
+        case Ok(b) => inboundTiles(b)
+    }
 
 }
