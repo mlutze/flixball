@@ -10,10 +10,16 @@ namespace TestDisplay {
     use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot, goAndSpin, naiveSearchAndDestroy, wander};
 
     def testBoard01(): (Board, Map[PlayerId, MoveLogic]) =
-        let board = Board({rows = 5, cols = 5, tiles = Map#{
-            (2, 2) => Person(0, South),
-            (3, 3) => Person(1, West)
-        }}) |> Flixball/Core/Board.addBorder;
+        let board = match Flixball/Core/Board.fromString(String.unlines(
+            "     " ::
+            "     " ::
+            "  v  " ::
+            "   < " ::
+            Nil
+        )) {
+            case Ok(b) => b
+            case Err(msg) => bug!(msg)
+        };
         let moveLogics = Map#{
             0 => walk(),
             1 => shoot()
@@ -21,18 +27,15 @@ namespace TestDisplay {
         (board, moveLogics)
     
     def testBoard02(): (Board, Map[PlayerId, MoveLogic]) =
-        let board = Board({rows = 3, cols = 15, tiles = Map#{
-            (1, 1) => Person(0, East),
-            (1, 3) => Person(1, North),
-            (1, 4) => Person(2, North),
-            (1, 5) => Person(3, North),
-            (1, 6) => Person(4, North),
-            (1, 7) => Person(5, North),
-            (1, 8) => Person(6, North),
-            (1, 9) => Person(7, North),
-            (1, 10) => Wall,
-            (1, 12) => Person(8, West)
-        }}) |> Flixball/Core/Board.addBorder;
+        let board = match Flixball/Core/Board.fromString(String.unlines(
+            "                  " ::
+            " >  ^^^^^^^#  <   " ::
+            "                  " ::
+            Nil
+        )) {
+            case Ok(b) => b
+            case Err(msg) => bug!(msg)
+        };
         let moveLogics = Map#{
             0 => shoot(),
             1 => rotate(Clockwise),
@@ -47,25 +50,22 @@ namespace TestDisplay {
         (board, moveLogics)
 
     def testBoard03(): (Board, Map[PlayerId, MoveLogic]) =
-        let board = Board({rows = 10, cols = 10, tiles = Map#{
-            (0, 0) => Person(0, North),
-            (0, 2) => Wall,
-            (1, 2) => Wall,
-            (2, 2) => Wall,
-            (3, 2) => Wall,
-            (5, 0) => Wall,
-            (5, 1) => Wall,
-            (5, 2) => Wall,
-            (5, 3) => Wall,
-            (5, 4) => Wall,
-            (5, 5) => Wall,
-            (5, 6) => Wall,
-            (5, 7) => Wall,
-            (4, 5) => Wall,
-            (3, 5) => Wall,
-            (7, 9) => Wall,
-            (7, 8) => Wall
-        }}) |> Flixball/Core/Board.addBorder;
+        let board = match Flixball/Core/Board.fromString(String.unlines(
+            "^ #       " ::
+            "  #       " ::
+            "  #       " ::
+            "  #  #    " ::
+            "     #    " ::
+            "########  " ::
+            "          " ::
+            "        ##" ::
+            "          " ::
+            "          " ::
+            Nil
+        )) {
+            case Ok(b) => b
+            case Err(msg) => bug!(msg)
+        };
         let moveLogics = Map#{0 => goAndSpin((10, 10))};
         (board, moveLogics)
 
@@ -76,18 +76,22 @@ namespace TestDisplay {
         automataBoard(285_041_125i64, rows=25, 40, 0.38, 3)
 
     pub def testBoard06(): (Board, Map[PlayerId, MoveLogic]) =
-        let board = Board({rows = 10, cols = 10, tiles = Map#{
-            (0, 0) => Person(0, North),
-            (1, 1) => Person(1, South),
-            (2, 2) => Person(2, West),
-            (3, 3) => Person(3, East),
-            (4, 4) => Person(4, West),
-            (5, 5) => Person(5, South),
-            (6, 6) => Person(6, North),
-            (7, 7) => Person(7, West),
-            (8, 8) => Person(8, South),
-            (9, 9) => Person(9, East)
-        }}) |> Flixball/Core/Board.addBorder;
+        let board = match Flixball/Core/Board.fromString(String.unlines(
+            "^         " ::
+            " v        " ::
+            "  <       " ::
+            "   >      " ::
+            "    <     " ::
+            "     v    " ::
+            "      ^   " ::
+            "       <  " ::
+            "        v " ::
+            "         >" ::
+            Nil
+        )) {
+            case Ok(b) => b
+            case Err(msg) => bug!(msg)
+        };
         let moveLogics = Map#{
             0 => naiveSearchAndDestroy(), 
             1 => wander(), 

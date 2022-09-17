@@ -164,6 +164,7 @@ namespace Flixball {
         namespace Board {
             use Flixball/Core.{Board, Coordinates, PlayerId, Position, Tile};
             use Flixball/Core.Board.Board;
+            use Flixball/Core.Direction.{East, North, South, West};
             use Flixball/Core.Position.Position;
             use Flixball/Core.Tile.{Person, Wall};
 
@@ -254,6 +255,63 @@ namespace Flixball {
                 players(b) |>
                     List.find(match (foundId, _) -> foundId == id) |>
                     Option.map(match (_, pos) -> pos)
+
+            ///
+            /// Each line of the string is a row. If lines are of different
+            /// lengths they will be interpreted as being right-padded with
+            /// spaces. The board will have an surrounding edge added. Players
+            /// are numbered from 0, top-to-bottom, left-to-right. 
+            ///
+            /// " " = empty tile
+            /// "#" = wall tile
+            /// {"<","^",">","v"} = player tile
+            ///
+            pub def fromString(s: String): Result[Board, String] = region r {
+                let lines = String.lines(s);
+
+                let rows = List.length(lines);
+                let cols = lines |>
+                    List.map(String.length) |>
+                    List.maximum |>
+                    Option.getWithDefault(0);
+                let tileMap = new MutMap(r);
+
+                let availableId = ref 0 @ r;
+                def freshId() = {
+                    let id = deref availableId;
+                    availableId := id + 1;
+                    id
+                };
+
+                let error = ref None @ r;
+                def addError(msg: String) = {
+                    if (deref error == None) error := Some(msg)
+                    else ()
+                };
+
+                foreach((line, row) <- lines |> List.enumerator(r)) {
+                    let cells = String.toList(line);
+                    foreach((cell, col) <- cells |> List.enumerator(r)) {
+                        def addTile(tile) = MutMap.put!((row, col), tile, tileMap);
+                        match cell {
+                            case ' ' => () // do nothing
+                            case '<' => addTile(Person(freshId(), West))
+                            case '^' => addTile(Person(freshId(), North))
+                            case '>' => addTile(Person(freshId(), East))
+                            case 'v' => addTile(Person(freshId(), South))
+                            case '#' => addTile(Wall)
+                            case c   => addError("Unexpected '${c}' at row ${row} column ${col}")
+                        }
+                    }
+                };
+                match deref error {
+                    case None =>
+                        let b = Board({cols = cols, rows = rows, tiles = MutMap.toMap(tileMap)});
+                        Ok(addBorder(b))
+                    case Some(msg) =>
+                        Err(msg)
+                }
+            }
 
         }
     }
