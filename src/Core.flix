@@ -261,7 +261,7 @@ namespace Flixball {
             /// lengths they will be interpreted as being right-padded with
             /// spaces. The board will have an surrounding edge added. Anything
             /// not listed below will be interpreted as a wall. Players are
-            /// numbered from 0, top-to-buttom, left-to-right. 
+            /// numbered from 0, top-to-bottom, left-to-right. 
             ///
             /// " " = empty tile
             /// "#" = wall tile
