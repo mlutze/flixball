@@ -75,4 +75,11 @@ namespace TestBoard {
         case Ok(b) => inboundTiles(b)
     }
 
+    @test
+    def testError(): Bool =
+        match "  #  \n  v  \n#  Q  " |> Flixball/Core/Board.fromString {
+            case Err(_) => true
+            case Ok(_) => false
+        }
+
 }
