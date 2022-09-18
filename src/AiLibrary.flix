@@ -41,11 +41,9 @@ namespace Flixball/AiLibrary {
 
     pub def goAndSpin(coords: Coordinates): MoveLogic =
         MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
-            let currentPosition = match playerMap |> Map.get(id) {
-                case None => ?unreachable
-                case Some(v) => v
-            };
-            let move = goTo(currentPosition, Eq.eq(coords), board) |> Option.getWithDefault(Turn(Clockwise));
+            let currentPosition = playerMap |> Map.get(id) |> Utils/Option.unsafeGet;
+            let goal = match Position(c, _) -> c == coords;
+            let move = goTo(currentPosition, goal, passablePlayers=false, board) |> Option.getWithDefault(Turn(Clockwise));
             (move, state)
         })
     
@@ -63,10 +61,7 @@ namespace Flixball/AiLibrary {
                 |> List.head;
 
             // Get my own position
-            let Position(coords, dir) = match playerMap |> Map.get(id) {
-                case None => unreachable!()
-                case Some(v) => v
-            };
+            let Position(coords, dir) = playerMap |> Map.get(id) |> Utils/Option.unsafeGet;
 
             // Pick a move
             let move = match target {
@@ -75,11 +70,12 @@ namespace Flixball/AiLibrary {
 
                 // Case 2: Some target. Hunt them down.
                 case Some((targetId, Position(targetCoords, _))) =>
+                    let goal = match Position(c, _) -> c == targetCoords;
                     match raytraceEx(dir, coords, board) {
                         // Case 2.1: Looking at my target. Shoot.
                         case Some(Person(viewId, _)) if viewId == targetId => Shoot 
                         // Case 2.2: Not looking at my target. Keep moving.
-                        case _ => goTo(Position(coords, dir), Eq.eq(targetCoords), board) |> Option.getWithDefault(Turn(Clockwise))
+                        case _ => goTo(Position(coords, dir), goal, passablePlayers=true, board) |> Option.getWithDefault(Turn(Counterclockwise))
                             // TODO pick another target if this one is inaccessible
                     }
             };
@@ -90,33 +86,24 @@ namespace Flixball/AiLibrary {
 
     ///
     /// Selects a move based on the shortest path from position p to a
-    /// coordinate where `goal` is true.
+    /// coordinate where `goal` is true. Considers players obstacles if
+    /// `passablePlayers` is `false`.
     ///
-    def goTo(p: Position, goal: Coordinates -> Bool \ ef, b: Board): Option[Move] \ ef = {
+    def goTo
+            (p: Position, goal: Position -> Bool \ ef, passablePlayers: {passablePlayers=Bool}, b: Board):
+            Option[Move] \ ef =
+    {
         use Option.flatMap;
 
         let Board(br) = b;
-        let Position(coordsFrom, direction) = p;
-        
-        let* path = findShortestPath(
-            c -> Map.get(c, br.tiles) != Some(Wall),
-            start=coordsFrom, goal);
-        let* (xNext, yNext) = List.head(path);
-        let (xFrom, yFrom) = coordsFrom;
-
-        // if a path exist, find the correct move/turn
-        let neededDirection = match (xNext-xFrom, yNext-yFrom) {
-            case (1 , 0 ) => South
-            case (-1, 0 ) => North
-            case (0 , 1 ) => East
-            case (0 , -1) => West
-            case _ => ?unreachable
+        def availablePosition(c: Coordinates) = {
+            if (passablePlayers.passablePlayers)
+                Map.get(c, br.tiles) != Some(Wall)
+            else
+                Map.get(c, br.tiles) == None
         };
-        match rotateTowardsDir(current=direction, neededDirection) {
-            case Nothing => Some(Walk)
-            case MustTurn(rot) => Some(Turn(rot))
-            case Either => Some(Turn(Clockwise))
-        }
+        let* moves = findShortestPath(availablePosition, p, goal);
+        List.head(moves)
     }
 
     enum DirectionChoice with Eq {
@@ -124,28 +111,5 @@ namespace Flixball/AiLibrary {
         case Either
         case MustTurn(Rotation)
     }
-
-    def rotateTowardsDir(current: {current::Direction}, target: Direction): DirectionChoice =
-        match (current.current, target) {
-            case (North, North) => Nothing
-            case (North, East ) => MustTurn(Clockwise)
-            case (North, South) => Either
-            case (North, West ) => MustTurn(Counterclockwise)
-
-            case (East, North) => MustTurn(Counterclockwise)
-            case (East, East ) => Nothing
-            case (East, South) => MustTurn(Clockwise)
-            case (East, West ) => Either
-
-            case (South, North) => Either
-            case (South, East ) => MustTurn(Counterclockwise)
-            case (South, South) => Nothing
-            case (South, West ) => MustTurn(Clockwise)
-
-            case (West, North) => MustTurn(Clockwise)
-            case (West, East ) => Either
-            case (West, South) => MustTurn(Counterclockwise)
-            case (West, West ) => Nothing
-        }
 
 }

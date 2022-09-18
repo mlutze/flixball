@@ -31,7 +31,7 @@ namespace Flixball {
         /// 
         pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[Coordinates, Tile]})
 
-        pub enum Direction with Eq, ToString {
+        pub enum Direction with Eq, ToString, Order {
             case North
             case East
             case South
@@ -59,7 +59,7 @@ namespace Flixball {
             (Move, AiState)
         )
 
-        pub enum Position(Coordinates, Direction)
+        pub enum Position(Coordinates, Direction) with Eq, Order
 
         pub enum GameState(
             Map[PlayerId, AiState],
@@ -68,7 +68,20 @@ namespace Flixball {
             Board
         )
 
-        pub def initialPlayerState(): AiState = Value("") 
+        pub def initialPlayerState(): AiState = Value("")
+
+        ///
+        /// Returns the coordinates one step in the given direction.
+        ///
+        pub def step(coords: Coordinates, dir: Direction): Coordinates = {
+            let (row, col) = coords;
+            match dir {
+                case North => (row - 1, col)
+                case East  => (row, col + 1)
+                case South => (row + 1, col)
+                case West  => (row, col - 1)
+            }
+        }
 
         pub def rotateDir(rot: Rotation, dir: Direction): Direction = match (rot, dir) {
             case (Clockwise, North) => East

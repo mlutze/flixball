@@ -1,12 +1,12 @@
 namespace Flixball/Engine {
-    use Flixball/Core.{GameState, Move, PlayerId, Position};
+    use Flixball/Core.{GameState, Move, step, PlayerId, Position};
     use Flixball/Core.GameState.GameState;
     use Flixball/Core.Move.{Shoot, Turn, Walk};
     use Flixball/Core.MoveLogic.MoveLogic;
     use Flixball/Core.Position.Position;
     use Flixball/Core.Tile.{Person, Wall};
     use Flixball/Core/Board.{get_, players};
-    use Flixball/GridGraph.{raytraceEx, step};
+    use Flixball/GridGraph.raytraceEx;
 
     ///
     /// resolves one step of the GameState.
@@ -23,10 +23,7 @@ namespace Flixball/Engine {
                 MutMap.put!(id, state, newStates);
                 Some((id, moveToDo))
             ) |>
-            List.map(opt -> match opt {
-                case Some(v) => v
-                case None => ?unreachable
-            }) |> List.toMap;
+            List.map(Utils/Option.unsafeGet) |> List.toMap;
         // Everything in gamestate except the values in player states is handled in resolve.
         resolve(moves, GameState(MutMap.toMap(newStates), moveLogics, playerPositions, board))
     }
