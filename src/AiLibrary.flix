@@ -75,9 +75,37 @@ namespace Flixball/AiLibrary {
                         // Case 2.1: Looking at my target. Shoot.
                         case Some(Person(viewId, _)) if viewId == targetId => Shoot 
                         // Case 2.2: Not looking at my target. Keep moving.
-                        case _ => goTo(Position(coords, dir), goal, passablePlayers=true, board) |> Option.getWithDefault(Turn(Counterclockwise))
+                        case _ =>
+                            goTo(Position(coords, dir), goal, passablePlayers=true, board) |>
+                                Option.getWithDefault(Turn(Counterclockwise))
                             // TODO pick another target if this one is inaccessible
                     }
+            };
+            (move, state)
+        })
+
+    pub def smartSearchAndDestroy(): MoveLogic =
+        MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
+
+            // Get my own position
+            let Position(coords, dir) = playerMap |> Map.get(id) |> Utils/Option.unsafeGet;
+
+            let move = match raytraceEx(dir, coords, board) {
+                case Some(Person(_, _)) =>
+                    // Shoot first, ask questions later!
+                    Shoot
+                case _ =>
+                    // optimization possibility: precompute the set of spaces where this predicate
+                    // is true in n^2 time, instead of on-demand evaluation (n^3)
+
+                    // find a position where somebody (not ourselves) can be shot
+                    let goal = match Position(c, d) -> match raytraceEx(d, c, board) {
+                        case Some(Person(seenId, _)) => seenId != id
+                        case _ => false
+                    };
+                    // go to such a position, otherwise do a victory spin 
+                    goTo(Position(coords, dir), goal, passablePlayers=false, board)
+                     |> Option.getWithDefault(Turn(Counterclockwise))
             };
             (move, state)
         })
@@ -104,12 +132,6 @@ namespace Flixball/AiLibrary {
         };
         let* moves = findShortestPath(availablePosition, p, goal);
         List.head(moves)
-    }
-
-    enum DirectionChoice with Eq {
-        case Nothing
-        case Either
-        case MustTurn(Rotation)
     }
 
 }

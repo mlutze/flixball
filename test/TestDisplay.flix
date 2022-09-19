@@ -6,8 +6,10 @@ namespace TestDisplay {
     use Flixball/Core.Tile.{Person, Wall};
     use Flixball/Core/Board.{automataBoard, randomBoard};
     use Flixball/Core/GameState.mkGameState;
-
-    use Flixball/AiLibrary.{rotate, shoot, walk, spinAndShoot, goAndSpin, naiveSearchAndDestroy, wander};
+    use Flixball/AiLibrary.{
+        rotate, shoot, walk, spinAndShoot, goAndSpin, naiveSearchAndDestroy,
+        wander, smartSearchAndDestroy
+    };
 
     def testBoard01(): (Board, Map[PlayerId, MoveLogic]) =
         let board = match Flixball/Core/Board.fromString(String.unlines(
@@ -71,13 +73,13 @@ namespace TestDisplay {
             1 => walk()};
         (board, moveLogics)
 
-    pub def testBoard04(): Board =
+    def testBoard04(): Board =
         randomBoard(719_657i64, rows=15, 10, 0.3)
     
-    pub def testBoard05(): Board =
+    def testBoard05(): Board =
         automataBoard(285_041_125i64, rows=25, 40, 0.38, 3)
 
-    pub def testBoard06(): (Board, Map[PlayerId, MoveLogic]) =
+    def testBoard06(): (Board, Map[PlayerId, MoveLogic]) =
         let board = match Flixball/Core/Board.fromString(String.unlines(
             "^         " ::
             " v        " ::
@@ -105,6 +107,34 @@ namespace TestDisplay {
             7 => wander(),
             8 => wander(),
             9 => wander()
+        };
+        (board, moveLogics)
+
+    def testBoard07(): (Board, Map[PlayerId, MoveLogic]) =
+        let board = match Flixball/Core/Board.fromString(String.unlines(
+            "^   #    <" ::
+            "    #  ###" ::
+            "#   #  #  " ::
+            "v      >  " ::
+            "   #### ##" ::
+            "     ^    " ::
+            "###  #  # " ::
+            "  <###  ##" ::
+            "       >  " ::
+            "    ##    " ::
+            Nil
+        )) {
+            case Ok(b) => b
+            case Err(msg) => bug!(msg)
+        };
+        let moveLogics = Map#{
+            0 => smartSearchAndDestroy(), 
+            1 => wander(), 
+            2 => wander(),
+            3 => wander(),
+            4 => wander(),
+            5 => wander(),
+            6 => wander()
         };
         (board, moveLogics)
 
@@ -136,4 +166,7 @@ namespace TestDisplay {
 
     pub def testRunBoard06(): Unit & Impure =
         Flixball/Display.runGameState(500i64, testBoard06() ||> mkGameState)
+
+    pub def testRunBoard07(): Unit & Impure =
+        Flixball/Display.runGameState(500i64, testBoard07() ||> mkGameState)
 }
