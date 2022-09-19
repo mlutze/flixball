@@ -9,7 +9,22 @@ namespace Flixball/Engine {
     use Flixball/GridGraph.raytraceEx;
 
     ///
-    /// resolves one step of the GameState.
+    /// Returns an iterator over the game states in this game.
+    ///
+    pub def runGame(r: Region[r], gs0: GameState): Iterator[GameState, r] \ r = {
+        // TODO use pure unfold when that is added to stdlib
+        let gs = ref gs0 @ r;
+        def next() = {
+            let res = deref gs;
+            gs := runStep(res);
+            res
+        };
+        def done() = false;
+        Iterator(upcast done, next)
+    }
+
+    ///
+    /// Resolves one step of the GameState.
     ///
     pub def runStep(gs: GameState): GameState = region r {
         let GameState(states0, moveLogics, playerPositions, board) = gs;
