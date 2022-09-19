@@ -47,12 +47,20 @@ namespace Flixball/Display {
     }
 
     def mkIdColorMap(_b: Board): Int32 -> String -> String =
-        id -> match (id mod 5) {
+        // all the ANSI colors
+        id -> match (id mod 12) {
             case 0 => Console.magenta
             case 1 => Console.red
             case 2 => Console.yellow
             case 3 => Console.blue
-            case _ => Console.green
+            case 4 => Console.cyan
+            case 5 => Console.green
+            case 6 => Console.magentaBright
+            case 7 => Console.redBright
+            case 8 => Console.yellowBright
+            case 9 => Console.blueBright
+            case 10 => Console.cyanBright
+            case _ => Console.greenBright
         }
 
     def directionStr(d: Direction): String = match d {
