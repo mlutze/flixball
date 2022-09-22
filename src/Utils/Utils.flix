@@ -38,4 +38,16 @@ namespace Utils {
             case Some(v) => v
         }
     }
+
+    namespace Map {
+        pub def unzip(m: Map[k, (v1, v2)]): (Map[k, v1], Map[k, v2]) with Order[k] = region r {
+            let m1 = new MutMap(r);
+            let m2 = new MutMap(r);
+            foreach((k, (v1, v2)) <- Map.iterator(r, m)) {
+                MutMap.put!(k, v1, m1);
+                MutMap.put!(k, v2, m2)
+            };
+            (MutMap.toMap(m1), MutMap.toMap(m2))
+        }
+    }
 }

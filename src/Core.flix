@@ -10,6 +10,49 @@ namespace Flixball {
             case Collection(List[AiState])
         }
 
+        namespace AiState {
+            use Flixball/Core.AiState
+            use Flixball/Core.AiState.Collection
+
+            pub def empty(): AiState = Collection(Nil)
+        }
+
+        pub opaque enum AiInfo(Board, Map[PlayerId, Position])
+
+        namespace AiInfo {
+            use Flixball/Core.AiInfo
+            use Flixball/Core.AiInfo.AiInfo
+            use Flixball/Core.Board.Board
+            use Flixball/Core.Coordinates
+            use Flixball/Core.GameState
+            use Flixball/Core.GameState.GameState
+            use Flixball/Core.PlayerId
+            use Flixball/Core.Position
+            use Flixball/Core.Tile
+
+
+            pub def getTiles(i: AiInfo): Map[Coordinates, Tile] =
+                let AiInfo(Board(br), _) = i;
+                br.tiles
+
+            pub def getRows(i: AiInfo): Int32 =
+                let AiInfo(Board(br), _) = i;
+                br.rows
+
+            pub def getColumns(i: AiInfo): Int32 =
+                let AiInfo(Board(br), _) = i;
+                br.cols
+
+            pub def getPlayers(i: AiInfo): Map[PlayerId, Position] =
+                let AiInfo(_, players) = i;
+                players
+            
+            pub def fromState(gs: GameState): AiInfo =
+                let GameState(_, _, players, board) = gs;
+                AiInfo(board, players)
+
+        }
+
 
         ///
         /// Board uses matrix-like index ordering. Map entries should not be out
@@ -54,10 +97,11 @@ namespace Flixball {
             case Person(PlayerId, Direction)
         }
 
-        pub enum MoveLogic(
-            (GameState, PlayerId, AiState) ->
-            (Move, AiState)
-        )
+        /// given a player id, the strategy determines a
+        /// seed-parametric starting state and a move logic.
+        pub type alias Strategy = PlayerId -> (Int64 -> AiState, MoveLogic)
+
+        pub type alias MoveLogic = (AiInfo, AiState) -> (Move, AiState)
 
         pub enum Position(Coordinates, Direction) with Eq, Order
 
@@ -67,8 +111,6 @@ namespace Flixball {
             Map[PlayerId, Position],
             Board
         )
-
-        pub def initialPlayerState(): AiState = Value("")
 
         ///
         /// Returns the coordinates one step in the given direction.
@@ -96,7 +138,8 @@ namespace Flixball {
         }
 
         namespace GameState {
-            use Flixball/Core.{AiState, Board, Coordinates, GameState, MoveLogic, PlayerId, rotateDir, Rotation};
+            use Flixball/Core.{AiState, Board, Coordinates, GameState, Strategy,
+                PlayerId, rotateDir, Rotation};
             use Flixball/Core.GameState.GameState;
             use Flixball/Core.Position.Position;
             use Flixball/Core.Tile.Person;
@@ -159,18 +202,13 @@ namespace Flixball {
                         }
                 }
             }
-
-            pub def initialStates(players: List[PlayerId]): Map[PlayerId, AiState] =
-                players |> List.map(p -> {
-                    (p, Flixball/Core.initialPlayerState())
-                }) |> List.toMap
             
-            pub def mkGameState(b: Board, moveLogics: Map[PlayerId, MoveLogic]): GameState =
-                let states = b |>
-                    Flixball/Core/Board.players |>
-                    List.map(match (id, _) -> id) |>
-                    initialStates;
+            pub def mkGameState(seed: Int64, strategies: Map[PlayerId, Strategy], b: Board): GameState =
                 let playerMap = Flixball/Core/Board.players(b) |> List.toMap;
+                let (states, moveLogics) = strategies |> Map.mapWithKey((id, strat) -> {
+                    let (stateGen, ml) = strat(id);
+                    (stateGen(seed), ml)
+                }) |> Utils/Map.unzip;
                 GameState(states, moveLogics, playerMap, b)
         }
 

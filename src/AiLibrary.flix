@@ -4,58 +4,75 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.GameState.GameState;
     use Flixball/Core.Move.{Shoot, Turn, Walk};
-    use Flixball/Core.MoveLogic.MoveLogic;
     use Flixball/Core.Position.Position;
     use Flixball/Core.Rotation.Clockwise;
     use Flixball/Core.Rotation.Counterclockwise;
     use Flixball/Core.Tile.{Person, Wall};
-    use Flixball/Core.{Board, Coordinates, Direction, Move, MoveLogic, Position, Rotation};
+    use Flixball/Core.{AiInfo, Board, Coordinates, Direction, Move,
+        MoveLogic, PlayerId, Position, Rotation, Strategy, Tile};
     use Flixball/GridGraph.{findShortestPath, raytraceEx};
+    use Flixball/Core/AiState.{empty => aiStateEmpty}
+    use Flixball/Core/AiInfo.{getPlayers, getTiles, getColumns, getRows};
 
-    def constantAction(m: Move): MoveLogic =
-        ((_, _, state) -> (m, state)) |> MoveLogic
+    def statelessMoveLogic(logic: AiInfo -> Move): MoveLogic =
+        (info, state) -> (logic(info), state)
 
-    pub def shoot(): MoveLogic = constantAction(Shoot)
+    def statelessStrategy(s: PlayerId -> AiInfo -> Move): Strategy =
+        id -> (_ -> aiStateEmpty(), statelessMoveLogic(s(id)))
 
-    pub def walk(): MoveLogic = constantAction(Walk)
+    def constantStrategy(m: Move): Strategy =
+        statelessStrategy((_, _) -> m)
 
-    pub def rotate(r: Rotation): MoveLogic = constantAction(Turn(r))
+    pub def shoot(): Strategy = constantStrategy(Shoot)
 
-    pub def wander(): MoveLogic =
+    pub def walk(): Strategy = constantStrategy(Walk)
+
+    pub def rotate(r: Rotation): Strategy = constantStrategy(Turn(r))
+
+    pub def wander(): Strategy = _id -> {
         use RegionedRandom.nextInt64;
-        MoveLogic((_, _) -> state -> region r {
+        let stateGen = seed -> toState(seed);
+        let moveLogic = (_, state) -> region r {
             // use "0" if there's a bad encoding
             let ran = RegionedRandom.newWithSeed(r, fromState(state) |> Option.getWithDefault(0i64));
             let roll = ref nextInt64(ran) @ r;
             let choices = Nel(Walk, Walk :: Turn(Clockwise) :: Turn(Counterclockwise) :: Nil);
             let move = RegionedRandom.chooseNel(ran, choices);
             (move, toState(deref roll))
-        })
+        };
+        (stateGen, moveLogic)
+    }
 
-    pub def spinAndShoot(r: Rotation): MoveLogic =
-        MoveLogic((_, _, state) -> {
+    pub def spinAndShoot(r: Rotation): Strategy = _id -> {
+        let stateGen = seed -> toState(seed mod 2i64 == 0i64);
+        let moveLogic = (_, state) -> {
             // use "false" if there's a bad encoding
-            if (not (fromState(state) |> Option.getWithDefault(false))) (Turn(r), toState(true))
-            else (Shoot, toState(false))
-        })
+            let shoot = fromState(state) |> Option.getWithDefault(false);
+            if (shoot) (Shoot, toState(false))
+            else (Turn(r), toState(true))
+        };
+        (stateGen, moveLogic)
+    }
 
-    pub def goAndSpin(coords: Coordinates): MoveLogic =
-        MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
-            let currentPosition = playerMap |> Map.get(id) |> Utils/Option.unsafeGet;
+    pub def goAndSpin(coords: Coordinates): Strategy =
+        statelessStrategy((id, info) -> {
+            let currentPosition = getPlayers(info) |> Map.get(id) |> Utils/Option.unsafeGet;
             let goal = match Position(c, _) -> c == coords;
-            let move = goTo(currentPosition, goal, passablePlayers=false, board) |> Option.getWithDefault(Turn(Clockwise));
-            (move, state)
+            goTo(currentPosition, goal, passablePlayers=false, getTiles(info)) |>
+                Option.getWithDefault(Turn(Clockwise))
         })
     
     ///
     /// Go to the next player on the list and shoot them.
     /// Doesn't necessarily take the shortest path to find a shooting angle.
     ///
-    pub def naiveSearchAndDestroy(): MoveLogic =
-        MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
-
+    pub def naiveSearchAndDestroy(): Strategy =
+        statelessStrategy((id, info) -> {
+            let playerMap = getPlayers(info);
+            let tiles = getTiles(info);
+            let board = Board({rows=getRows(info), cols=getColumns(info), tiles=tiles});
             // Pick a target from among the players (lowest ID except me)
-            let target = playerMap 
+            let target = playerMap
                 |> Map.filterWithKey((id2, _) -> id != id2) 
                 |> Map.toList
                 |> List.head;
@@ -64,7 +81,7 @@ namespace Flixball/AiLibrary {
             let Position(coords, dir) = playerMap |> Map.get(id) |> Utils/Option.unsafeGet;
 
             // Pick a move
-            let move = match target {
+            match target {
                 // Case 1: No target. Just spin for fun.
                 case None => Turn(Clockwise)
 
@@ -76,21 +93,21 @@ namespace Flixball/AiLibrary {
                         case Some(Person(viewId, _)) if viewId == targetId => Shoot 
                         // Case 2.2: Not looking at my target. Keep moving.
                         case _ =>
-                            goTo(Position(coords, dir), goal, passablePlayers=true, board) |>
+                            goTo(Position(coords, dir), goal, passablePlayers=true, tiles) |>
                                 Option.getWithDefault(Turn(Counterclockwise))
                             // TODO pick another target if this one is inaccessible
                     }
-            };
-            (move, state)
+            }
         })
 
-    pub def smartSearchAndDestroy(): MoveLogic =
-        MoveLogic(match GameState(_, _, playerMap, board) -> id -> state -> {
-
+    pub def smartSearchAndDestroy(): Strategy =
+        statelessStrategy((id, info) -> {
+            let tiles = getTiles(info);
+            let board = Board({rows=getRows(info), cols=getColumns(info), tiles=tiles});
             // Get my own position
-            let Position(coords, dir) = playerMap |> Map.get(id) |> Utils/Option.unsafeGet;
+            let Position(coords, dir) = getPlayers(info) |> Map.get(id) |> Utils/Option.unsafeGet;
 
-            let move = match raytraceEx(dir, coords, board) {
+            match raytraceEx(dir, coords, board) {
                 case Some(Person(_, _)) =>
                     // Shoot first, ask questions later!
                     Shoot
@@ -104,10 +121,9 @@ namespace Flixball/AiLibrary {
                         case _ => false
                     };
                     // go to such a position, otherwise do a victory spin 
-                    goTo(Position(coords, dir), goal, passablePlayers=false, board)
+                    goTo(Position(coords, dir), goal, passablePlayers=false, tiles)
                      |> Option.getWithDefault(Turn(Counterclockwise))
-            };
-            (move, state)
+            }
         })
 
     // Utilities
@@ -118,17 +134,17 @@ namespace Flixball/AiLibrary {
     /// `passablePlayers` is `false`.
     ///
     def goTo
-            (p: Position, goal: Position -> Bool \ ef, passablePlayers: {passablePlayers=Bool}, b: Board):
+            (p: Position, goal: Position -> Bool \ ef, passablePlayers: {passablePlayers=Bool}, tiles: Map[Coordinates, Tile]):
             Option[Move] \ ef =
     {
         use Option.flatMap;
 
-        let Board(br) = b;
+        // todo: this predicate should just be caller supplied
         def availablePosition(c: Coordinates) = {
             if (passablePlayers.passablePlayers)
-                Map.get(c, br.tiles) != Some(Wall)
+                Map.get(c, tiles) != Some(Wall)
             else
-                Map.get(c, br.tiles) == None
+                Map.get(c, tiles) == None
         };
         let* moves = findShortestPath(availablePosition, p, goal);
         List.head(moves)

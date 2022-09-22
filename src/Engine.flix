@@ -2,7 +2,7 @@ namespace Flixball/Engine {
     use Flixball/Core.{GameState, Move, step, PlayerId, Position};
     use Flixball/Core.GameState.GameState;
     use Flixball/Core.Move.{Shoot, Turn, Walk};
-    use Flixball/Core.MoveLogic.MoveLogic;
+    use Flixball/Core.MoveLogic;
     use Flixball/Core.Position.Position;
     use Flixball/Core.Tile.{Person, Wall};
     use Flixball/Core/Board.{get_, players};
@@ -32,9 +32,9 @@ namespace Flixball/Engine {
         let moves = players(board) |>
             List.map(match (id, _) ->
                 use Option.flatMap;
-                let* MoveLogic(move) = Map.get(id, moveLogics);
+                let* move = Map.get(id, moveLogics);
                 let* state0 = Map.get(id, states0);
-                let (moveToDo, state) = move(gs, id, state0);
+                let (moveToDo, state) = move(gs |> Flixball/Core/AiInfo.fromState, state0);
                 MutMap.put!(id, state, newStates);
                 Some((id, moveToDo))
             ) |>
@@ -118,4 +118,5 @@ namespace Flixball/Engine {
         let GameState(_, _, playerPositions, _) = state;
         playerPositions |> Map.get(id)
     }
+
 }

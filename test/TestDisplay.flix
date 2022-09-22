@@ -1,5 +1,5 @@
 namespace TestDisplay {
-    use Flixball/Core.{Board, MoveLogic, PlayerId};
+    use Flixball/Core.{Board, Strategy, PlayerId};
     use Flixball/Core.Board.Board;
     use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
@@ -11,7 +11,7 @@ namespace TestDisplay {
         wander, smartSearchAndDestroy
     };
 
-    def testBoard01(): (Board, Map[PlayerId, MoveLogic]) =
+    def testBoard01(): (Board, Map[PlayerId, Strategy]) =
         let board = match Flixball/Core/Board.fromString(String.unlines(
             "     " ::
             "     " ::
@@ -28,7 +28,7 @@ namespace TestDisplay {
         };
         (board, moveLogics)
     
-    def testBoard02(): (Board, Map[PlayerId, MoveLogic]) =
+    def testBoard02(): (Board, Map[PlayerId, Strategy]) =
         let board = match Flixball/Core/Board.fromString(String.unlines(
             "                  " ::
             " >  ^^^^^^^#  <   " ::
@@ -51,7 +51,7 @@ namespace TestDisplay {
         };
         (board, moveLogics)
 
-    def testBoard03(): (Board, Map[PlayerId, MoveLogic]) =
+    def testBoard03(): (Board, Map[PlayerId, Strategy]) =
         let board = match Flixball/Core/Board.fromString(String.unlines(
             "^ #       " ::
             "  #       " ::
@@ -79,7 +79,7 @@ namespace TestDisplay {
     def testBoard05(): Board =
         automataBoard(285_041_125i64, rows=25, 40, 0.38, 3)
 
-    def testBoard06(): (Board, Map[PlayerId, MoveLogic]) =
+    def testBoard06(): (Board, Map[PlayerId, Strategy]) =
         let board = match Flixball/Core/Board.fromString(String.unlines(
             "^         " ::
             " v        " ::
@@ -110,7 +110,7 @@ namespace TestDisplay {
         };
         (board, moveLogics)
 
-    def testBoard07(): (Board, Map[PlayerId, MoveLogic]) =
+    def testBoard07(): (Board, Map[PlayerId, Strategy]) =
         let board = match Flixball/Core/Board.fromString(String.unlines(
             "^   #    <" ::
             "    #  ###" ::
@@ -144,19 +144,23 @@ namespace TestDisplay {
         Flixball/Display.displayBoard(fst(testBoard01()))
 
     pub def testRunBoard01(): Unit & Impure =
-        Flixball/Display.runGameState(500i64, testBoard01() ||> mkGameState)
+        // OBS letbinding is avoided because of bug https://github.com/flix/flix/issues/4440
+        testBoard01() |> match (board, strategies) ->
+        Flixball/Display.runGameState(500i64, mkGameState(42i64, strategies, board))
 
     pub def testDisplayBoard02(): Unit & Impure =
         Flixball/Display.displayBoard(fst(testBoard02()))
 
     pub def testRunBoard02(): Unit & Impure =
-        Flixball/Display.runGameState(500i64, testBoard02() ||> mkGameState)
+        testBoard02() |> match (board, strategies) ->
+        Flixball/Display.runGameState(500i64, mkGameState(42i64, strategies, board))
 
     pub def testDisplayBoard03(): Unit & Impure =
         Flixball/Display.displayBoard(fst(testBoard03()))
 
     pub def testRunBoard03(): Unit & Impure =
-        Flixball/Display.runGameState(200i64, testBoard03() ||> mkGameState)
+        testBoard03() |> match (board, strategies) ->
+        Flixball/Display.runGameState(500i64, mkGameState(42i64, strategies, board))
 
     pub def testDisplayBoard04(): Unit & Impure =
         Flixball/Display.displayBoard(testBoard04())
@@ -165,8 +169,11 @@ namespace TestDisplay {
         Flixball/Display.displayBoard(testBoard05())
 
     pub def testRunBoard06(): Unit & Impure =
-        Flixball/Display.runGameState(500i64, testBoard06() ||> mkGameState)
+        testBoard06() |> match (board, strategies) ->
+        Flixball/Display.runGameState(500i64, mkGameState(42i64, strategies, board))
 
     pub def testRunBoard07(): Unit & Impure =
-        Flixball/Display.runGameState(500i64, testBoard07() ||> mkGameState)
+        testBoard07() |> match (board, strategies) ->
+        Flixball/Display.runGameState(500i64, mkGameState(42i64, strategies, board))
+
 }
