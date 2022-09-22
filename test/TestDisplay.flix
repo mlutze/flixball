@@ -10,6 +10,7 @@ namespace TestDisplay {
         rotate, shoot, walk, spinAndShoot, goAndSpin, naiveSearchAndDestroy,
         wander, smartSearchAndDestroy
     };
+    use Flixball/Display.{runGameState, displayBoard}
 
     def testBoard01(): (Board, Map[PlayerId, Strategy]) =
         let board = match Flixball/Core/Board.fromString(String.unlines(
@@ -141,39 +142,40 @@ namespace TestDisplay {
     // Test Scenarios
 
     pub def testDisplayBoard01(): Unit & Impure =
-        Flixball/Display.displayBoard(fst(testBoard01()))
+        displayBoard(fst(testBoard01()))
 
     pub def testRunBoard01(): Unit & Impure =
-        // OBS letbinding is avoided because of bug https://github.com/flix/flix/issues/4440
+        // OBS letbinding is avoided because of bug
+        // https://github.com/flix/flix/issues/4440
         testBoard01() |> match (board, strategies) ->
-        Flixball/Display.runGameState(500i64, mkGameState(42i64, strategies, board))
+        runGameState(500i64, mkGameState(42i64, strategies, board))
 
     pub def testDisplayBoard02(): Unit & Impure =
-        Flixball/Display.displayBoard(fst(testBoard02()))
+        displayBoard(fst(testBoard02()))
 
     pub def testRunBoard02(): Unit & Impure =
         testBoard02() |> match (board, strategies) ->
-        Flixball/Display.runGameState(500i64, mkGameState(42i64, strategies, board))
+        runGameState(500i64, mkGameState(42i64, strategies, board))
 
     pub def testDisplayBoard03(): Unit & Impure =
-        Flixball/Display.displayBoard(fst(testBoard03()))
+        displayBoard(fst(testBoard03()))
 
     pub def testRunBoard03(): Unit & Impure =
         testBoard03() |> match (board, strategies) ->
-        Flixball/Display.runGameState(500i64, mkGameState(42i64, strategies, board))
+        runGameState(500i64, mkGameState(42i64, strategies, board))
 
     pub def testDisplayBoard04(): Unit & Impure =
-        Flixball/Display.displayBoard(testBoard04())
+        displayBoard(testBoard04())
 
     pub def testDisplayBoard05(): Unit & Impure =
-        Flixball/Display.displayBoard(testBoard05())
+        displayBoard(testBoard05())
 
     pub def testRunBoard06(): Unit & Impure =
         testBoard06() |> match (board, strategies) ->
-        Flixball/Display.runGameState(500i64, mkGameState(42i64, strategies, board))
+        runGameState(500i64, mkGameState(42i64, strategies, board))
 
     pub def testRunBoard07(): Unit & Impure =
         testBoard07() |> match (board, strategies) ->
-        Flixball/Display.runGameState(500i64, mkGameState(42i64, strategies, board))
+        runGameState(500i64, mkGameState(42i64, strategies, board))
 
 }

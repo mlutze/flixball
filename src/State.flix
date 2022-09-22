@@ -14,6 +14,21 @@ namespace Flixball {
         pub def fromState(r: Region[r], x: AiState): Option[m[r]] \ Write(r)
     }
 
+    instance State[AiState] {
+        pub def toState(x: AiState): AiState = x
+    
+        pub def fromState(x: AiState): Option[AiState] = Some(x)
+    }
+
+    instance State[Unit] {
+        pub def toState(): AiState = Value("")
+    
+        pub def fromState(x: AiState): Option[Unit] = match x {
+            case Value("") => Some(())
+            case _ => None
+        }
+    }
+
     instance State[Bool] {
         pub def toState(x: Bool): AiState = Value("${x}")
 

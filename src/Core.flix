@@ -10,13 +10,6 @@ namespace Flixball {
             case Collection(List[AiState])
         }
 
-        namespace AiState {
-            use Flixball/Core.AiState
-            use Flixball/Core.AiState.Collection
-
-            pub def empty(): AiState = Collection(Nil)
-        }
-
         pub opaque enum AiInfo(Board, Map[PlayerId, Position])
 
         namespace AiInfo {
