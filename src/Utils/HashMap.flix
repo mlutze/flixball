@@ -89,6 +89,9 @@ namespace HashMap {
     pub def valuesOf(hm: HashMap[k, v]): List[v] =
         let HashMap(m) = hm;
         Map.valuesOf(m) |> List.flatMap(List.map(snd))
+    
+    pub def fromList(l: List[(k, v)]): HashMap[k, v] =
+        List.foldLeft(acc -> match (k, v) -> HashMap.insert(k, v, acc), HashMap.empty(), l)
 
     // filterWithKey, mapWithKey, unzip, toList, filter, filterMap
 
