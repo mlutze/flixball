@@ -67,20 +67,11 @@ namespace Flixball {
         /// 
         pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[Coordinates, Tile]})
 
-        pub enum Direction with Eq, ToString {
+        pub enum Direction with Eq, ToString, Hash {
             case North
             case East
             case South
             case West
-        }
-
-        instance Hash[Direction] {
-            pub def hash(x: Direction): Int32 = match x {
-                case North => 7
-                case East => 13
-                case South => 17
-                case West => 23
-            }
         }
 
         pub enum Rotation with Eq {
@@ -105,14 +96,7 @@ namespace Flixball {
 
         pub type alias MoveLogic = (AiInfo, AiState) -> (Move, AiState)
 
-        pub enum Position(Coordinates, Direction) with Eq
-
-        instance Hash[Position] {
-            pub def hash(x: Position): Int32 =
-                let Position(c, d) = x;
-                7*Hash.hash(c) + 13*Hash.hash(d) 
-        }
-        
+        pub enum Position(Coordinates, Direction) with Eq, Hash
 
         pub enum GameState(
             Map[PlayerId, AiState],
