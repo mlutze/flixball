@@ -7,7 +7,7 @@ namespace HashMap {
     /// invariants:
     /// <<A>> There are no mappings with empty lists
     /// <<B>> there are no duplicates in the lists
-    pub opaque enum HashMap[k, v] with Eq {
+    pub opaque enum HashMap[k, v] with Eq, Hash {
         case HashMap(Map[Int32, List[(k, v)]])
     }
 
@@ -90,7 +90,7 @@ namespace HashMap {
         let HashMap(m) = hm;
         Map.valuesOf(m) |> List.flatMap(List.map(snd))
     
-    pub def fromList(l: List[(k, v)]): HashMap[k, v] =
+    pub def fromList(l: List[(k, v)]): HashMap[k, v] with Eq[k], Hash[k] =
         List.foldLeft(acc -> match (k, v) -> HashMap.insert(k, v, acc), HashMap.empty(), l)
 
     // filterWithKey, mapWithKey, unzip, toList, filter, filterMap
