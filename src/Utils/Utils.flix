@@ -31,6 +31,10 @@ namespace Utils {
         } else x
     }
 
+    /// Returns `Some(f())` if `b == true`, otherwise `None`. 
+    pub def boolMap(f: Unit -> t \ ef, b: Bool): Option[t] \ ef =
+        if (b) Some(f()) else None
+
     namespace Option {
         @Unsafe
         pub def unsafeGet(o: Option[a]): a = match o {
