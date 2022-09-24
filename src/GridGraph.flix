@@ -95,6 +95,7 @@ namespace Flixball/GridGraph {
     /// Includes the given tile.
     ///
     pub def raytraceIn(dir: Direction, coords0: Coordinates, board: Board): Option[Tile] = {
+        // todo: by the border requirement of boards, this does not need the bounds.
         let (row, col) = coords0;
         let Board(rec) = board;
         let rows = rec.rows;
