@@ -6,7 +6,7 @@ namespace HashSet {
     /// invariants:
     /// <<A>> There are no mappings with empty lists
     /// <<B>> there are no duplicates in the lists
-    pub opaque enum HashSet[t] with Eq {
+    pub opaque enum HashSet[t] with Eq, Hash {
         case HashSet(Map[Int32, List[t]])
     }
 
@@ -58,6 +58,9 @@ namespace HashSet {
             case None => false
             case Some(list) => List.memberOf(x, list)
         }
+
+    pub def fromList(l: List[t]): HashSet[t] with Eq[t], Hash[t] =
+        List.foldLeft((acc, e) -> HashSet.insert(e, acc), HashSet.empty(), l)
 
     // private
 
