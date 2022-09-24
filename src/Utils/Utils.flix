@@ -34,6 +34,10 @@ namespace Utils {
     /// Returns `Some(f())` if `b == true`, otherwise `None`. 
     pub def boolMap(f: Unit -> t \ ef, b: Bool): Option[t] \ ef =
         if (b) Some(f()) else None
+    
+    /// Runs `f()` if `b == true`.
+    pub def boolForeach(f: Unit -> Unit \ ef, b: Bool): Unit \ ef =
+        if (b) f() else ()
 
     namespace Option {
         @Unsafe
@@ -41,6 +45,11 @@ namespace Utils {
             case None => ?unreachable
             case Some(v) => v
         }
+    }
+
+    namespace MutList {
+        pub def point[t: Type, r: Region](r: Region[r], x: t) : MutList[t, r] \ Write(r) =
+            List.point(x) |> List.toMutList(r)
     }
 
     namespace Map {
