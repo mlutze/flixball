@@ -7,12 +7,22 @@ Bots compete in a last-player standing arena, taking simultaneous turns to rotat
 Flixball is in a very early development state and is not yet ready
 for military use.
 
-You will need the following in order to build Flixball.
-## Flix Version
+* [Contributing to the Project](#contributing-to-the-project)
+* [License](#license)
+* [Dependencies and Flix Version](#dependencies-and-build)
 
+## Contributing to the Project
+Our code conventions are listed in [CONVENTIONS.md](./CONVENTIONS.md)
+
+## License
+The project license [LICENSE.md](./LICENSE.md)
+
+## Dependencies and Flix Version
+You will need the following in order to build Flixball.
+
+### Flix Version
 v0.31.0
 
-## Dependencies
+### Dependencies
 
 [JonathanStarup/Flix-ANSI-Terminal](https://github.com/JonathanStarup/Flix-ANSI-Terminal) v1.0.1
-
