@@ -9,7 +9,7 @@ for military use.
 
 * [Contributing to the Project](#contributing-to-the-project)
 * [License](#license)
-* [Dependencies and Flix Version](#dependencies-and-build)
+* [Dependencies and Flix Version](#dependencies-and-flix-version)
 
 ## Contributing to the Project
 Our code conventions are listed in [CONVENTIONS.md](./CONVENTIONS.md)
