@@ -44,7 +44,11 @@ Record Types
 
 ### Code Blocks
 You must enclose expressions in `{ ... }` when you have binders
-(`let`/`def`/...). You must however always use blocks for multiline nested defs.
+(`let`/`def`/...), statements `...; ...`, or uses/imports. You must however
+always use blocks for multiline nested defs. This helps with nicer parser errors
+and scan-ability.
+
+Rule of thumb: anything with a semicolon should be in a block.
 
 ### Examples
 Defs

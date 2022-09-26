@@ -1,7 +1,8 @@
 namespace Utils {
-    pub def |||>(triple: (a, b, c), f: (a, b, c) -> d): d =
+    pub def |||>(triple: (a, b, c), f: (a, b, c) -> d): d = {
         let (a, b, c) = triple;
         f(a, b, c)
+    }
     
     @Unsafe
     pub def dbg(x: a): a with ToString[a] = {

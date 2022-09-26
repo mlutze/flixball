@@ -6,7 +6,8 @@ namespace Flixball {
         pub def toState(x: a): AiState
         pub def fromState(x: AiState): Option[a]
 
-        law inverse: forall (x: a) with Eq[a] . Flixball/State.fromState(Flixball/State.toState(x)) == Some(x)
+        law inverse: forall (x: a) with Eq[a] .
+            Flixball/State.fromState(Flixball/State.toState(x)) == Some(x)
     }
 
     pub class MutState[m: Region -> Type] {
@@ -65,10 +66,11 @@ namespace Flixball {
         }
 
         pub def fromState(x: AiState): Option[(a, b)] = match x {
-            case Collection(a0 :: b0 :: Nil) =>
+            case Collection(a0 :: b0 :: Nil) => {
                 let a = Flixball/State.fromState(a0);
                 let b = Flixball/State.fromState(b0);
                 Applicative.product(a, b)
+            }
             case _ => None
         }
     }
@@ -98,9 +100,11 @@ namespace Flixball {
     }
 
     instance MutState[Ref[a]] with State[a] {
-        pub def toState(x: Ref[a, r]): AiState \ Read(r) = Flixball/State.toState(deref x)
+        pub def toState(x: Ref[a, r]): AiState \ Read(r) =
+            Flixball/State.toState(deref x)
     
-        pub def fromState(r: Region[r], x: AiState): Option[Ref[a, r]] \ Write(r) = Flixball/State.fromState(x) |> Option.map(y -> ref y @ r)
+        pub def fromState(r: Region[r], x: AiState): Option[Ref[a, r]] \ Write(r) =
+            Flixball/State.fromState(x) |> Option.map(y -> ref y @ r)
     }
     
 }

@@ -28,11 +28,10 @@ namespace Flixball/Options {
     pub def parse(args: List[String]): Action = {
         match getOpt(Permute, options(), args) {
             case Success(flags) =>
-                if (flags.nonOptions != Nil) {
+                if (flags.nonOptions != Nil)
                     Error
-                } else {
+                else
                     flagsToAction(flags.options)
-                }
             case Failure(_) => Error
         }
     }
