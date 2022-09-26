@@ -1,18 +1,22 @@
 #### Flix ####
 # Standard output folders of flix
-build/
-target/
+build/*
+target/*
+
+# Everything in the lib folder, they should be installed locally
+lib/*
+!lib/.gitkeep
 
 # Crash Reports
-crash_report_*.txt
+/crash_report_*.txt
 
-# Custom flix jar and build jars
-*.jar
+# Custom flix jar and build jars in root
+/*.jar
 
-# Flix package
-*.fpkg
+# Build flix package in root
+/*.fpkg
 
-# local files
+# Local files
 **/personal/**
 
 
