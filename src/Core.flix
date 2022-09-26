@@ -67,7 +67,7 @@ namespace Flixball {
         /// 
         pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[Coordinates, Tile]})
 
-        pub enum Direction with Eq, ToString, Order {
+        pub enum Direction with Eq, ToString, Hash {
             case North
             case East
             case South
@@ -96,7 +96,7 @@ namespace Flixball {
 
         pub type alias MoveLogic = (AiInfo, AiState) -> (Move, AiState)
 
-        pub enum Position(Coordinates, Direction) with Eq, Order
+        pub enum Position(Coordinates, Direction) with Eq, Hash
 
         pub enum GameState(
             Map[PlayerId, AiState],
