@@ -1,6 +1,6 @@
 namespace TestBoard {
-    use Flixball/Core.Board;
-    use Flixball/Core.Board.Board;
+    use Flixball/Core/Board.Board;
+    use Flixball/Core/Board.Board.Board;
     use Flixball/Core.Tile;
     use Flixball/Core.Direction;
 

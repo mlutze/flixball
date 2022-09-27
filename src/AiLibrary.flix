@@ -1,6 +1,7 @@
 namespace Flixball/AiLibrary {
     use Flixball/State.{toState, fromState};
-    use Flixball/Core.Board.Board;
+    use Flixball/Core/AiInfo.AiInfo;
+    use Flixball/Core/Board.Board.Board;
     use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.GameState.GameState;
     use Flixball/Core.Move.{Shoot, Turn, Walk};
@@ -8,7 +9,7 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.Rotation.Clockwise;
     use Flixball/Core.Rotation.Counterclockwise;
     use Flixball/Core.Tile.{Person, Wall};
-    use Flixball/Core.{AiInfo, Board, Coordinates, Direction, Move,
+    use Flixball/Core.{Coordinates, Direction, Move,
         MoveLogic, PlayerId, Position, Rotation, Strategy, Tile};
     use Flixball/GridGraph.{findShortestPath, raytraceEx};
     use Flixball/Core/AiInfo.{getPlayers, getTiles, getColumns, getRows};
