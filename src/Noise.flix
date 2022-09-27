@@ -4,9 +4,10 @@ namespace Flixball/Noise {
 
     pub type alias Dimensions = {width :: Int32, height :: Int32} 
 
-    def createGrid(r: Region[r], f: (Int32, Int32) -> t \ ef, d: Dimensions): Grid[t, r] \ {Write(r), ef} =
+    def createGrid(r: Region[r], f: (Int32, Int32) -> t \ ef, d: Dimensions): Grid[t, r] \ {Write(r), ef} = {
         use Array.init;
         init(r, x -> init(r, y -> f(x, y), d.height), d.width)
+    }
 
     ///
     /// Returns a two-dimensional array of random values >= 0.
@@ -75,15 +76,15 @@ namespace Flixball/Noise {
         deref current
     }
 
-    def mooreNeighborhood(p: {x::Int32, y::Int32}, d: Dimensions): List[{x::Int32, y::Int32}] =
+    def mooreNeighborhood(p: {x::Int32, y::Int32}, d: Dimensions): List[{x::Int32, y::Int32}] = {
         let inbound = px -> px.x >= 0 and px.x < d.width and px.y >= 0 and px.y < d.height;
         let self = px -> px.x == p.x and px.y == p.y;
         let offsets = List.range(-1, 2);
         offsets |> List.flatMap(xset ->
-            offsets |> List.filterMap(yset ->
+            offsets |> List.filterMap(yset -> {
                 let nb = {x=p.x + xset, y=p.y + yset};
                 if (inbound(nb) and not self(nb)) Some(nb) else None
-            )
+            })
         )
-
+    }
 }
