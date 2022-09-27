@@ -43,12 +43,13 @@ Record Types
 ```
 
 ### Code Blocks
-You must enclose expressions in `{ ... }` when you have binders
-(`let`/`def`/...), statements `...; ...`, or uses/imports. You must however
-always use blocks for multiline nested defs. This helps with nicer parser errors
-and scan-ability.
+An expression must be enclosed in braces (`{...}`) when it contains:
+* a binder (`let`/`def`/...),
+* a statement (`...; ...`), or
+* a `use` or `import`
 
-Rule of thumb: anything with a semicolon should be in a block.
+Additionally, a multiline nested definition implementation must be wrapped in
+braces. This helps with nicer parser errors and scanability.
 
 ### Examples
 Defs
