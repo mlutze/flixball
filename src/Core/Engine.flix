@@ -1,13 +1,15 @@
-namespace Flixball/Engine {
+namespace Flixball/Core/GameState/Engine {
     use Flixball/Core.{Move, step, PlayerId, Position};
-    use Flixball/Core/GameState.GameState.GameState;
-    use Flixball/Core/GameState.GameState;
     use Flixball/Core.Move.{Shoot, Turn, Walk};
     use Flixball/Core.MoveLogic;
     use Flixball/Core.Position.Position;
     use Flixball/Core.Tile.{Person, Wall};
     use Flixball/Core/Board.{get_, players};
+    use Flixball/Core/GameState.GameState;
+    use Flixball/Core/GameState.GameState.GameState;
+    use Flixball/Core/GameState.setStates;
     use Flixball/GridGraph.raytraceEx;
+    use Flixball/Core/GameState.getPosition;
 
     ///
     /// Returns an iterator over the game states in this game.
@@ -35,13 +37,14 @@ namespace Flixball/Engine {
                 use Option.flatMap;
                 let* move = Map.get(id, moveLogics);
                 let* state0 = Map.get(id, states0);
-                let (moveToDo, state) = move(gs |> Flixball/Core/AiInfo.fromState, state0);
+                let aiInfo = Flixball/Core/AiInfo.init(board, playerPositions);
+                let (moveToDo, state) = move(aiInfo, state0);
                 MutMap.put!(id, state, newStates);
                 Some((id, moveToDo))
             ) |>
             List.map(Utils/Option.unsafeGet) |> List.toMap;
         // Everything in gamestate except the values in player states is handled in resolve.
-        resolve(moves, GameState(MutMap.toMap(newStates), moveLogics, playerPositions, board))
+        resolve(moves, gs |> setStates(MutMap.toMap(newStates)))
     }
     
     ///
@@ -110,14 +113,6 @@ namespace Flixball/Engine {
             case Some(Wall) => None
             case None => None
         }
-    }
-
-    ///
-    /// Gets the position of the given player.
-    ///
-    def getPosition(id: PlayerId, state: GameState): Option[Position] = {
-        let GameState(_, _, playerPositions, _) = state;
-        playerPositions |> Map.get(id)
     }
 
 }

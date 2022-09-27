@@ -14,12 +14,26 @@ namespace Flixball/Core/GameState {
     use Flixball/Core/Board.get_
     use Flixball/Core/Board.set_
 
-    pub enum GameState(
+    pub opaque enum GameState(
         Map[PlayerId, AiState],
         Map[PlayerId, MoveLogic],
         Map[PlayerId, Position],
         Board
     )
+
+    pub def init(seed: Int64, strategies: Map[PlayerId, Strategy], b: Board): GameState = {
+        let playerMap = Flixball/Core/Board.players(b) |> List.toMap;
+        let (states, moveLogics) = strategies |> Map.mapWithKey((id, strat) -> {
+            let (stateGen, ml) = strat(id);
+            (stateGen(seed), ml)
+        }) |> Utils/Map.unzip;
+        GameState(states, moveLogics, playerMap, b)
+    }
+
+    pub def board(gs: GameState): Board = {
+        let GameState(_, _, _, board) = gs;
+        board
+    }
 
     /// Removes a player from the game.
     /// Does nothing if the player does not exist in the game.
@@ -82,13 +96,17 @@ namespace Flixball/Core/GameState {
             }
         }
     }
-    
-    pub def mkGameState(seed: Int64, strategies: Map[PlayerId, Strategy], b: Board): GameState = {
-        let playerMap = Flixball/Core/Board.players(b) |> List.toMap;
-        let (states, moveLogics) = strategies |> Map.mapWithKey((id, strat) -> {
-            let (stateGen, ml) = strat(id);
-            (stateGen(seed), ml)
-        }) |> Utils/Map.unzip;
-        GameState(states, moveLogics, playerMap, b)
+
+    def setStates(aiStates: Map[PlayerId, AiState], gs: GameState): GameState = {
+        let GameState(_, moveLogics, playerMap, board) = gs;
+        GameState(aiStates, moveLogics, playerMap, board)
+    }
+
+    ///
+    /// Gets the position of the given player.
+    ///
+    def getPosition(id: PlayerId, state: GameState): Option[Position] = {
+        let GameState(_, _, playerPositions, _) = state;
+        playerPositions |> Map.get(id)
     }
 }

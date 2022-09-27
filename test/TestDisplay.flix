@@ -6,7 +6,7 @@ namespace TestDisplay {
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
     use Flixball/Core.Tile.{Person, Wall};
     use Flixball/Core/Board.{automataBoard, randomBoard};
-    use Flixball/Core/GameState.mkGameState;
+    use Flixball/Core/GameState.init;
     use Flixball/AiLibrary.{
         rotate, shoot, walk, spinAndShoot, goAndSpin, naiveSearchAndDestroy,
         wander, smartSearchAndDestroy
@@ -149,21 +149,21 @@ namespace TestDisplay {
         // OBS letbinding is avoided because of bug
         // https://github.com/flix/flix/issues/4440
         testBoard01() |> match (board, strategies) ->
-        runGameState(500i64, mkGameState(42i64, strategies, board))
+        runGameState(500i64, init(42i64, strategies, board))
 
     pub def testDisplayBoard02(): Unit & Impure =
         displayBoard(fst(testBoard02()))
 
     pub def testRunBoard02(): Unit & Impure =
         testBoard02() |> match (board, strategies) ->
-        runGameState(500i64, mkGameState(42i64, strategies, board))
+        runGameState(500i64, init(42i64, strategies, board))
 
     pub def testDisplayBoard03(): Unit & Impure =
         displayBoard(fst(testBoard03()))
 
     pub def testRunBoard03(): Unit & Impure =
         testBoard03() |> match (board, strategies) ->
-        runGameState(500i64, mkGameState(42i64, strategies, board))
+        runGameState(500i64, init(42i64, strategies, board))
 
     pub def testDisplayBoard04(): Unit & Impure =
         displayBoard(testBoard04())
@@ -173,10 +173,10 @@ namespace TestDisplay {
 
     pub def testRunBoard06(): Unit & Impure =
         testBoard06() |> match (board, strategies) ->
-        runGameState(500i64, mkGameState(42i64, strategies, board))
+        runGameState(500i64, init(42i64, strategies, board))
 
     pub def testRunBoard07(): Unit & Impure =
         testBoard07() |> match (board, strategies) ->
-        runGameState(500i64, mkGameState(42i64, strategies, board))
+        runGameState(500i64, init(42i64, strategies, board))
 
 }

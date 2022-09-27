@@ -5,7 +5,7 @@ namespace Flixball/Display {
     use Flixball/Core/Board.Board;
     use Flixball/Core/Board.Board.Board;
     use Flixball/Core/GameState.GameState;
-    use Flixball/Core/GameState.GameState.GameState;
+    use Flixball/Core/GameState.{board => gameStateBoard};
 
     ///
     /// Clears then screen and then displays the board. The cursor will be left
@@ -22,10 +22,9 @@ namespace Flixball/Display {
     ///
     pub def runGameState(delayDuration: Int64, gs: GameState): Unit & Impure = {
         import static java.lang.Thread.sleep(Int64): Unit & Impure;
-        let GameState(_, _, _, board) = gs;
-        displayBoard(board);
+        gameStateBoard(gs) |> displayBoard;
         sleep(delayDuration);
-        runGameState(delayDuration, Flixball/Engine.runStep(gs))
+        runGameState(delayDuration, Flixball/Core/GameState/Engine.runStep(gs))
     }
 
     def boardLines(b: Board): List[String] = region r {
