@@ -95,7 +95,7 @@ namespace Flixball/Core/Board {
         Board({rows=rows.rows, cols=cols, tiles=gridToMap(grid)}) |> addBorder
     }
 
-    def gridToMap(g: Array[Array[Bool, r], r]): Map[(Int32, Int32), Tile] \ Read(r) =
+    def gridToMap(g: Array[Array[Bool, r], r]): Map[(Int32, Int32), Tile] \ Read(r) = {
         let r = Scoped.regionOf(g);
         let mutTiles = new MutMap(r);
         foreach(
@@ -106,13 +106,15 @@ namespace Flixball/Core/Board {
             else ()
         };
         MutMap.toMap(mutTiles)
+    }
 
-    pub def players(b: Board): List[(PlayerId, Position)] =
+    pub def players(b: Board): List[(PlayerId, Position)] = {
         let Board(br) = b;
         br.tiles |> Map.toList |> List.filterMap(match (coords, t) -> match t {
             case Person(id, dir) => Some(id, Position(coords, dir))
             case _ => None
         })
+    }
 
     pub def player(b: Board, id: PlayerId): Option[Position] =
         players(b) |>
@@ -168,9 +170,10 @@ namespace Flixball/Core/Board {
             }
         };
         match deref error {
-            case None =>
+            case None => {
                 let b = Board({cols = cols, rows = rows, tiles = MutMap.toMap(tileMap)});
                 Ok(addBorder(b))
+            }
             case Some(msg) =>
                 Err(msg)
         }

@@ -30,7 +30,7 @@ namespace Flixball/GridGraph {
         let foundGoal = ref None;
         MutDeque.pushBack(start, taskList);
         def bfsLoop() = match MutDeque.popFront(taskList) {
-            case Some(current) =>
+            case Some(current) => {
                 foreach((next, move) <- possibleMoves(r, current)) {
                     let Position(nextCoord, _) = next;
                     if (nextCoord == startCoord or available(nextCoord)) {
@@ -44,6 +44,7 @@ namespace Flixball/GridGraph {
                     } else ()
                 };
                 if (Option.isEmpty(deref foundGoal)) bfsLoop() else ()
+            }
             case None => ()
         };
         bfsLoop();
@@ -51,7 +52,7 @@ namespace Flixball/GridGraph {
         // return none if not reachable
         match deref foundGoal {
             case None => None // no reachable goal
-            case Some(end) =>
+            case Some(end) => {
                 // construct the path list, end to start
                 def stepBack(pos) = {
                     let pathLength = MutMap.get(pos, dists) |> Utils/Option.unsafeGet;
@@ -60,11 +61,12 @@ namespace Flixball/GridGraph {
                 };
                 let revPathList = List.unfold(c -> stepBack(c) |> Option.map(match (prev, move) -> (move, prev)), end);
                 Some(List.reverse(revPathList))
+            }
         }
     }}
 
     /// Returns the three possibles movement moves from `p` and their new position.
-    def possibleMoves(r: Region[r], p: Position): Iterator[(Position, Move), r] \ Write(r) =
+    def possibleMoves(r: Region[r], p: Position): Iterator[(Position, Move), r] \ Write(r) = {
         use Flixball/Core.rotateDir;
         let Position(coord, dir) = p;
         let clockwise = (
@@ -80,15 +82,15 @@ namespace Flixball/GridGraph {
             Walk
         );
         (clockwise :: counterclockwise :: move :: Nil) |> List.iterator(r)
+    }
 
     ///
     /// Finds the first nonempty tile tracing in the given direction.
     /// Excludes the given tile.
     ///
     // TODO: make it board-agnostic
-    pub def raytraceEx(dir: Direction, coords0: Coordinates, board: Board): Option[Tile] = {
+    pub def raytraceEx(dir: Direction, coords0: Coordinates, board: Board): Option[Tile] =
         raytraceIn(dir, step(coords0, dir), board)
-    }
 
     ///
     /// Finds the first nonempty tile tracing in the given direction.
@@ -107,9 +109,10 @@ namespace Flixball/GridGraph {
             None
         } else {
             match (tiles |> Map.get(coords0)) {
-                case None =>
+                case None => {
                     let coords = step(coords0, dir);
                     raytraceIn(dir, coords, board)
+                }
                 case Some(tile) => Some(tile)
             }
         }

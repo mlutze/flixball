@@ -10,24 +10,29 @@ namespace Flixball/Core/AiInfo {
 
     pub opaque enum AiInfo(Board, Map[PlayerId, Position])
 
-    pub def getTiles(i: AiInfo): Map[Coordinates, Tile] =
+    pub def getTiles(i: AiInfo): Map[Coordinates, Tile] = {
         let AiInfo(Board(br), _) = i;
         br.tiles
+    }
 
-    pub def getRows(i: AiInfo): Int32 =
+    pub def getRows(i: AiInfo): Int32 = {
         let AiInfo(Board(br), _) = i;
         br.rows
+    }
 
-    pub def getColumns(i: AiInfo): Int32 =
+    pub def getColumns(i: AiInfo): Int32 = {
         let AiInfo(Board(br), _) = i;
         br.cols
+    }
 
-    pub def getPlayers(i: AiInfo): Map[PlayerId, Position] =
+    pub def getPlayers(i: AiInfo): Map[PlayerId, Position] = {
         let AiInfo(_, players) = i;
         players
+    }
     
-    pub def fromState(gs: GameState): AiInfo =
+    pub def fromState(gs: GameState): AiInfo = {
         let GameState(_, _, players, board) = gs;
         AiInfo(board, players)
+    }
 
 }

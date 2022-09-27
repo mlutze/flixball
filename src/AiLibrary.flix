@@ -155,7 +155,7 @@ namespace Flixball/AiLibrary {
                 case Some(Person(_, _)) =>
                     // Shoot first, ask questions later!
                     Shoot
-                case _ =>
+                case _ => {
                     // optimization possibility: precompute the set of spaces
                     // where this predicate is true in n^2 time, instead of
                     // on-demand evaluation (n^3)
@@ -174,6 +174,7 @@ namespace Flixball/AiLibrary {
                         passablePlayers=false,
                         tiles
                     ) |> Option.getWithDefault(Turn(Counterclockwise))
+                }
             }
         })
 

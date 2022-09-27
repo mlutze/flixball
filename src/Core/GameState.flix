@@ -30,11 +30,12 @@ namespace Flixball/Core/GameState {
             case None => state0
 
             // Case 2: Found the player. Remove from the map, the board, and the states.
-            case Some(Position(coords, _)) =>
+            case Some(Position(coords, _)) => {
                 let playerPositions = playerPositions0 |> Map.remove(id);
                 let states = states0 |> Map.remove(id);
                 let board = board0 |> set_(coords, None);
                 GameState(states, moveLogics, playerPositions, board)
+            }
         }
     }
 
@@ -47,7 +48,7 @@ namespace Flixball/Core/GameState {
             case None => state0
 
             // Case 2: Found the player. Change their direction in the map and the board.
-            case Some(Position(coords, dir0)) =>
+            case Some(Position(coords, dir0)) => {
                 let dir = dir0 |> rotateDir(rot);
                 let playerPositions = playerPositions0 |> Map.insert(id, Position(coords, dir));
                 let board = (coords, board0) ||> adjust(tileOpt -> match tileOpt {
@@ -56,6 +57,7 @@ namespace Flixball/Core/GameState {
                     }
                 );
                 GameState(states, moveLogics, playerPositions, board)
+            }
         }
     }
 
@@ -68,22 +70,25 @@ namespace Flixball/Core/GameState {
             case None => state0
 
             // Case 2: Found the player. Change their position in the map and the board.
-            case Some(Position(coords0, dir)) =>
+            case Some(Position(coords0, dir)) => {
                 let playerPositions = playerPositions0 |> Map.insert(id, Position(coords, dir));
                 match get_(coords0, board0) {
                     case None => bug!("invalid game state")
-                    case Some(person) =>
+                    case Some(person) => {
                         let board = board0 |> set_(coords0, None) |> set_(coords, Some(person));
                         GameState(states, moveLogics, playerPositions, board)
+                    }
                 }
+            }
         }
     }
     
-    pub def mkGameState(seed: Int64, strategies: Map[PlayerId, Strategy], b: Board): GameState =
+    pub def mkGameState(seed: Int64, strategies: Map[PlayerId, Strategy], b: Board): GameState = {
         let playerMap = Flixball/Core/Board.players(b) |> List.toMap;
         let (states, moveLogics) = strategies |> Map.mapWithKey((id, strat) -> {
             let (stateGen, ml) = strat(id);
             (stateGen(seed), ml)
         }) |> Utils/Map.unzip;
         GameState(states, moveLogics, playerMap, b)
+    }
 }
