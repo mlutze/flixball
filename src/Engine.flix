@@ -1,6 +1,7 @@
 namespace Flixball/Engine {
-    use Flixball/Core.{GameState, Move, step, PlayerId, Position};
-    use Flixball/Core.GameState.GameState;
+    use Flixball/Core.{Move, step, PlayerId, Position};
+    use Flixball/Core/GameState.GameState.GameState;
+    use Flixball/Core/GameState.GameState;
     use Flixball/Core.Move.{Shoot, Turn, Walk};
     use Flixball/Core.MoveLogic;
     use Flixball/Core.Position.Position;

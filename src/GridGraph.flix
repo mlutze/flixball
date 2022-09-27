@@ -1,6 +1,4 @@
 namespace Flixball/GridGraph {
-    use Flixball/Core.Board;
-    use Flixball/Core.Board.Board;
     use Flixball/Core.Coordinates;
     use Flixball/Core.Direction;
     use Flixball/Core.Direction.{East, North, South, West};
@@ -11,6 +9,8 @@ namespace Flixball/GridGraph {
     use Flixball/Core.Rotation;
     use Flixball/Core.step;
     use Flixball/Core.Tile;
+    use Flixball/Core/Board.Board;
+    use Flixball/Core/Board.Board.Board;
 
     ///
     /// It is assumed that `available` keeps the search space finite or

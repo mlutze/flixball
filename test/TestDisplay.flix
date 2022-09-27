@@ -1,6 +1,7 @@
 namespace TestDisplay {
-    use Flixball/Core.{Board, Strategy, PlayerId};
-    use Flixball/Core.Board.Board;
+    use Flixball/Core.{Strategy, PlayerId};
+    use Flixball/Core/Board.Board.Board;
+    use Flixball/Core/Board.Board;
     use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
     use Flixball/Core.Tile.{Person, Wall};
