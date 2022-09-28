@@ -3,12 +3,15 @@ namespace Flixball/Config {
     use Flixball/Core/Board.Board;
     use Json.JsonElement.JsonArray;
     use Json.JsonElement.JsonObject;
+    use Json.JsonElement.JsonInt;
+    use Json.JsonElement.JsonFloat;
+    use Json.JsonElement.JsonString;
     use Json.JsonElement;
 
     ///
     /// A run configuration holding a board and list of strategies.
     ///
-    pub enum Config(Board, List[Strategy])
+    pub enum Config(Int64 -> Board, List[Strategy])
 
     ///
     /// Reads the run configuration from a JSON string.
@@ -32,12 +35,13 @@ namespace Flixball/Config {
     }
 
 
-    def readMap(json: JsonElement): Option[Board] = match json {
+    def readMap(json: JsonElement): Option[Int64 -> Board] = match json {
         case JsonObject(o) => {
             use Option.flatMap;
-            let* id = Map.get("id", o);
-            let* data = Map.get("data", o);
-            ??? // delegate to map builders
+            let* id0 = Map.get("id", o);
+            let* id = asString(id0);
+            let data = Map.get("data", o);
+            mkMap(id, data)
         }
         case _ => None
     }
@@ -50,11 +54,51 @@ namespace Flixball/Config {
     def readPlayer(json: JsonElement): Option[Strategy] = match json {
         case JsonObject(o) => {
             use Option.flatMap;
-            let* id = Map.get("id", o);
-            let* data = Map.get("data", o);
-            ??? // delegate to strategy builders
+            let* id0 = Map.get("id", o);
+            let* id = asString(id0);
+            let data = Map.get("data", o);
+            mkPlayer(id, data)
         }
         case _ => None
     }
 
+    ///
+    /// Creates a map generating function from the ID and configuration data.
+    ///
+    def mkMap(id: String, data: Option[JsonElement]): Option[Int64 -> Board] = match (id, data) {
+        case ("random", Some(JsonObject(o))) => {
+            use Option.flatMap;
+            let* rows0 = Map.get("rows", o);
+            let* cols0 = Map.get("cols", o);
+            let* density0 = Map.get("density", o);
+            let* rows = asInt(rows0);
+            let* cols = asInt(cols0);
+            let* density = asFloat(density0);
+            Some(seed -> Flixball/Core/Board.randomBoard(seed, rows = rows, cols, density))
+        }
+        case _ => None
+    }
+
+    ///
+    /// Creates a player from the ID and configuration data.
+    ///
+    def mkPlayer(id: String, _data: Option[JsonElement]): Option[Strategy] = match id {
+        case "shoot" => Some(Flixball/AiLibrary.shoot())
+        case _ => None
+    }
+
+    def asString(json: JsonElement): Option[String] = match json {
+        case JsonString(s) => Some(s)
+        case _ => None
+    }
+
+    def asInt(json: JsonElement): Option[Int32] = match json {
+        case JsonInt(i) => Some(i)
+        case _ => None
+    }
+
+    def asFloat(json: JsonElement): Option[Float64] = match json {
+        case JsonFloat(i) => Some(i)
+        case _ => None
+    }
 }
