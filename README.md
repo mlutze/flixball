@@ -25,4 +25,6 @@ v0.31.0
 
 ### Dependencies
 
-[JonathanStarup/Flix-ANSI-Terminal](https://github.com/JonathanStarup/Flix-ANSI-Terminal) v1.0.1
+* [JonathanStarup/Flix-ANSI-Terminal](https://github.com/JonathanStarup/Flix-ANSI-Terminal) v1.0.1
+
+* [mlutze/flix-json](https://github.com/mlutze/flix-json) v0.4.0
