@@ -26,6 +26,7 @@ jobs:
 
           # install dependencies
           java -jar flix.jar install JonathanStarup/Flix-ANSI-Terminal
+          java -jar flix.jar install mlutze/flix-json
 
           # run tests
           java -jar flix.jar test
