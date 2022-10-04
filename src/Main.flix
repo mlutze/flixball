@@ -1,3 +1,6 @@
+
+pub def main(): Unit \ {IO, NonDet} = Flixball/Main.main()
+
 namespace Flixball/Main {
     use Flixball/Options.Action;
     use Flixball/Options.RunOption;
