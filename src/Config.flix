@@ -29,7 +29,7 @@ namespace Flixball/Config {
             let* playersJson = Map.get("players", o);
             let* map = readMap(mapJson);
             let* players = readPlayers(playersJson);
-            ???
+            Some(Config(map, players))
         }
         case _ => None
     }
