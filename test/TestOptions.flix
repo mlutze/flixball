@@ -6,19 +6,19 @@ namespace TestOptions {
     @test
     def testEmpty(): Bool = {
         let input = Nil;
-        parse(input) == Action.Run(Nil)
+        parse(input) == Action.Run(Nil, Nil)
     }
 
     @test
     def testRunWithConfig(): Bool = {
         let input = "--config" :: "flixball.cfg" :: Nil;
-        parse(input) == Action.Run(RunOption.Config("flixball.cfg") :: Nil)
+        parse(input) == Action.Run(RunOption.Config("flixball.cfg") :: Nil, Nil)
     }
 
     @test
     def testRunWithSeed(): Bool = {
         let input = "--seed" :: "12345" :: Nil;
-        parse(input) == Action.Run(RunOption.Seed(12345i64) :: Nil)
+        parse(input) == Action.Run(RunOption.Seed(12345i64) :: Nil, Nil)
     }
 
     @test
