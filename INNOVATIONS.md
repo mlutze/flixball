@@ -13,7 +13,7 @@ It is now an independent library at [JonathanStarup/Flix-ANSI-Terminal](https://
 ## Regioned Random
 
 Flixball requires purely-generated pseudorandom numbers.
-In order for Flix to understand that the pseudorandom number generation is not (from the outside) effectful,
+In order for Flix to understand that the seeded pseudorandom number generation is not (from the outside) effectful,
 we keep the `Random` object in a region.
 This idea was originally explored by [JonathanStarup](https://github.com/JonathanStarup/) and is currently incorporated into the Flixball codebase.
 
