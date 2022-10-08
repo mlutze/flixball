@@ -1,12 +1,11 @@
 namespace Flixball/Core/AiInfo {
     use Flixball/Core.Coordinates
-    use Flixball/Core/GameState.GameState
-    use Flixball/Core/GameState.GameState.GameState
     use Flixball/Core.PlayerId
     use Flixball/Core.Position
     use Flixball/Core.Tile
     use Flixball/Core/Board.Board
     use Flixball/Core/Board.Board.Board
+    use Flixball/Core/Board.{players => boardPlayers}
 
     pub opaque enum AiInfo(Board, Map[PlayerId, Position])
 
@@ -25,14 +24,17 @@ namespace Flixball/Core/AiInfo {
         br.cols
     }
 
-    pub def getPlayers(i: AiInfo): Map[PlayerId, Position] = {
-        let AiInfo(_, players) = i;
-        players
+    pub def playerPositions(i: AiInfo): Map[PlayerId, Position] = {
+        let AiInfo(_, pm) = i;
+        pm
+    }
+
+    pub def playerPosition(id: PlayerId, i: AiInfo): Option[Position] = {
+        let AiInfo(_, pm) = i;
+        Map.get(id, pm)
     }
     
-    pub def fromState(gs: GameState): AiInfo = {
-        let GameState(_, _, players, board) = gs;
-        AiInfo(board, players)
-    }
+    pub def fromBoard(b: Board): AiInfo =
+        AiInfo(b, boardPlayers(b))
 
 }

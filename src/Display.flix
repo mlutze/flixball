@@ -1,11 +1,13 @@
 namespace Flixball/Display {
-    use Flixball/Core.{Direction, Tile};
-    use Flixball/Core.Direction.{East, North, South, West};
-    use Flixball/Core.Tile.{Person, Wall};
-    use Flixball/Core/Board.Board;
-    use Flixball/Core/Board.Board.Board;
-    use Flixball/Core/GameState.GameState;
-    use Flixball/Core/GameState.GameState.GameState;
+    use Flixball/Core.Direction
+    use Flixball/Core.Direction.{East, North, South, West}
+    use Flixball/Core.Tile
+    use Flixball/Core.Tile.Person
+    use Flixball/Core.Tile.Wall
+    use Flixball/Core/Board.Board
+    use Flixball/Core/Board.Board.Board
+    use Flixball/Core/GameState.{board => gsBoard}
+    use Flixball/Core/GameState.GameState
 
     ///
     /// Clears then screen and then displays the board. The cursor will be left
@@ -22,8 +24,7 @@ namespace Flixball/Display {
     ///
     pub def runGameState(delayDuration: Int64, gs: GameState): Unit & Impure = {
         import static java.lang.Thread.sleep(Int64): Unit & Impure;
-        let GameState(_, _, _, board) = gs;
-        displayBoard(board);
+        displayBoard(gsBoard(gs));
         sleep(delayDuration);
         runGameState(delayDuration, Flixball/Engine.runStep(gs))
     }

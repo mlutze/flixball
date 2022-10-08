@@ -2,16 +2,16 @@
 pub def main(): Unit \ {IO, NonDet} = Flixball/Main.main()
 
 namespace Flixball/Main {
-    use Flixball/Options.Action;
-    use Flixball/Options.RunOption;
-    use Flixball/Options.DisplayOption;
-    use Flixball/Options.parse;
-    use Flixball/Options.usage;
-    use Flixball/Version.version;
-    use Flixball/Config.Config;
-    use Flixball/Config.Config.Config;
-    use Flixball/Config.{read => readConfig};
-    use Flixball/Core/GameState.GameState.GameState;
+    use Flixball/Config.{read => readConfig}
+    use Flixball/Config.Config
+    use Flixball/Config.Config.Config
+    use Flixball/Core/GameState.{board => gsBoard}
+    use Flixball/Options.Action
+    use Flixball/Options.DisplayOption
+    use Flixball/Options.parse
+    use Flixball/Options.RunOption
+    use Flixball/Options.usage
+    use Flixball/Version.version
 
     pub def main(): Unit \ {IO, NonDet} = {
         let args = Environment.getArgs();
@@ -38,12 +38,10 @@ namespace Flixball/Main {
         let gs0 = Flixball/Core/GameState.mkGameState(config.seed, stratMap, mkBoard(config.seed));
         region r {
             let stream = Flixball/Engine.runGame(r, gs0);
-            stream |> Iterator.foreach(
-                match GameState(_, _, _, board) -> {
-                    Flixball/Display.displayBoard(board);
-                    sleep(config.period |> Int32.toInt64)
-                }
-            )
+            stream |> Iterator.foreach(gs -> {
+                Flixball/Display.displayBoard(gsBoard(gs));
+                sleep(config.period |> Int32.toInt64)
+            })
         }
     }
 
