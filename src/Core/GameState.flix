@@ -1,6 +1,7 @@
 namespace Flixball/Core/GameState {
     use Flixball/Core.AiState
     use Flixball/Core.Coordinates
+    use Flixball/Core.Move
     use Flixball/Core.MoveLogic
     use Flixball/Core.PlayerId
     use Flixball/Core.Position
@@ -9,86 +10,124 @@ namespace Flixball/Core/GameState {
     use Flixball/Core.Rotation
     use Flixball/Core.Strategy
     use Flixball/Core.Tile.Person
-    use Flixball/Core/Board.adjust
+    use Flixball/Core/Board.{adjust => boardAdjust}
     use Flixball/Core/Board.Board
     use Flixball/Core/Board.get_
     use Flixball/Core/Board.set_
+    use Flixball/Core/Position.{coordinates => posCoords}
+    use Flixball/Core/Position.{direction => posDir}
 
-    pub enum GameState(
-        Map[PlayerId, AiState],
-        Map[PlayerId, MoveLogic],
-        Map[PlayerId, Position],
+    type alias PlayerInfo = {
+        state = AiState,
+        ml = MoveLogic,
+        pos = Position
+    }
+
+    pub opaque enum GameState(
+        Map[PlayerId, PlayerInfo],
         Board
     )
+
+    /// Returns the board of the state.
+    pub def board(s: GameState): Board = {
+        let GameState(_, b) = s;
+        b
+    }
+
+    ///
+    /// Gets the position of the given player.
+    ///
+    pub def playerPosition(id: PlayerId, s: GameState): Option[Position] = {
+        let GameState(players, _) = s;
+        players |> Map.get(id) |> Option.map(info -> info.pos)
+    }
+
+    /// Position updates are naively done without care for collisions or inconsistensies.
+    pub def map(f: PlayerInfo -> PlayerInfo, s: GameState): GameState =
+        mapWithId((_, info) -> f(info), s)
+
+    /// Position updates are naively done without care for collisions or inconsistensies.
+    pub def mapWithId(f: (PlayerId, PlayerInfo) -> PlayerInfo, s: GameState): GameState = region r {
+        let GameState(players0, board0) = s;
+        let board = ref board0 @ r;
+        let players = players0 |> Map.mapWithKey((id, info0) -> {
+            let info = f(id, info0);
+            if (info.pos != info0.pos) {
+                // remove previous
+                board := set_(posCoords(info0.pos), None, deref board);
+                // insert new
+                board := set_(posCoords(info.pos), Some(Person(id, posDir(info.pos))), deref board)
+            } else ();
+            info
+        });
+        GameState(players, deref board)
+    }
+
+    /// Adjusts the playerinfo of player `id`. Position updates are not verified.
+    pub def adjust(id: PlayerId, f: PlayerInfo -> PlayerInfo, s: GameState): GameState = region r {
+        let GameState(players0, board0) = s;
+        let board = ref board0 @ r;
+        let players = players0 |> Map.adjust(info0 -> {
+            let info = f(info0);
+            if (info.pos != info0.pos) {
+                board := set_(posCoords(info0.pos), None, deref board);
+                board := set_(posCoords(info.pos), Some(Person(id, posDir(info.pos))), deref board)
+            } else ();
+            info
+        }, id);
+        GameState(players, deref board)
+    }
+
+    /// Computes the logics of all players, returning their map of moves.
+    pub def computeMoveLogics(s: GameState): (Map[PlayerId, Move], GameState) = {
+        let GameState(players0, b0) = s;
+        let (moves, players) = players0 |> Map.mapWithKey((_, info) -> {
+            let (move, state) = (info.ml)(Flixball/Core/AiInfo.fromBoard(b0), info.state);
+            (move, {state = state | info})
+        }) |> Utils/Map.unzip;
+        (moves, GameState(players, b0))
+    }
 
     /// Removes a player from the game.
     /// Does nothing if the player does not exist in the game.
     pub def removePlayer(id: PlayerId, state0: GameState): GameState = {
-        let GameState(states0, moveLogics, playerPositions0, board0) = state0;
-        match (playerPositions0 |> Map.get(id)) {
+        match (playerPosition(id, state0)) {
             // Case 1: No such player. Do nothing.
             case None => state0
 
             // Case 2: Found the player. Remove from the map, the board, and the states.
             case Some(Position(coords, _)) => {
-                let playerPositions = playerPositions0 |> Map.remove(id);
-                let states = states0 |> Map.remove(id);
+                let GameState(players0, board0) = state0;
                 let board = board0 |> set_(coords, None);
-                GameState(states, moveLogics, playerPositions, board)
+                let players = players0 |> Map.remove(id);
+                GameState(players, board)
             }
         }
     }
 
     /// Rotates a player with the given rotation.
     /// Does nothing if the player does not exist in the game.
-    pub def rotatePlayer(id: PlayerId, rot: Rotation, state0: GameState): GameState = {
-        let GameState(states, moveLogics, playerPositions0, board0) = state0;
-        match (playerPositions0 |> Map.get(id)) {
-            // Case 1: No such player. Do nothing.
-            case None => state0
-
-            // Case 2: Found the player. Change their direction in the map and the board.
-            case Some(Position(coords, dir0)) => {
-                let dir = dir0 |> rotateDir(rot);
-                let playerPositions = playerPositions0 |> Map.insert(id, Position(coords, dir));
-                let board = (coords, board0) ||> adjust(tileOpt -> match tileOpt {
-                        case Some(Person(_, _)) => Some(Person(id, dir))
-                        case other => other
-                    }
-                );
-                GameState(states, moveLogics, playerPositions, board)
-            }
-        }
-    }
+    pub def rotatePlayer(id: PlayerId, rot: Rotation, gs: GameState): GameState =
+        gs |> adjust(id, info -> {
+            let pos = Position(posCoords(info.pos), posDir(info.pos) |> rotateDir(rot));
+            {pos = pos | info}
+        })
 
     /// Moves a player to a new position.
     /// Does not change the direction of the player.
-    pub def movePlayer(id: PlayerId, coords: Coordinates, state0: GameState): GameState = {
-        let GameState(states, moveLogics, playerPositions0, board0) = state0;
-        match (playerPositions0 |> Map.get(id)) {
-            // Case 1: No such player. Do nothing.
-            case None => state0
-
-            // Case 2: Found the player. Change their position in the map and the board.
-            case Some(Position(coords0, dir)) => {
-                let playerPositions = playerPositions0 |> Map.insert(id, Position(coords, dir));
-                match get_(coords0, board0) {
-                    case None => bug!("invalid game state")
-                    case Some(person) => {
-                        let board = board0 |> set_(coords0, None) |> set_(coords, Some(person));
-                        GameState(states, moveLogics, playerPositions, board)
-                    }
-                }
-            }
-        }
-    }
+    pub def movePlayer(id: PlayerId, coords: Coordinates, gs: GameState): GameState =
+        gs |> adjust(id, info -> {
+            let pos = Position(coords, posDir(info.pos));
+            {pos = pos | info}
+        })
     
     pub def mkGameState(seed: Int64, strategies: Map[PlayerId, Strategy], b: Board): GameState = {
-        let playerMap = Flixball/Core/Board.players(b) |> List.toMap;
-        let (states, moveLogics) = strategies |> Map.mapWithKey((id, strat) -> {
+        let playerMap = Flixball/Core/Board.players(b);
+        let ais = strategies |> Map.mapWithKey((id, strat) -> {
             let (stateGen, ml) = strat(id);
-            (stateGen(seed), ml)
-        }) |> Utils/Map.unzip;
-        GameState(states, moveLogics, playerMap, b)
+            let pos = Map.get(id, playerMap) |> Utils/Option.unsafeGet;
+            {state = stateGen(seed), ml = ml, pos = pos}
+        });
+        GameState(ais, b)
     }
 }

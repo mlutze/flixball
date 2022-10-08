@@ -108,18 +108,20 @@ namespace Flixball/Core/Board {
         MutMap.toMap(mutTiles)
     }
 
-    pub def players(b: Board): List[(PlayerId, Position)] = {
+    pub def players(b: Board): Map[PlayerId, Position] = {
         let Board(br) = b;
         br.tiles |> Map.toList |> List.filterMap(match (coords, t) -> match t {
             case Person(id, dir) => Some(id, Position(coords, dir))
             case _ => None
-        })
+        }) |> List.toMap
     }
 
     pub def player(b: Board, id: PlayerId): Option[Position] =
-        players(b) |>
-            List.find(match (foundId, _) -> foundId == id) |>
-            Option.map(match (_, pos) -> pos)
+        let Board(br) = b;
+        br.tiles |> Utils/Map.findMap((coord, tile) -> match tile {
+            case Person(id1, dir) if id1 == id => Some(Position(coord, dir))
+            case _ => None
+        })
 
     ///
     /// Each line of the string is a row. If lines are of different

@@ -38,9 +38,22 @@ namespace Utils {
             case None => ?unreachable
             case Some(v) => v
         }
+
+        /// use `f` is `o` is `None`.
+        pub def noneMap(f: Unit -> a \ ef, o: Option[a]): Option[a] \ ef = match o {
+            case Some(v) => Some(v)
+            case None => Some(f())
+        }
+
+        /// use `f` is `o` is `None`.
+        pub def noneFlatMap(f: Unit -> Option[a] \ ef, o: Option[a]): Option[a] \ ef = match o {
+            case Some(v) => Some(v)
+            case None => f()
+        }
     }
 
     namespace Map {
+
         pub def unzip(m: Map[k, (v1, v2)]): (Map[k, v1], Map[k, v2]) with Order[k] = region r {
             let m1 = new MutMap(r);
             let m2 = new MutMap(r);
@@ -49,6 +62,11 @@ namespace Utils {
                 MutMap.put!(k, v2, m2)
             };
             (MutMap.toMap(m1), MutMap.toMap(m2))
+        }
+
+        pub def findMap(f: k -> v -> Option[a] \ ef, m: Map[k, v]): Option[a] \ ef = {
+            use Utils/Option.noneFlatMap;
+            Map.foldLeftWithKey((acc, k, v) -> noneFlatMap(_ -> f(k, v), acc), None, m)
         }
     }
 }
