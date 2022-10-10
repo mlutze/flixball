@@ -20,9 +20,8 @@ namespace Flixball/Main {
             case Action.Help => println(usage())
             case Action.Run(runOpts, dispOpts) => 
                 match mkRunConfig(runOpts, dispOpts) {
-                    case None => println("configuration error")
-                    case Some(config) =>
-                        run(config)
+                    case Ok(config) => run(config)
+                    case Err(s) => println("Error: ${s}")
                 }
             case Action.Replay(_) => println("Replay not implemented")
             case Action.Error => println(usage())
@@ -48,21 +47,22 @@ namespace Flixball/Main {
         }
     }
 
-    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Option[RunConfig] \ NonDet = {
-        use Option.flatMap;
+    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[RunConfig, String] \ NonDet = {
+        use Result.flatMap;
         let seed = runOpts
             |> List.findMap(x -> match x {
                 case RunOption.Seed(s) => Some(s)
                 case _ => None
             })
             |> Option.getWithDefault(Random.nextInt64(Random.new()));
-        let* config = runOpts
+        let* configPath = runOpts
             |> List.findMap(x -> match x {
-                case RunOption.Config(c) =>
-                    let* file = File.read(c) |> Result.toOption;
-                    readConfig(file)
+                case RunOption.Config(c) => Some(c)
                 case _ => None
-            });
+            })
+            |> Option.toOk("missing config");
+        let* file = File.read(configPath);
+        let* config = readConfig(file);
         let quiet = runOpts |> List.memberOf(RunOption.Quiet);
         let log = runOpts
             |> List.findMap(x -> match x {
@@ -81,7 +81,7 @@ namespace Flixball/Main {
                 case _ => None
             })
             |> Option.getWithDefault(1_000);
-        Some({
+        Ok({
             seed = seed,
             config = config,
             log = log,
