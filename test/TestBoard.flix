@@ -40,7 +40,7 @@ namespace TestBoard {
             " " ::
             Nil;
         let boardString = rowStrings |> String.unlines;
-        Flixball/Core/Board.fromString(boardString)
+        Flixball/BoardLibrary.fromString(boardString)
 
     @test
     def testDimensions(): Bool = match testBoard01() {
@@ -77,7 +77,7 @@ namespace TestBoard {
 
     @test
     def testError(): Bool =
-        match "  #  \n  v  \n#  Q  " |> Flixball/Core/Board.fromString {
+        match "  #  \n  v  \n#  Q  " |> Flixball/BoardLibrary.fromString {
             case Err(_) => true
             case Ok(_) => false
         }
