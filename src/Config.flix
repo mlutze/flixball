@@ -73,7 +73,7 @@ namespace Flixball/Config {
                 let* rows = asInt("map.data.rows", rows0);
                 let* cols = asInt("map.data.cols", cols0);
                 let* density = asFloat("map.data.density", density0);
-                Ok(seed -> Flixball/Core/Board.randomBoard(seed, rows = rows, cols, density))
+                Ok(seed -> Flixball/BoardLibrary.randomBoard(seed, rows = rows, cols, density))
             }
             case None => Err("missing key 'map.data'")
         }

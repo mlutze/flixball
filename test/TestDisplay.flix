@@ -5,7 +5,7 @@ namespace TestDisplay {
     use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.Rotation.{Clockwise, Counterclockwise};
     use Flixball/Core.Tile.{Person, Wall};
-    use Flixball/Core/Board.{automataBoard, randomBoard};
+    use Flixball/BoardLibrary.{automataBoard, randomBoard};
     use Flixball/Core/GameState.mkGameState;
     use Flixball/AiLibrary.{
         rotate, shoot, walk, spinAndShoot, goAndSpin, naiveSearchAndDestroy,
@@ -14,7 +14,7 @@ namespace TestDisplay {
     use Flixball/Display.{runGameState, displayBoard}
 
     def testBoard01(): (Board, Map[PlayerId, Strategy]) =
-        let board = match Flixball/Core/Board.fromString(String.unlines(
+        let board = match Flixball/BoardLibrary.fromString(String.unlines(
             "     " ::
             "     " ::
             "  v  " ::
@@ -31,7 +31,7 @@ namespace TestDisplay {
         (board, moveLogics)
     
     def testBoard02(): (Board, Map[PlayerId, Strategy]) =
-        let board = match Flixball/Core/Board.fromString(String.unlines(
+        let board = match Flixball/BoardLibrary.fromString(String.unlines(
             "                  " ::
             " >  ^^^^^^^#  <   " ::
             "                  " ::
@@ -54,7 +54,7 @@ namespace TestDisplay {
         (board, moveLogics)
 
     def testBoard03(): (Board, Map[PlayerId, Strategy]) =
-        let board = match Flixball/Core/Board.fromString(String.unlines(
+        let board = match Flixball/BoardLibrary.fromString(String.unlines(
             "^ #       " ::
             "  #       " ::
             "  #       " ::
@@ -82,7 +82,7 @@ namespace TestDisplay {
         automataBoard(285_041_125i64, rows=25, 40, 0.38, 3)
 
     def testBoard06(): (Board, Map[PlayerId, Strategy]) =
-        let board = match Flixball/Core/Board.fromString(String.unlines(
+        let board = match Flixball/BoardLibrary.fromString(String.unlines(
             "^         " ::
             " v        " ::
             "  <       " ::
@@ -113,7 +113,7 @@ namespace TestDisplay {
         (board, moveLogics)
 
     def testBoard07(): (Board, Map[PlayerId, Strategy]) =
-        let board = match Flixball/Core/Board.fromString(String.unlines(
+        let board = match Flixball/BoardLibrary.fromString(String.unlines(
             "^   #    <" ::
             "    #  ###" ::
             "#   #  #  " ::
