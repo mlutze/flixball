@@ -54,6 +54,33 @@ namespace Flixball/BoardLibrary {
         Board({rows=rows.rows, cols=cols, tiles=gridToMap(grid)}) |> addBorder
     }
 
+    ///
+    /// Puts the players in random empty positions on the board.
+    ///
+    pub def sprinklePlayers(seed: Int64, n: Int32, b0: Board): Board = region r {
+        let rand = RegionedRandom.newWithSeed(r, seed);
+        let Board(rec) = b0;
+        let rows = List.range(0, rec.rows);
+        let cols = List.range(0, rec.cols);
+        let options = {
+            use List.flatMap;
+            let* row = rows;
+            let* col = cols;
+            if (Map.get((row, col), rec.tiles) == None) {
+                (row, col) :: Nil
+            } else {
+                Nil
+            }
+        };
+        let choices = options |> RegionedRandom.shuffleList(rand) |> List.take(n);
+        let choiceToPlayer = choices |> List.zipWithIndex;
+        (b0, choiceToPlayer) ||> List.foldLeft(
+            b -> match (coords, id) -> 
+                let dir = RegionedRandom.chooseNel(rand, Nel(North, East :: South :: West :: Nil));
+                b |> Flixball/Core/Board.set_(coords, Some(Tile.Person(id, dir)))
+        )
+    }
+
     def gridToMap(g: Array[Array[Bool, r], r]): Map[(Int32, Int32), Tile] \ Read(r) = {
         let r = Scoped.regionOf(g);
         let mutTiles = new MutMap(r);

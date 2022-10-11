@@ -27,13 +27,15 @@ namespace Flixball/Config {
         let* o = asObject(".", json);
         let* mapJson = Map.get("map", o) |> Option.toOk("missing key 'map'");
         let* playersJson = Map.get("players", o) |> Option.toOk("missing key 'players'");
-        let* map = readMap(mapJson);
+        let* map0 = readMap(mapJson);
         let* players = readPlayers(playersJson);
+        // apply the map generator to the number of players
+        let map = map0(List.length(players));
         Ok(Config(map, players))
     }
 
 
-    def readMap(json: JsonElement): Result[Int64 -> Board, String] = match json {
+    def readMap(json: JsonElement): Result[(Int32, Int64) -> Board, String] = match json {
         case JsonObject(o) => {
             use Result.flatMap;
             let* id0 = Map.get("id", o) |> Option.toOk("missing key 'map.id'");
@@ -62,7 +64,7 @@ namespace Flixball/Config {
     ///
     /// Creates a map generating function from the ID and configuration data.
     ///
-    def mkMap(id: String, data: Option[JsonElement]): Result[Int64 -> Board, String] = match id {
+    def mkMap(id: String, data: Option[JsonElement]): Result[(Int32, Int64) -> Board, String] = match id {
         case "random" => match data {
             case Some(json) => {
                 use Result.flatMap;
@@ -73,7 +75,7 @@ namespace Flixball/Config {
                 let* rows = asInt("map.data.rows", rows0);
                 let* cols = asInt("map.data.cols", cols0);
                 let* density = asFloat("map.data.density", density0);
-                Ok(seed -> Flixball/BoardLibrary.randomBoard(seed, rows = rows, cols, density))
+                Ok((numPlayers, seed) -> Flixball/BoardLibrary.randomBoard(seed, rows = rows, cols, density) |> Flixball/BoardLibrary.sprinklePlayers(seed, numPlayers))
             }
             case None => Err("missing key 'map.data'")
         }
