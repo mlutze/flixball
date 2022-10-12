@@ -87,6 +87,9 @@ namespace Flixball/Config {
     ///
     def mkPlayer(id: String, _data: Option[JsonElement]): Result[Strategy, String] = match id {
         case "shoot" => Ok(Flixball/AiLibrary.shoot())
+        case "wander" => Ok(Flixball/AiLibrary.wander())
+        case "naive" => Ok(Flixball/AiLibrary.naiveSearchAndDestroy())
+        case "smart" => Ok(Flixball/AiLibrary.smartSearchAndDestroy())
         case unknownId => Err("unknown player ID ${unknownId}")
     }
 
