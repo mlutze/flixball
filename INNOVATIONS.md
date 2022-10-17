@@ -24,6 +24,7 @@ In Flixball, we are exploring the use of hashsets and hashmaps as the standard, 
 
 ## Hall of Bugs
 Bugs found through flixball (newest at the top)
+* 22, Oct 17 - [regression of use of outer namespace definitions](https://github.com/flix/flix/issues/4722)
 * 22, Oct 14 - [Record restriction is a mutating operation](https://github.com/flix/flix/issues/4704)
 * 22, Aug 09 - [bug using `let _ =` in entrypoint](https://github.com/flix/flix/issues/4440)
 * 22, Jun 15 - [use does not allow whitespace before initial multiuse](https://github.com/flix/flix/issues/3975)
