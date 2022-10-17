@@ -42,17 +42,14 @@ namespace Flixball/Core {
     pub enum Position(Coordinates, Direction) with Eq, Order
 
     namespace Position {
-        use Flixball/Core.Position
         use Flixball/Core.Position.Position
-        use Flixball/Core.Coordinates
-        use Flixball/Core.Direction
 
-        pub def coordinates(p: Position): Coordinates = {
+        pub def coordinates(p: Flixball/Core.Position): Flixball/Core.Coordinates = {
             let Position(c, _) = p;
             c
         }
 
-        pub def direction(p: Position): Direction = {
+        pub def direction(p: Flixball/Core.Position): Flixball/Core.Direction = {
             let Position(_, d) = p;
             d
         }
