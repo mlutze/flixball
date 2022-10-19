@@ -28,6 +28,8 @@ namespace Flixball/Core/GameState {
         Board
     )
 
+    //law gamestatea = 
+
     /// Returns the board of the state.
     pub def board(s: GameState): Board = {
         let GameState(_, b) = s;
@@ -121,10 +123,16 @@ namespace Flixball/Core/GameState {
             {pos = pos | info}
         })
     
+    ///
+    /// Create a gamestate based on a seed (for ais), strategies and a board.
+    /// Precondition: The domain of `strategies` must be `[0,n]` where `n` is
+    /// the number of players on the board. 
+    ///
     pub def mkGameState(seed: Int64, strategies: Map[PlayerId, Strategy], b: Board): GameState = {
         let playerMap = Flixball/Core/Board.players(b);
         let ais = strategies |> Map.mapWithKey((id, strat) -> {
             let (stateGen, ml) = strat(id);
+            // unsafe get is safe per precondition.
             let pos = Map.get(id, playerMap) |> Utils/Option.unsafeGet;
             {state = stateGen(seed), ml = ml, pos = pos}
         });
