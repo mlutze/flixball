@@ -23,24 +23,41 @@ namespace Flixball/Core/GameState {
         pos = Position
     }
 
+    // Time is a non-negative number.
+    type alias Time = Int32
+
     pub opaque enum GameState(
         Map[PlayerId, PlayerInfo],
-        Board
+        Board,
+        Time
     )
 
-    //law gamestatea = 
+    pub def initTime(): Time = 0
 
     /// Returns the board of the state.
     pub def board(s: GameState): Board = {
-        let GameState(_, b) = s;
-        b
+        let GameState(_, board, _) = s;
+        board
+    }
+
+    /// Returns the time of the state.
+    pub def time(s: GameState): Int32 = {
+        // Return type `Int32` since `Time` is internal.
+        let GameState(_, _, time) = s;
+        time
+    }
+
+    /// Take a step in time of the state.
+    pub def stepTime(s: GameState): GameState = {
+        let GameState(players, board, time) = s;
+        GameState(players, board, time+1)
     }
 
     ///
     /// Gets the position of the given player.
     ///
     pub def playerPosition(id: PlayerId, s: GameState): Option[Position] = {
-        let GameState(players, _) = s;
+        let GameState(players, _, _) = s;
         players |> Map.get(id) |> Option.map(info -> info.pos)
     }
 
@@ -50,7 +67,7 @@ namespace Flixball/Core/GameState {
 
     /// Position updates are naively done without care for collisions or inconsistensies.
     pub def mapWithId(f: (PlayerId, PlayerInfo) -> PlayerInfo, s: GameState): GameState = region r {
-        let GameState(players0, board0) = s;
+        let GameState(players0, board0, time0) = s;
         let board = ref board0 @ r;
         let players = players0 |> Map.mapWithKey((id, info0) -> {
             let info = f(id, info0);
@@ -62,12 +79,12 @@ namespace Flixball/Core/GameState {
             } else ();
             info
         });
-        GameState(players, deref board)
+        GameState(players, deref board, time0)
     }
 
     /// Adjusts the playerinfo of player `id`. Position updates are not verified.
     pub def adjust(id: PlayerId, f: PlayerInfo -> PlayerInfo, s: GameState): GameState = region r {
-        let GameState(players0, board0) = s;
+        let GameState(players0, board0, time0) = s;
         let board = ref board0 @ r;
         let players = players0 |> Map.adjust(info0 -> {
             let info = f(info0);
@@ -77,17 +94,17 @@ namespace Flixball/Core/GameState {
             } else ();
             info
         }, id);
-        GameState(players, deref board)
+        GameState(players, deref board, time0)
     }
 
     /// Computes the logics of all players, returning their map of moves.
     pub def computeMoveLogics(s: GameState): (Map[PlayerId, Move], GameState) = {
-        let GameState(players0, b0) = s;
+        let GameState(players0, b0, time0) = s;
         let (moves, players) = players0 |> Map.mapWithKey((_, info) -> {
             let (move, state) = (info.ml)(Flixball/Core/AiInfo.fromBoard(b0), info.state);
             (move, {state = state | info})
         }) |> Utils/Map.unzip;
-        (moves, GameState(players, b0))
+        (moves, GameState(players, b0, time0))
     }
 
     /// Removes a player from the game.
@@ -99,10 +116,10 @@ namespace Flixball/Core/GameState {
 
             // Case 2: Found the player. Remove from the map, the board, and the states.
             case Some(Position(coords, _)) => {
-                let GameState(players0, board0) = state0;
+                let GameState(players0, board0, time0) = state0;
                 let board = board0 |> set_(coords, None);
                 let players = players0 |> Map.remove(id);
-                GameState(players, board)
+                GameState(players, board, time0)
             }
         }
     }
@@ -136,6 +153,6 @@ namespace Flixball/Core/GameState {
             let pos = Map.get(id, playerMap) |> Utils/Option.unsafeGet;
             {state = stateGen(seed), ml = ml, pos = pos}
         });
-        GameState(ais, b)
+        GameState(ais, b, initTime())
     }
 }
