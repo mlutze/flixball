@@ -8,6 +8,8 @@ of Flix.
     * [Record Syntax](#record-syntax)
     * [Code Blocks](#code-blocks)
 * [Design Conventions](#design-conventions)
+* [Documentation Conventions](#documentation-conventions)
+    * [Use of `@Unsafe` Code](#use-of-unsafe-code)
 
 --------------------------------------------------------------------------------
 
@@ -123,3 +125,25 @@ List.range(0, k) |> List.map(e -> {
 
 ## Design Conventions
 Conventions related to programming patterns and use of language features.
+
+--------------------------------------------------------------------------------
+
+## Documentation Conventions
+Conventions related to documentation of code.
+
+### Use of `@Unsafe` code
+When calling functions annotated with `@Unsafe` or using holes or
+`unreachable!/bug!`, argumentation must be made in a comment near the
+occurrence about why the specific usage is okay. Reasons can be local reasoning, type class laws, preconditions, and so on.
+
+### examples
+
+```scala
+let x = Some(42);
+match x {
+    case None =>
+        // Safe by definition of `x`.
+        unreachable!()
+    case Some(v) => v
+}
+```

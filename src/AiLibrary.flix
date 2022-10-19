@@ -1,6 +1,11 @@
 namespace Flixball/AiLibrary {
     use Flixball/State.{toState, fromState};
     use Flixball/Core/AiInfo.AiInfo;
+    use Flixball/Core/AiInfo.getColumns;
+    use Flixball/Core/AiInfo.playerPosition;
+    use Flixball/Core/AiInfo.playerPositions;
+    use Flixball/Core/AiInfo.getRows;
+    use Flixball/Core/AiInfo.getTiles;
     use Flixball/Core/Board.Board.Board;
     use Flixball/Core.Direction.{East, North, South, West};
     use Flixball/Core.GameState.GameState;
@@ -12,7 +17,6 @@ namespace Flixball/AiLibrary {
     use Flixball/Core.{Coordinates, Direction, Move,
         MoveLogic, PlayerId, Position, Rotation, Strategy, Tile};
     use Flixball/GridGraph.{findShortestPath, raytraceEx};
-    use Flixball/Core/AiInfo.{getPlayers, getTiles, getColumns, getRows};
     use Flixball.State
 
     def statelessMoveLogic(logic: AiInfo -> Move): MoveLogic =
@@ -77,8 +81,7 @@ namespace Flixball/AiLibrary {
 
     pub def goAndSpin(coords: Coordinates): Strategy =
         statelessStrategy((id, info) -> {
-            let currentPosition = getPlayers(info) |>
-                Map.get(id) |>
+            let currentPosition = playerPosition(id, info) |>
                 Utils/Option.unsafeGet;
             let goal = match Position(c, _) -> c == coords;
             goTo(
@@ -95,7 +98,7 @@ namespace Flixball/AiLibrary {
     ///
     pub def naiveSearchAndDestroy(): Strategy =
         statelessStrategy((id, info) -> {
-            let playerMap = getPlayers(info);
+            let playerMap = playerPositions(info);
             let tiles = getTiles(info);
             let board = Board({
                 rows = getRows(info),
@@ -109,9 +112,7 @@ namespace Flixball/AiLibrary {
                 |> List.head;
 
             // Get my own position
-            let Position(coords, dir) = playerMap |>
-                Map.get(id) |>
-                Utils/Option.unsafeGet;
+            let Position(coords, dir) = playerPosition(id, info) |> Utils/Option.unsafeGet;
 
             // Pick a move
             match target {
@@ -130,7 +131,7 @@ namespace Flixball/AiLibrary {
                             goTo(
                                 Position(coords, dir),
                                 goal,
-                                passablePlayers=true,
+                                passablePlayers = true,
                                 tiles
                             ) |> Option.getWithDefault(Turn(Counterclockwise))
                             // TODO pick another target if inaccessible
@@ -147,9 +148,7 @@ namespace Flixball/AiLibrary {
                 tiles = tiles
             });
             // Get my own position
-            let Position(coords, dir) = getPlayers(info) |>
-                Map.get(id) |>
-                Utils/Option.unsafeGet;
+            let Position(coords, dir) = playerPosition(id, info) |> Utils/Option.unsafeGet;
 
             match raytraceEx(dir, coords, board) {
                 case Some(Person(_, _)) =>
@@ -171,7 +170,7 @@ namespace Flixball/AiLibrary {
                     goTo(
                         Position(coords, dir),
                         goal,
-                        passablePlayers=false,
+                        passablePlayers = false,
                         tiles
                     ) |> Option.getWithDefault(Turn(Counterclockwise))
                 }
