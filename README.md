@@ -21,7 +21,7 @@ The project license [LICENSE.md](./LICENSE.md)
 You will need the following in order to build Flixball.
 
 ### Flix Version
-v0.31.0
+v0.33.0
 
 ### Dependencies
 
