@@ -27,4 +27,4 @@ v0.33.0
 
 * [JonathanStarup/Flix-ANSI-Terminal](https://github.com/JonathanStarup/Flix-ANSI-Terminal) v1.0.1
 
-* [mlutze/flix-json](https://github.com/mlutze/flix-json) v0.4.0
+* [mlutze/flix-json](https://github.com/mlutze/flix-json) v0.5.0
