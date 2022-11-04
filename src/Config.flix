@@ -3,8 +3,7 @@ namespace Flixball/Config {
     use Flixball/Core/Board.Board;
     use Json.JsonElement.JsonArray;
     use Json.JsonElement.JsonObject;
-    use Json.JsonElement.JsonInt;
-    use Json.JsonElement.JsonFloat;
+    use Json.JsonElement.JsonNumber;
     use Json.JsonElement.JsonString;
     use Json.JsonElement;
 
@@ -104,12 +103,12 @@ namespace Flixball/Config {
     }
 
     def asInt(path: String, json: JsonElement): Result[Int32, String] = match json {
-        case JsonInt(i) => Ok(i)
+        case JsonNumber(i) => BigDecimal.tryToInt32(i) |> Option.toOk("non-float at ${path}")
         case _ => Err("non-int at ${path}")
     }
 
     def asFloat(path: String, json: JsonElement): Result[Float64, String] = match json {
-        case JsonFloat(i) => Ok(i)
+        case JsonNumber(i) => BigDecimal.tryToFloat64(i) |> Option.toOk("non-float at ${path}")
         case _ => Err("non-float at ${path}")
     }
 
