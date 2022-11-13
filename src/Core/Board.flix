@@ -24,7 +24,7 @@ namespace Flixball/Core/Board {
     /// North, East, South, West correspond to the drawing above, likewise
     /// with Clockwise and Counterclockwise.
     /// 
-    pub enum Board({rows :: Int32, cols :: Int32, tiles :: Map[Coordinates, Tile]})
+    pub enum Board({rows = Int32, cols = Int32, tiles = Map[Coordinates, Tile]})
 
     pub def set_(coords: Coordinates, tile: Option[Tile], board0: Board): Board = {
         let Board(rec0) = board0;
