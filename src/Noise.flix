@@ -2,7 +2,7 @@ namespace Flixball/Noise {
 
     pub type alias Grid[t: Type, r: Region] = Array[Array[t, r], r]
 
-    pub type alias Dimensions = {width :: Int32, height :: Int32} 
+    pub type alias Dimensions = {width = Int32, height = Int32} 
 
     def createGrid(r: Region[r], f: (Int32, Int32) -> t \ ef, d: Dimensions): Grid[t, r] \ {Write(r), ef} = {
         use Array.init;
@@ -76,7 +76,7 @@ namespace Flixball/Noise {
         deref current
     }
 
-    def mooreNeighborhood(p: {x::Int32, y::Int32}, d: Dimensions): List[{x::Int32, y::Int32}] = {
+    def mooreNeighborhood(p: {x = Int32, y = Int32}, d: Dimensions): List[{x = Int32, y = Int32}] = {
         let inbound = px -> px.x >= 0 and px.x < d.width and px.y >= 0 and px.y < d.height;
         let self = px -> px.x == p.x and px.y == p.y;
         let offsets = List.range(-1, 2);
