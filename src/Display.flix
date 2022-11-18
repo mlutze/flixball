@@ -15,7 +15,7 @@ namespace Flixball/Display {
     ///
     pub def displayBoard(b: Board): Unit & Impure = {
         Terminal.clearScreenAndReset();
-        b |> boardLines |> List.foreach(println)
+        b |> boardLines |> List.forEach(println)
     }
 
     ///
@@ -33,9 +33,9 @@ namespace Flixball/Display {
         let Board(br) = b;
         let lines = new MutList(r);
         let idColor = mkIdColorMap(b);
-        Iterator.range(r, 0, br.rows) |> Iterator.foreach(row -> {
+        Iterator.range(r, 0, br.rows) |> Iterator.forEach(row -> {
             let sb = StringBuilder.new(r);
-            Iterator.range(r, 0, br.cols) |> Iterator.foreach(column -> {
+            Iterator.range(r, 0, br.cols) |> Iterator.forEach(column -> {
                 match Map.get((row, column), br.tiles) {
                     case None => StringBuilder.append!(" ", sb)
                     case Some(tile) => StringBuilder.append!(tileStr(idColor, tile), sb)

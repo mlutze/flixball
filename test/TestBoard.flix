@@ -29,7 +29,7 @@ namespace TestBoard {
         let inbound = match (row, col) ->
             0 <= row and row < br.rows and
             0 <= col and col < br.cols;
-        br.tiles |> Map.keysOf |> Set.forall(inbound)
+        br.tiles |> Map.keysOf |> Set.forAll(inbound)
 
     def testBoard01(): Result[Board, String] =
         let rowStrings =
