@@ -38,7 +38,7 @@ namespace Flixball/Main {
         let gs0 = Flixball/Core/GameState.mkGameState(config.seed, stratMap, mkBoard(config.seed));
         region r {
             let stream = Flixball/Engine.runGame(r, gs0);
-            stream |> Iterator.foreach(gs -> {
+            stream |> Iterator.forEach(gs -> {
                 Flixball/Display.displayBoard(gsBoard(gs));
                 sleep(config.period |> Int32.toInt64)
             })
