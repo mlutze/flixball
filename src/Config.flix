@@ -123,11 +123,4 @@ namespace Flixball/Config {
             Ok(NamedStrategy(id, strat))
         }
     }
-
-    pub def getAtKeyOpt(p: Path, key: k, m: Map[String, JsonElement]): Result[Option[v], JsonError] with ToString[k], FromJson[v] = {
-        match Map.get("${key}", m) {
-            case None => Ok(None)
-            case Some(val) => Json/FromJson.fromJsonAt(p !! "${key}", val)
-        }
-    }
 }
