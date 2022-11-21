@@ -1,16 +1,42 @@
 namespace Flixball/Config {
     use Flixball/Core.Strategy;
     use Flixball/Core/Board.Board;
+    use Json/FromJson.fromJsonAt;
+    use Json.FromJson;
     use Json.JsonElement.JsonArray;
-    use Json.JsonElement.JsonObject;
     use Json.JsonElement.JsonNumber;
+    use Json.JsonElement.JsonObject;
     use Json.JsonElement.JsonString;
     use Json.JsonElement;
+    use Json.JsonError;
+    use Json.JsonError.JsonError;
+    use Json.getAtKey;
+    use Json/FromJson.fromJson;
+    use Json/Path.Path;
+    use Json/Path.{!!};
 
     ///
-    /// A run configuration holding a board and list of strategies.
+    /// A run configuration holding a board generator and list of strategies.
     ///
     pub enum Config(Int64 -> Board, List[Strategy])
+
+    ///
+    /// Builds a board from a number of players and a seed.
+    ///
+    enum BoardGen((Int32, Int64) -> Board)
+
+    pub enum NamedStrategy(StrategyId, Strategy)
+
+    enum MapId {
+        case Random
+    }
+
+    enum StrategyId {
+        case Shoot
+        case Wander
+        case Naive
+        case Smart
+    }
 
     ///
     /// Reads the run configuration from a JSON string.
@@ -18,102 +44,90 @@ namespace Flixball/Config {
     pub def read(json: String): Result[Config, String] = {
         use Result.flatMap;
         let* obj = Json/Parse.parse(json) |> Option.toOk("invalid JSON");
-        fromJson(obj)
+        fromJson(obj) |> Result.mapErr(match JsonError(path, opts) -> "Error at ${path}. Expected one of: ${opts}")
     }
 
-    def fromJson(json: JsonElement): Result[Config, String] = {
-        use Result.flatMap;
-        let* o = asObject(".", json);
-        let* mapJson = Map.get("map", o) |> Option.toOk("missing key 'map'");
-        let* playersJson = Map.get("players", o) |> Option.toOk("missing key 'players'");
-        let* map0 = readMap(mapJson);
-        let* players = readPlayers(playersJson);
-        // apply the map generator to the number of players
-        let map = map0(List.length(players));
-        Ok(Config(map, players))
-    }
-
-
-    def readMap(json: JsonElement): Result[(Int32, Int64) -> Board, String] = match json {
-        case JsonObject(o) => {
+    instance FromJson[Config] {
+        pub def fromJsonAt(p: Path, x: JsonElement): Result[Config, JsonError] = {
             use Result.flatMap;
-            let* id0 = Map.get("id", o) |> Option.toOk("missing key 'map.id'");
-            let* id = asString(".map", id0);
-            let data = Map.get("data", o);
-            mkMap(id, data)
+            let* obj = fromJsonAt(p, x);
+            let* BoardGen(fromPlayers) = getAtKey(p, "map", obj);
+            let* players = getAtKey(p, "players", obj);
+            let strats = players |> List.map(match NamedStrategy(_, strat) -> strat);
+            let boardGen = fromPlayers(List.length(players));
+            Ok(Config(boardGen, strats))
         }
-        case _ => Err("non-object")
     }
 
-    def readPlayers(json: JsonElement): Result[List[Strategy], String] = {
-        use Result.flatMap;
-        let* a = asArray(".players", json);
-        Result.traverse(readPlayer, a)
-    }
-
-    def readPlayer(json: JsonElement): Result[Strategy, String] = {
-        use Result.flatMap;
-        let* o = asObject(".players[_]", json);
-        let* id0 = Map.get("id", o) |> Option.toOk("missing key 'players[_].id'");
-        let* id = asString(".players[_]", id0);
-        let data = Map.get("data", o);
-        mkPlayer(id, data)
-    }
-
-    ///
-    /// Creates a map generating function from the ID and configuration data.
-    ///
-    def mkMap(id: String, data: Option[JsonElement]): Result[(Int32, Int64) -> Board, String] = match id {
-        case "random" => match data {
-            case Some(json) => {
-                use Result.flatMap;
-                let* o = asObject("map.data", json);
-                let* rows0 = Map.get("rows", o) |> Option.toOk("missing key 'map.data.rows'");
-                let* cols0 = Map.get("cols", o) |> Option.toOk("missing key 'map.data.cols'");
-                let* density0 = Map.get("density", o) |> Option.toOk("missing key 'map.data.density'");
-                let* rows = asInt("map.data.rows", rows0);
-                let* cols = asInt("map.data.cols", cols0);
-                let* density = asFloat("map.data.density", density0);
-                Ok((numPlayers, seed) -> Flixball/BoardLibrary.randomBoard(seed, rows = rows, cols, density) |> Flixball/BoardLibrary.sprinklePlayers(seed, numPlayers))
+    instance FromJson[BoardGen] {
+        pub def fromJsonAt(p: Path, x: JsonElement): Result[BoardGen, JsonError] = {
+            use Result.flatMap;
+            let* o = fromJsonAt(p, x);
+            let* id = getAtKey(p, "id", o);
+            match id {
+                case Random => {
+                    let* data = getAtKey(p, "data", o);
+                    let* obj = fromJsonAt(p, data);
+                    let* rows = getAtKey(p, "rows", obj);
+                    let* cols = getAtKey(p, "cols", obj);
+                    let* density = getAtKey(p, "density", obj);
+                    Ok(BoardGen((numPlayers, seed) -> Flixball/BoardLibrary.randomBoard(seed, rows = rows, cols, density) |> Flixball/BoardLibrary.sprinklePlayers(seed, numPlayers)))
+                }
             }
-            case None => Err("missing key 'map.data'")
         }
-        case unknownId => Err("unknown map ID ${unknownId}")
     }
 
-    ///
-    /// Creates a player from the ID and configuration data.
-    ///
-    def mkPlayer(id: String, _data: Option[JsonElement]): Result[Strategy, String] = match id {
-        case "shoot" => Ok(Flixball/AiLibrary.shoot())
-        case "wander" => Ok(Flixball/AiLibrary.wander())
-        case "naive" => Ok(Flixball/AiLibrary.naiveSearchAndDestroy())
-        case "smart" => Ok(Flixball/AiLibrary.smartSearchAndDestroy())
-        case unknownId => Err("unknown player ID ${unknownId}")
+
+    instance FromJson[MapId] {
+        pub def fromJsonAt(p: Path, x: JsonElement): Result[MapId, JsonError] = {
+            use Result.flatMap;
+            let* name = fromJsonAt(p, x);
+            let map = Map#{
+                "random" => Random
+            };
+            match Map.get(name, map) {
+                case Some(s) => Ok(s)
+                case None => Err(JsonError(p, Map.keysOf(map)))
+            }
+        }
     }
 
-    def asArray(path: String, json: JsonElement): Result[List[JsonElement], String] = match json {
-        case JsonArray(a) => Ok(a)
-        case _ => Err("non-array at ${path}")
+    instance FromJson[StrategyId] {
+        pub def fromJsonAt(p: Path, x: JsonElement): Result[StrategyId, JsonError] = {
+            use Result.flatMap;
+            let* name = fromJsonAt(p, x);
+            let map = Map#{
+                "shoot" => Shoot,
+                "wander" => Wander,
+                "naive" => Naive,
+                "smart" => Smart
+            };
+            match Map.get(name, map) {
+                case Some(s) => Ok(s)
+                case None => Err(JsonError(p, Map.keysOf(map)))
+            }
+        }
     }
 
-    def asString(path: String, json: JsonElement): Result[String, String] = match json {
-        case JsonString(s) => Ok(s)
-        case _ => Err("non-string at ${path}")
+    instance FromJson[NamedStrategy] {
+        pub def fromJsonAt(p: Path, x: JsonElement): Result[NamedStrategy, JsonError] = {
+            use Result.flatMap;
+            let* obj = fromJsonAt(p, x);
+            let* id = getAtKey(p, "id", obj);
+            let strat = match id {
+                case Shoot => Flixball/AiLibrary.shoot()
+                case Wander => Flixball/AiLibrary.wander()
+                case Naive => Flixball/AiLibrary.naiveSearchAndDestroy()
+                case Smart => Flixball/AiLibrary.smartSearchAndDestroy()
+            };
+            Ok(NamedStrategy(id, strat))
+        }
     }
 
-    def asInt(path: String, json: JsonElement): Result[Int32, String] = match json {
-        case JsonNumber(i) => BigDecimal.tryToInt32(i) |> Option.toOk("non-float at ${path}")
-        case _ => Err("non-int at ${path}")
-    }
-
-    def asFloat(path: String, json: JsonElement): Result[Float64, String] = match json {
-        case JsonNumber(i) => BigDecimal.tryToFloat64(i) |> Option.toOk("non-float at ${path}")
-        case _ => Err("non-float at ${path}")
-    }
-
-    def asObject(path: String, json: JsonElement): Result[Map[String, JsonElement], String] = match json {
-        case JsonObject(m) => Ok(m)
-        case _ => Err("non-object at ${path}")
+    pub def getAtKeyOpt(p: Path, key: k, m: Map[String, JsonElement]): Result[Option[v], JsonError] with ToString[k], FromJson[v] = {
+        match Map.get("${key}", m) {
+            case None => Ok(None)
+            case Some(val) => Json/FromJson.fromJsonAt(p !! "${key}", val)
+        }
     }
 }
