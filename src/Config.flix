@@ -1,17 +1,17 @@
 namespace Flixball/Config {
     use Flixball/Core.Strategy;
     use Flixball/Core/Board.Board;
-    use Json/FromJson.fromJsonAt;
     use Json.FromJson;
     use Json.JsonElement.JsonArray;
     use Json.JsonElement.JsonNumber;
     use Json.JsonElement.JsonObject;
     use Json.JsonElement.JsonString;
     use Json.JsonElement;
-    use Json.JsonError;
     use Json.JsonError.JsonError;
+    use Json.JsonError;
     use Json.getAtKey;
     use Json/FromJson.fromJson;
+    use Json/FromJson.fromJsonAt;
     use Json/Path.Path;
     use Json/Path.{!!};
 
