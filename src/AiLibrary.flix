@@ -8,7 +8,6 @@ namespace Flixball/AiLibrary {
     use Flixball/Core/AiInfo.getTiles;
     use Flixball/Core/Board.Board.Board;
     use Flixball/Core.Direction.{East, North, South, West};
-    use Flixball/Core.GameState.GameState;
     use Flixball/Core.Move.{Shoot, Turn, Walk};
     use Flixball/Core.Position.Position;
     use Flixball/Core.Rotation.Clockwise;
