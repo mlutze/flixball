@@ -8,18 +8,18 @@ namespace Utils {
     pub def dbg(x: a): a with ToString[a] = unsafe_cast {
         println(x);
         x
-    } as \ {}
+    } as _ \ {}
     
     @Unsafe
     pub def dbgMsg(msg: String, x: a): a with ToString[a] = unsafe_cast {
         println("${msg}: ${x}");
         x
-    } as \ {}
+    } as _ \ {}
 
     @Unsafe
     pub def dbgCond(msg: String, cond: a -> Bool \ ef, x: a): a \ ef with ToString[a] = {
         if (cond(x)) {
-            unsafe_cast println("${msg}: ${x}") as \ ef;
+            unsafe_cast println("${msg}: ${x}") as _ \ ef;
             x
         } else x
     }
@@ -27,7 +27,7 @@ namespace Utils {
     @Unsafe
     pub def dbgAny(msg: String, cond: a -> Bool \ ef1, toStr: a -> String \ ef2, x: a): a \ {ef1, ef2} = {
         if (cond(x)) {
-            unsafe_cast println("${msg}: ${toStr(x)}") as \ ef2;
+            unsafe_cast println("${msg}: ${toStr(x)}") as _ \ ef2;
             x
         } else x
     }

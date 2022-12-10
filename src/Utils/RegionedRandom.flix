@@ -47,7 +47,7 @@ namespace RegionedRandom {
     pub def shuffleArray(ran: Random[r1], a: Array[a, r2]): Unit & r1 and r2 = {
         use Random.Random.{Random => FlixRandom};
         let Random(javaRandom) = ran;
-        unsafe_cast Array.shuffle(FlixRandom(javaRandom), a) as & r1 and r2
+        unsafe_cast Array.shuffle(FlixRandom(javaRandom), a) as _ & r1 and r2
     }
 
     ///
@@ -56,7 +56,7 @@ namespace RegionedRandom {
     pub def shuffleList(ran: Random[r], l: List[a]): List[a] & r = {
         use Random.Random.{Random => FlixRandom};
         let Random(javaRandom) = ran;
-        unsafe_cast List.shuffle(FlixRandom(javaRandom), l) as & r
+        unsafe_cast List.shuffle(FlixRandom(javaRandom), l) as _ & r
     }
 
     ///
