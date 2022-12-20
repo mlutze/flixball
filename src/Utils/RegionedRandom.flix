@@ -14,10 +14,10 @@ namespace RegionedRandom {
     /// Returns `None` if the given array `a` is empty.
     ///
     pub def chooseArray(ran: Random[r1], a: Array[a, r2]): Option[a] & r1 and r2 = {
-        if (a.length == 0) {
+        if (Array.length(a) == 0) {
             None
         } else {
-            let m = a.length;
+            let m = Array.length(a);
             let i = nextNatWithMax(ran, m);
             Some(a[i])
         }
