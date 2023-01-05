@@ -75,7 +75,7 @@ namespace Flixball/BoardLibrary {
         let choices = options |> RegionedRandom.shuffleList(rand) |> List.take(n);
         let choiceToPlayer = choices |> List.zipWithIndex;
         (b0, choiceToPlayer) ||> List.foldLeft(
-            b -> match (coords, id) -> 
+            b -> match (id, coords) -> 
                 let dir = RegionedRandom.chooseNel(rand, Nel(North, East :: South :: West :: Nil));
                 b |> Flixball/Core/Board.set_(coords, Some(Tile.Person(id, dir)))
         )
@@ -85,8 +85,8 @@ namespace Flixball/BoardLibrary {
         let r = Scoped.regionOf(g);
         let mutTiles = new MutMap(r);
         foreach(
-            (arr, x) <- Array.enumerator(g);
-            (b, y) <- Array.enumerator(arr))
+            (x, arr) <- Array.enumerator(r, g);
+            (y, b) <- Array.enumerator(r, arr))
         {
             if (b) mutTiles |> MutMap.put!((x, y), Wall)
             else ()
@@ -104,7 +104,7 @@ namespace Flixball/BoardLibrary {
     /// "#" = wall tile
     /// {"<","^",">","v"} = player tile
     ///
-    pub def fromString(s: String): Result[Board, String] = region r {
+    pub def fromString(s: String): Result[String, Board] = region r {
         let lines = String.lines(s);
 
         let rows = List.length(lines);
@@ -127,9 +127,9 @@ namespace Flixball/BoardLibrary {
             else ()
         };
 
-        foreach((line, row) <- lines |> List.enumerator(r)) {
+        foreach((row, line) <- lines |> List.enumerator(r)) {
             let cells = String.toList(line);
-            foreach((cell, col) <- cells |> List.enumerator(r)) {
+            foreach((col, cell) <- cells |> List.enumerator(r)) {
                 def addTile(tile) = MutMap.put!((row, col), tile, tileMap);
                 match cell {
                     case ' ' => () // do nothing

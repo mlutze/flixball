@@ -31,7 +31,7 @@ namespace TestBoard {
             0 <= col and col < br.cols;
         br.tiles |> Map.keysOf |> Set.forAll(inbound)
 
-    def testBoard01(): Result[Board, String] =
+    def testBoard01(): Result[String, Board] =
         let rowStrings =
             "      " ::
             " #  v   # " ::

@@ -33,7 +33,6 @@ namespace Flixball/Main {
         let Config(mkBoard, strats) = config.config;
         let stratMap = strats
             |> List.zipWithIndex
-            |> List.map(swap)
             |> List.toMap;
         let gs0 = Flixball/Core/GameState.mkGameState(config.seed, stratMap, mkBoard(config.seed));
         region r {
@@ -45,7 +44,7 @@ namespace Flixball/Main {
         }
     }
 
-    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[RunConfig, String] \ NonDet = {
+    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[String, RunConfig] \ NonDet = {
         use Result.flatMap;
         let seed = runOpts
             |> List.findMap(x -> match x {

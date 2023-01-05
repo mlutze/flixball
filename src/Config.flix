@@ -15,13 +15,13 @@ namespace Flixball/Config {
     ///
     /// Reads the run configuration from a JSON string.
     ///
-    pub def read(json: String): Result[Config, String] = {
+    pub def read(json: String): Result[String, Config] = {
         use Result.flatMap;
         let* obj = Json/Parse.parse(json) |> Option.toOk("invalid JSON");
         fromJson(obj)
     }
 
-    def fromJson(json: JsonElement): Result[Config, String] = {
+    def fromJson(json: JsonElement): Result[String, Config] = {
         use Result.flatMap;
         let* o = asObject(".", json);
         let* mapJson = Map.get("map", o) |> Option.toOk("missing key 'map'");
@@ -34,7 +34,7 @@ namespace Flixball/Config {
     }
 
 
-    def readMap(json: JsonElement): Result[(Int32, Int64) -> Board, String] = match json {
+    def readMap(json: JsonElement): Result[String, (Int32, Int64) -> Board] = match json {
         case JsonObject(o) => {
             use Result.flatMap;
             let* id0 = Map.get("id", o) |> Option.toOk("missing key 'map.id'");
@@ -45,13 +45,13 @@ namespace Flixball/Config {
         case _ => Err("non-object")
     }
 
-    def readPlayers(json: JsonElement): Result[List[Strategy], String] = {
+    def readPlayers(json: JsonElement): Result[String, List[Strategy]] = {
         use Result.flatMap;
         let* a = asArray(".players", json);
         Result.traverse(readPlayer, a)
     }
 
-    def readPlayer(json: JsonElement): Result[Strategy, String] = {
+    def readPlayer(json: JsonElement): Result[String, Strategy] = {
         use Result.flatMap;
         let* o = asObject(".players[_]", json);
         let* id0 = Map.get("id", o) |> Option.toOk("missing key 'players[_].id'");
@@ -63,7 +63,7 @@ namespace Flixball/Config {
     ///
     /// Creates a map generating function from the ID and configuration data.
     ///
-    def mkMap(id: String, data: Option[JsonElement]): Result[(Int32, Int64) -> Board, String] = match id {
+    def mkMap(id: String, data: Option[JsonElement]): Result[String, (Int32, Int64) -> Board] = match id {
         case "random" => match data {
             case Some(json) => {
                 use Result.flatMap;
@@ -84,7 +84,7 @@ namespace Flixball/Config {
     ///
     /// Creates a player from the ID and configuration data.
     ///
-    def mkPlayer(id: String, _data: Option[JsonElement]): Result[Strategy, String] = match id {
+    def mkPlayer(id: String, _data: Option[JsonElement]): Result[String, Strategy] = match id {
         case "shoot" => Ok(Flixball/AiLibrary.shoot())
         case "wander" => Ok(Flixball/AiLibrary.wander())
         case "naive" => Ok(Flixball/AiLibrary.naiveSearchAndDestroy())
@@ -92,7 +92,7 @@ namespace Flixball/Config {
         case unknownId => Err("unknown player ID ${unknownId}")
     }
 
-    def asArray(path: String, json: JsonElement): Result[List[JsonElement], String] = match json {
+    def asArray(path: String, json: JsonElement): Result[String, List[JsonElement]] = match json {
         case JsonArray(a) => Ok(a)
         case _ => Err("non-array at ${path}")
     }
@@ -102,17 +102,17 @@ namespace Flixball/Config {
         case _ => Err("non-string at ${path}")
     }
 
-    def asInt(path: String, json: JsonElement): Result[Int32, String] = match json {
+    def asInt(path: String, json: JsonElement): Result[String, Int32] = match json {
         case JsonNumber(i) => BigDecimal.tryToInt32(i) |> Option.toOk("non-float at ${path}")
         case _ => Err("non-int at ${path}")
     }
 
-    def asFloat(path: String, json: JsonElement): Result[Float64, String] = match json {
+    def asFloat(path: String, json: JsonElement): Result[String, Float64] = match json {
         case JsonNumber(i) => BigDecimal.tryToFloat64(i) |> Option.toOk("non-float at ${path}")
         case _ => Err("non-float at ${path}")
     }
 
-    def asObject(path: String, json: JsonElement): Result[Map[String, JsonElement], String] = match json {
+    def asObject(path: String, json: JsonElement): Result[String, Map[String, JsonElement]] = match json {
         case JsonObject(m) => Ok(m)
         case _ => Err("non-object at ${path}")
     }

@@ -56,7 +56,7 @@ namespace RegionedRandom {
     /// Shuffles `a` to a random permutation.
     ///
     pub def shuffleArray(ran: RegionedRandom[r1], a: Array[a, r2]): Unit & r1 and r2 = {
-        use Random.Random.{Random => FlixRandom};
+        use Random.{Random => FlixRandom};
         let RegionedRandom(javaRandom) = ran;
         unsafe_cast Array.shuffle(FlixRandom(javaRandom), a) as _ & r1 and r2
     }
@@ -65,7 +65,7 @@ namespace RegionedRandom {
     /// Returns a random permutation of `l`.
     ///
     pub def shuffleList(ran: RegionedRandom[r], l: List[a]): List[a] & r = {
-        use Random.Random.{Random => FlixRandom};
+        use Random.{Random => FlixRandom};
         let RegionedRandom(javaRandom) = ran;
         unsafe_cast List.shuffle(FlixRandom(javaRandom), l) as _ & r
     }
