@@ -20,15 +20,15 @@ namespace Flixball/BoardLibrary {
         let cols = br.cols+2;
         let translatedMap = new MutMap(r);
         // Add translated existing tiles
-        foreach(((x, y), tile) <- Map.iterator(r, br.tiles)) {
+        foreach(((x, y), tile) <- br.tiles |> Map.toList) { // TODO wasted traversal
             MutMap.put!((x+1, y+1), tile, translatedMap)
         };
         // Add border walls
-        foreach(i <- Iterator.range(r, 0, cols)) {
+        foreach(i <- List.range(0, cols)) { // TODO wasted traversal
             MutMap.put!((0, i), Wall, translatedMap);
             MutMap.put!((rows-1, i), Wall, translatedMap)
         };
-        foreach(i <- Iterator.range(r, 0, rows)) {
+        foreach(i <- List.range(0, rows)) { // TODO wasted traversal
             MutMap.put!((i, 0), Wall, translatedMap);
             MutMap.put!((i, cols-1), Wall, translatedMap)
         };
@@ -85,8 +85,9 @@ namespace Flixball/BoardLibrary {
         let r = Scoped.regionOf(g);
         let mutTiles = new MutMap(r);
         foreach(
-            (x, arr) <- Array.enumerator(r, g);
-            (y, b) <- Array.enumerator(r, arr))
+            (x, arr) <- Array.enumerator(r, g) |> Iterator.toList; // TODO wasted traversal
+            (y, b) <- Array.enumerator(r, arr) |> Iterator.toList) // TODO wasted traversal
+
         {
             if (b) mutTiles |> MutMap.put!((x, y), Wall)
             else ()
@@ -127,9 +128,9 @@ namespace Flixball/BoardLibrary {
             else ()
         };
 
-        foreach((row, line) <- lines |> List.enumerator(r)) {
+        foreach((row, line) <- lines |> List.zipWithIndex) { // TODO wasted traversal
             let cells = String.toList(line);
-            foreach((col, cell) <- cells |> List.enumerator(r)) {
+            foreach((col, cell) <- cells |> List.zipWithIndex) {  // TODO wasted traversal
                 def addTile(tile) = MutMap.put!((row, col), tile, tileMap);
                 match cell {
                     case ' ' => () // do nothing

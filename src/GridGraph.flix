@@ -31,7 +31,7 @@ namespace Flixball/GridGraph {
         MutDeque.pushBack(start, taskList);
         def bfsLoop() = match MutDeque.popFront(taskList) {
             case Some(current) => {
-                foreach((next, move) <- possibleMoves(r, current)) {
+                foreach((next, move) <- possibleMoves(r, current) |> Iterator.toList) { // TODO wasted traversal
                     let Position(nextCoord, _) = next;
                     if (nextCoord == startCoord or available(nextCoord)) {
                         if (goal(next)) foundGoal := Some(next) else ();

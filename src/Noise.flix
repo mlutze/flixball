@@ -50,8 +50,8 @@ namespace Flixball/Noise {
         // and the swapping them.
         def simulationStep(iteration) = if (iteration <= 0) () else {
             foreach(
-                (x, arr) <- Array.enumerator(r1, deref current);
-                (y, _) <- Array.enumerator(r1, arr))
+                (x, arr) <- Array.enumerator(r1, deref current) |> Iterator.toList; // TODO wasted traversal
+                (y, _) <- Array.enumerator(r1, arr) |> Iterator.toList) // TODO wasted traversal
             {
                 let p = {x = x, y = y};
                 let nbh = mooreNeighborhood(p, d);
