@@ -66,7 +66,7 @@ namespace Flixball/GridGraph {
     }}
 
     /// Returns the three possibles movement moves from `p` and their new position.
-    def possibleMoves(r: Region[r], p: Position): Iterator[(Position, Move), r] \ Write(r) = {
+    def possibleMoves(r: Region[r], p: Position): Iterator[(Position, Move), r, r] \ Write(r) = {
         use Flixball/Core.rotateDir;
         let Position(coord, dir) = p;
         let clockwise = (

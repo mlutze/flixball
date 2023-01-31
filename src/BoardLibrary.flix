@@ -82,17 +82,18 @@ namespace Flixball/BoardLibrary {
     }
 
     def gridToMap(g: Array[Array[Bool, r], r]): Map[(Int32, Int32), Tile] \ Read(r) = {
-        let r = Scoped.regionOf(g);
-        let mutTiles = new MutMap(r);
-        foreach(
-            (x, arr) <- Array.enumerator(r, g) |> Iterator.toList; // TODO wasted traversal
-            (y, b) <- Array.enumerator(r, arr) |> Iterator.toList) // TODO wasted traversal
+        region rh {
+            let mutTiles = new MutMap(rh);
+            foreach(
+                (x, arr) <- Array.enumerator(rh, g) |> Iterator.toList; // TODO wasted traversal
+                (y, b) <- Array.enumerator(rh, arr) |> Iterator.toList) // TODO wasted traversal
 
-        {
-            if (b) mutTiles |> MutMap.put!((x, y), Wall)
-            else ()
-        };
-        MutMap.toMap(mutTiles)
+            {
+                if (b) mutTiles |> MutMap.put!((x, y), Wall)
+                else ()
+            };
+            MutMap.toMap(mutTiles)
+        }
     }
 
     ///

@@ -5,10 +5,6 @@ pub enum RegionedRandom[_r: Region] {
     case RegionedRandom(##java.util.Random)
 }
 
-instance Scoped[RegionedRandom] {
-    pub def regionOf(_x: RegionedRandom[r]): Region[r] = unsafe_cast () as Region[r]
-}
-
 namespace RegionedRandom {
 
     ///

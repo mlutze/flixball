@@ -21,16 +21,15 @@ namespace Flixball/Engine {
     ///
     /// Returns an iterator over the game states in this game.
     ///
-    pub def runGame(r: Region[r], gs0: GameState): Iterator[GameState, r] \ r = {
+    pub def runGame(r: Region[r], gs0: GameState): Iterator[GameState, r, r] \ r = {
         // TODO use pure unfold when that is added to stdlib
         let gs = ref gs0 @ r;
         def next() = {
             let res = deref gs;
             gs := runStep(res);
-            res
+            Some(res)
         };
-        def done() = false;
-        Iterator(upcast done, next)
+        Iterator.iterate(r, next)
     }
     
     ///
