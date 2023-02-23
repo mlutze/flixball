@@ -22,11 +22,12 @@ namespace Flixball/Display {
     /// Continously simulates the game state and drawing it between each step with a
     /// set delay. One second is `1000i64`.
     ///
-    pub def runGameState(delayDuration: Int64, gs: GameState): Unit & Impure = {
+    pub def runGameState(delayDuration: Int64, gs: GameState): Unit & Impure = region r {
         import static java.lang.Thread.sleep(Int64): Unit & Impure;
-        displayBoard(gsBoard(gs));
-        sleep(delayDuration);
-        runGameState(delayDuration, Flixball/Engine.runStep(gs))
+        foreach(gsi <- Flixball/Engine.runGame(r, gs)) {
+            displayBoard(gsBoard(gsi));
+            sleep(delayDuration)
+        }
     }
 
     def boardLines(b: Board): List[String] = region r {
