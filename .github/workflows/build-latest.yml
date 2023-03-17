@@ -18,9 +18,8 @@ jobs:
           # download Flix JAR
           curl -L https://github.com/flix/flix/releases/latest/download/flix.jar > flix.jar
 
-          # install dependencies
-          java -jar flix.jar install JonathanStarup/Flix-ANSI-Terminal
-          java -jar flix.jar install mlutze/flix-json
+          # hack the repl to install dependencies
+          echo ":q" | java -jar flix.jar
 
           # run tests
           java -jar flix.jar test
