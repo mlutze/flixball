@@ -18,13 +18,7 @@ Our code conventions are listed in [CONVENTIONS.md](./CONVENTIONS.md)
 The project license [LICENSE.md](./LICENSE.md)
 
 ## Dependencies and Flix Version
-You will need the following in order to build Flixball.
 
-### Flix Version
-v0.33.0
+See [flix.toml](./flix.toml)
 
-### Dependencies
-
-* [JonathanStarup/Flix-ANSI-Terminal](https://github.com/JonathanStarup/Flix-ANSI-Terminal) v1.0.1
-
-* [mlutze/flix-json](https://github.com/mlutze/flix-json) v0.5.0
+Note that Flixball is typically tracking the nightly release of Flix, which may not be compatible with the latest full Flix release.
