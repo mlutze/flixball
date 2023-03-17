@@ -18,7 +18,7 @@ namespace Flixball/BoardLibrary {
         let Board(br) = b;
         let rows = br.rows+2;
         let cols = br.cols+2;
-        let translatedMap = new MutMap(r);
+        let translatedMap = MutMap.new(r);
         // Add translated existing tiles
         foreach(((x, y), tile) <- br.tiles |> Map.toList) { // TODO wasted traversal
             MutMap.put!((x+1, y+1), tile, translatedMap)
@@ -76,24 +76,21 @@ namespace Flixball/BoardLibrary {
         let choiceToPlayer = choices |> List.zipWithIndex;
         (b0, choiceToPlayer) ||> List.foldLeft(
             b -> match (id, coords) -> 
-                let dir = RegionedRandom.chooseNel(rand, Nel(North, East :: South :: West :: Nil));
+                let dir = RegionedRandom.chooseNel(rand, Nel.Nel(North, East :: South :: West :: Nil));
                 b |> Flixball/Core/Board.set_(coords, Some(Tile.Person(id, dir)))
         )
     }
 
-    def gridToMap(g: Array[Array[Bool, r], r]): Map[(Int32, Int32), Tile] \ Read(r) = {
-        region rh {
-            let mutTiles = new MutMap(rh);
-            foreach(
-                (x, arr) <- Array.enumerator(rh, g) |> Iterator.toList; // TODO wasted traversal
-                (y, b) <- Array.enumerator(rh, arr) |> Iterator.toList) // TODO wasted traversal
-
-            {
+    def gridToMap(g: Array[Array[Bool, r], r]): Map[(Int32, Int32), Tile] \ Read(r) = region rh {
+        let mutTiles = MutMap.new(rh);
+        foreach(
+            (x, arr) <- Array.enumerator(rh, g) |> Iterator.toList; // TODO wasted traversal
+            (y, b) <- Array.enumerator(rh, arr) |> Iterator.toList  // TODO wasted traversal
+        ) {
                 if (b) mutTiles |> MutMap.put!((x, y), Wall)
                 else ()
-            };
-            MutMap.toMap(mutTiles)
-        }
+        };
+        MutMap.toMap(mutTiles)
     }
 
     ///
@@ -114,7 +111,7 @@ namespace Flixball/BoardLibrary {
             List.map(String.length) |>
             List.maximum |>
             Option.getWithDefault(0);
-        let tileMap = new MutMap(r);
+        let tileMap = MutMap.new(r);
 
         let availableId = ref 0 @ r;
         def freshId() = {

@@ -57,7 +57,7 @@ namespace Flixball/AiLibrary {
         let stateGen = seed -> seed;
         let moveLogic = (_, state) -> region r {
             let ran = newWithSeed(r, state);
-            let choices = Nel(
+            let choices = Nel.Nel(
                 Walk,
                 Walk ::
                 Turn(Clockwise) ::

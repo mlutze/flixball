@@ -1,6 +1,9 @@
 namespace Flixball/Core {
     use Flixball/Core/AiInfo.AiInfo
 
+    use Direction.{North, East, South, West}
+    use Rotation.{Clockwise, Counterclockwise}
+
     pub type alias PlayerId = Int32
 
     pub type alias Coordinates = (Int32, Int32)

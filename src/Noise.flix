@@ -44,7 +44,7 @@ namespace Flixball/Noise {
         let wallToFloorReq = 3;
 
         let current = ref boolNoise2d(r, d, seed, prob) @ r1;
-        let isWall = p -> (deref current)[p.x][p.y];
+        let isWall = p -> (deref current) |> Utils.Array.unsafeNth(p.x) |> Utils.Array.unsafeNth(p.y);
         let swap = ref createGrid(r, (_, _) -> false, d) @ r1;
         // perform automation step in current, storing the result in swap,
         // and the swapping them.
@@ -60,11 +60,11 @@ namespace Flixball/Noise {
                 if (isWall(p)) {
                     // stays true/wall if there is enough nearby walls
                     // and vice versa
-                    (deref swap)[x][y] = oob+wallCount >= wallToFloorReq
+                    (deref swap) |> Utils.Array.unsafeNth(x) |> Array.put(oob+wallCount >= wallToFloorReq, y)
                 } else {
                     // floor/false swaps to wall if there are enough nearby
                     // walls and vice versa
-                    (deref swap)[x][y] = oob+wallCount > floorToWallReq
+                    (deref swap) |> Utils.Array.unsafeNth(x) |> Array.put(oob+wallCount > floorToWallReq, y)
                 }
             };
             let tmp = deref current;

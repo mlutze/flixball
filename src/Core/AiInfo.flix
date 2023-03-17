@@ -6,6 +6,8 @@ namespace Flixball/Core/AiInfo {
     use Flixball/Core/Board.Board
     use Flixball/Core/Board.Board.Board
     use Flixball/Core/Board.{players => boardPlayers}
+    
+    use AiInfo.AiInfo
 
     pub opaque enum AiInfo(Board, Map[PlayerId, Position])
 

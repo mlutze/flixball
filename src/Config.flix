@@ -30,7 +30,7 @@ namespace Flixball/Config {
         let* players = readPlayers(playersJson);
         // apply the map generator to the number of players
         let map = map0(List.length(players));
-        Ok(Config(map, players))
+        Ok(Config.Config(map, players))
     }
 
 

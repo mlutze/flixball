@@ -27,9 +27,9 @@ namespace Flixball/Engine {
         def next() = {
             let res = deref gs;
             gs := runStep(res);
-            Some(res)
+            Iterator.Step.Ans(res)
         };
-        Iterator.iterate(r, next)
+        Iterator.Iterator(r, next)
     }
     
     ///

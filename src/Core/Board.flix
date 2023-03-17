@@ -6,6 +6,8 @@ namespace Flixball/Core/Board {
     use Flixball/Core.Tile
     use Flixball/Core.Tile.Person
 
+    use Board.Board
+
     ///
     /// Board uses matrix-like index ordering. Map entries should not be out
     /// of bounds and the outer border of the board should be wall to avoid

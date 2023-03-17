@@ -26,7 +26,7 @@ namespace RegionedRandom {
         } else {
             let m = Array.length(a);
             let i = nextNatWithMax(ran, m);
-            Some(a[i])
+            Some(Utils.Array.unsafeNth(i, a))
         }
     }
 
@@ -43,7 +43,7 @@ namespace RegionedRandom {
         if (n <= 0)
             Nel.head(l)
         else match Nel.tail(l) {
-            case hd :: tl => Nel(hd, tl) |> nelUnsafeNth(n-1)
+            case hd :: tl => Nel.Nel(hd, tl) |> nelUnsafeNth(n-1)
             case Nil => ?unreachable
         }
     }
@@ -54,7 +54,7 @@ namespace RegionedRandom {
     pub def shuffleArray(ran: RegionedRandom[r1], a: Array[a, r2]): Unit & r1 and r2 = {
         use Random.{Random => FlixRandom};
         let RegionedRandom(javaRandom) = ran;
-        unsafe_cast Array.shuffle(FlixRandom(javaRandom), a) as _ & r1 and r2
+        unchecked_cast(Array.shuffle(FlixRandom(javaRandom), a) as _ & r1 and r2)
     }
 
     ///
@@ -63,7 +63,7 @@ namespace RegionedRandom {
     pub def shuffleList(ran: RegionedRandom[r], l: List[a]): List[a] & r = {
         use Random.{Random => FlixRandom};
         let RegionedRandom(javaRandom) = ran;
-        unsafe_cast List.shuffle(FlixRandom(javaRandom), l) as _ & r
+        unchecked_cast(List.shuffle(FlixRandom(javaRandom), l) as _ & r)
     }
 
     ///

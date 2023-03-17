@@ -1,0 +1,10 @@
+[package]
+name    = "flixball"
+description = ""
+version = "0.0.0"
+flix    = "0.34.0"
+authors = []
+
+[dependencies]
+"github:JonathanStarup/Flix-ANSI-Terminal" = "1.2.0"
+"github:mlutze/flix-json" = "0.12.0"
