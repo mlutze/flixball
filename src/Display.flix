@@ -31,7 +31,7 @@ namespace Flixball/Display {
 
     def boardLines(b: Board): List[String] = region r {
         let Board(br) = b;
-        let lines = new MutList(r);
+        let lines = MutList.new(r);
         let idColor = mkIdColorMap(b);
         Iterator.range(r, 0, br.rows) |> Iterator.forEach(row -> {
             let sb = StringBuilder.new(r);

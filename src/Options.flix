@@ -4,6 +4,8 @@ namespace Flixball/Options {
     use GetOpt.ArgDescr.{NoArg, ReqArg};
     use GetOpt.ArgOrder.Permute;
 
+    use Action.{Error, Help, Replay, Run, Version}
+
     ///
     /// The action to run after parsing the arguments
     ///
@@ -38,12 +40,12 @@ namespace Flixball/Options {
     ///
     pub def parse(args: List[String]): Action = {
         match getOpt(Permute, options(), args) {
-            case Success(flags) =>
+            case Validation.Success(flags) =>
                 if (flags.nonOptions != Nil)
                     Error
                 else
                     flagsToAction(flags.options)
-            case Failure(_) => Error
+            case Validation.Failure(_) => Error
         }
     }
 

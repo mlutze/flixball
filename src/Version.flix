@@ -1,5 +1,7 @@
 namespace Flixball/Version {
 
+    use SemanticVersion.SemanticVersion
+
     /// A semantic version number.
     pub enum SemanticVersion(Int32, Int32, Int32)
 

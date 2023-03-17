@@ -17,6 +17,8 @@ namespace Flixball/Core/GameState {
     use Flixball/Core/Position.{coordinates => posCoords}
     use Flixball/Core/Position.{direction => posDir}
 
+    use GameState.GameState
+
     type alias PlayerInfo = {
         state = AiState,
         ml = MoveLogic,

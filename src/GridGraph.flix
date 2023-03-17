@@ -23,10 +23,10 @@ namespace Flixball/GridGraph {
     region r { if (goal(start)) Some(Nil) else {
         // bfs
         let Position(startCoord, _) = start;
-        let dists: MutMap[Position, Int32, r] = new MutMap(r);
-        let backtracking: MutMap[Position, (Position, Move), r] = new MutMap(r);
+        let dists: MutMap[Position, Int32, r] = MutMap.new(r);
+        let backtracking: MutMap[Position, (Position, Move), r] = MutMap.new(r);
         MutMap.put!(start, 0, dists);
-        let taskList = new MutDeque(r);
+        let taskList = MutDeque.new(r);
         let foundGoal = ref None;
         MutDeque.pushBack(start, taskList);
         def bfsLoop() = match MutDeque.popFront(taskList) {
