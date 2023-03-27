@@ -1,10 +1,10 @@
 [package]
 name    = "flixball"
-description = ""
+description = "A zero-player shooting game in the console"
 version = "0.0.0"
 flix    = "0.34.0"
-authors = []
+authors = ["Matthew Lutze", "Jonathan Starup"]
 
 [dependencies]
 "github:JonathanStarup/Flix-ANSI-Terminal" = "1.2.0"
-"github:mlutze/flix-json" = "0.12.0"
+"github:mlutze/flix-json" = "0.12.1"
