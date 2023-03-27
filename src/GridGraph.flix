@@ -27,7 +27,7 @@ namespace Flixball/GridGraph {
         let backtracking: MutMap[Position, (Position, Move), r] = MutMap.new(r);
         MutMap.put!(start, 0, dists);
         let taskList = MutDeque.new(r);
-        let foundGoal = ref None;
+        let foundGoal = ref None @ r;
         MutDeque.pushBack(start, taskList);
         def bfsLoop() = match MutDeque.popFront(taskList) {
             case Some(current) => {
