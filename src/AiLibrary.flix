@@ -196,8 +196,11 @@ namespace Flixball/AiLibrary {
             else
                 Map.get(c, tiles) == None
         };
-        let* moves = findShortestPath(availablePosition, p, goal);
-        List.head(moves)
+        for (
+            moves <- findShortestPath(availablePosition, p, goal)
+        ) yield {
+            List.head(moves)
+        }
     }
 
 }
