@@ -63,13 +63,12 @@ namespace Flixball/BoardLibrary {
         let rows = List.range(0, rec.rows);
         let cols = List.range(0, rec.cols);
         let options = {
-            use List.flatMap;
-            let* row = rows;
-            let* col = cols;
-            if (Map.get((row, col), rec.tiles) == None) {
-                (row, col) :: Nil
-            } else {
-                Nil
+            for (
+                row <- rows;
+                col <- cols;
+                if (Map.get((row, col), rec.tiles) == None)
+            ) yield {
+                (row, col)
             }
         };
         let choices = options |> RegionedRandom.shuffleList(rand) |> List.take(n);
