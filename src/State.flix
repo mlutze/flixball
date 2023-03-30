@@ -81,9 +81,11 @@ namespace Flixball {
         }
 
         pub def fromState(x: AiState): Option[Map[k, v]] = {
-            use Option.flatMap;
-            let* list = Flixball/State.fromState(x);
-            Some(List.toMap(list))
+            for (
+                list <- Flixball/State.fromState(x)
+            ) yield {
+                List.toMap(list)
+            }
         }
     }
 

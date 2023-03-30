@@ -98,10 +98,12 @@ namespace Flixball/Options {
     def dimensions(d: String): Option[Flag] = {
         match String.splitOn(substr = "x", d) {
             case rows0 :: cols0 :: Nil => {
-                use Option.flatMap;
-                let* rows = Int32.fromString(rows0);
-                let* cols = Int32.fromString(cols0);
-                Some(Flag.Dimensions(rows, cols))
+                for (
+                    rows <- Int32.fromString(rows0);
+                    cols <- Int32.fromString(cols0)
+                ) yield {
+                    Flag.Dimensions(rows, cols)
+                }
             }
             case _ => None
         }

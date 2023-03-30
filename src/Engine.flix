@@ -107,12 +107,15 @@ namespace Flixball/Engine {
     /// Returns the player killed by the shot.
     ///
     def resolveShot(state: GameState, shooter: PlayerId): Option[PlayerId] = {
-        use Option.flatMap;
-        let* Position(coords0, dir) = playerPosition(shooter, state);
-        match raytraceEx(dir, coords0, gsBoard(state)) {
-            case Some(Person(id, _)) => Some(id)
-            case Some(Wall) => None
-            case None => None
+        for (
+            Position(coords0, dir) <- playerPosition(shooter, state);
+            res <- match raytraceEx(dir, coords0, gsBoard(state)) {
+                case Some(Person(id, _)) => Some(id)
+                case Some(Wall) => None
+                case None => None
+            }
+        ) yield {
+            res
         }
     }
 

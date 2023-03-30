@@ -16,48 +16,60 @@ namespace Flixball/Config {
     /// Reads the run configuration from a JSON string.
     ///
     pub def read(json: String): Result[String, Config] = {
-        use Result.flatMap;
-        let* obj = Json/Parse.parse(json) |> Option.toOk("invalid JSON");
-        fromJson(obj)
+        for (
+            obj <- Json/Parse.parse(json) |> Option.toOk("invalid JSON");
+            res <- fromJson(obj)
+        ) yield {
+            res
+        }
     }
 
     def fromJson(json: JsonElement): Result[String, Config] = {
-        use Result.flatMap;
-        let* o = asObject(".", json);
-        let* mapJson = Map.get("map", o) |> Option.toOk("missing key 'map'");
-        let* playersJson = Map.get("players", o) |> Option.toOk("missing key 'players'");
-        let* map0 = readMap(mapJson);
-        let* players = readPlayers(playersJson);
-        // apply the map generator to the number of players
-        let map = map0(List.length(players));
-        Ok(Config.Config(map, players))
+        for (
+            o <- asObject(".", json);
+            mapJson <- Map.get("map", o) |> Option.toOk("missing key 'map'");
+            playersJson <- Map.get("players", o) |> Option.toOk("missing key 'players'");
+            map0 <- readMap(mapJson);
+            players <- readPlayers(playersJson)
+        ) yield {
+            // apply the map generator to the number of players
+            let map = map0(List.length(players));
+            Config.Config(map, players)
+        }
     }
 
 
     def readMap(json: JsonElement): Result[String, (Int32, Int64) -> Board] = match json {
         case JsonObject(o) => {
-            use Result.flatMap;
-            let* id0 = Map.get("id", o) |> Option.toOk("missing key 'map.id'");
-            let* id = asString(".map", id0);
-            let data = Map.get("data", o);
-            mkMap(id, data)
+            for (
+                id0 <- Map.get("id", o) |> Option.toOk("missing key 'map.id'");
+                id <- asString(".map", id0);
+                data <- Map.get("data", o) |> Ok;
+                res <- mkMap(id, data)
+            ) yield res
         }
         case _ => Err("non-object")
     }
 
     def readPlayers(json: JsonElement): Result[String, List[Strategy]] = {
-        use Result.flatMap;
-        let* a = asArray(".players", json);
-        Result.traverse(readPlayer, a)
+        for (
+            a <- asArray(".players", json);
+            res <- Result.traverse(readPlayer, a)
+        ) yield {
+            res
+        }
     }
 
     def readPlayer(json: JsonElement): Result[String, Strategy] = {
-        use Result.flatMap;
-        let* o = asObject(".players[_]", json);
-        let* id0 = Map.get("id", o) |> Option.toOk("missing key 'players[_].id'");
-        let* id = asString(".players[_]", id0);
-        let data = Map.get("data", o);
-        mkPlayer(id, data)
+        for (
+            o <- asObject(".players[_]", json);
+            id0 <- Map.get("id", o) |> Option.toOk("missing key 'players[_].id'");
+            id <- asString(".players[_]", id0);
+            data <- Map.get("data", o) |> Ok;
+            res <- mkPlayer(id, data)
+        ) yield {
+            res
+        }
     }
 
     ///
@@ -66,15 +78,17 @@ namespace Flixball/Config {
     def mkMap(id: String, data: Option[JsonElement]): Result[String, (Int32, Int64) -> Board] = match id {
         case "random" => match data {
             case Some(json) => {
-                use Result.flatMap;
-                let* o = asObject("map.data", json);
-                let* rows0 = Map.get("rows", o) |> Option.toOk("missing key 'map.data.rows'");
-                let* cols0 = Map.get("cols", o) |> Option.toOk("missing key 'map.data.cols'");
-                let* density0 = Map.get("density", o) |> Option.toOk("missing key 'map.data.density'");
-                let* rows = asInt("map.data.rows", rows0);
-                let* cols = asInt("map.data.cols", cols0);
-                let* density = asFloat("map.data.density", density0);
-                Ok((numPlayers, seed) -> Flixball/BoardLibrary.randomBoard(seed, rows = rows, cols, density) |> Flixball/BoardLibrary.sprinklePlayers(seed, numPlayers))
+                for (
+                o <- asObject("map.data", json);
+                rows0 <- Map.get("rows", o) |> Option.toOk("missing key 'map.data.rows'");
+                cols0 <- Map.get("cols", o) |> Option.toOk("missing key 'map.data.cols'");
+                density0 <- Map.get("density", o) |> Option.toOk("missing key 'map.data.density'");
+                rows <- asInt("map.data.rows", rows0);
+                cols <- asInt("map.data.cols", cols0);
+                density <- asFloat("map.data.density", density0)
+                ) yield {
+                    (numPlayers, seed) -> Flixball/BoardLibrary.randomBoard(seed, rows = rows, cols, density) |> Flixball/BoardLibrary.sprinklePlayers(seed, numPlayers)
+                }
             }
             case None => Err("missing key 'map.data'")
         }

@@ -52,40 +52,43 @@ namespace Flixball/Main {
                 case _ => None
             })
             |> Option.getWithDefault(Random.nextInt64(Random.new()));
-        let* configPath = runOpts
-            |> List.findMap(x -> match x {
-                case RunOption.Config(c) => Some(c)
-                case _ => None
-            })
-            |> Option.toOk("missing config");
-        let* file = File.read(configPath);
-        let* config = readConfig(file);
-        let quiet = runOpts |> List.memberOf(RunOption.Quiet);
-        let log = runOpts
-            |> List.findMap(x -> match x {
-                case RunOption.Log(l) => Some(l)
-                case _ => None
-            });
-        let dimensions = dispOpts
-            |> List.findMap(x -> match x {
-                case DisplayOption.Dimensions(rows, cols) => Some((rows, cols))
-                case _ => None
-            })
-            |> Option.getWithDefault(defaultDimensions());
-        let period = dispOpts
-            |> List.findMap(x -> match x {
-                case DisplayOption.Period(ms) => Some(ms)
-                case _ => None
-            })
-            |> Option.getWithDefault(1_000);
-        Ok({
-            seed = seed,
-            config = config,
-            log = log,
-            dimensions = dimensions,
-            period = period,
-            quiet = quiet
-        })
+        for (
+            configPath <- runOpts
+                |> List.findMap(x -> match x {
+                    case RunOption.Config(c) => Some(c)
+                    case _ => None
+                })
+                |> Option.toOk("missing config");
+            file <- File.read(configPath);
+            config <- readConfig(file)
+        ) yield {
+            let quiet = runOpts |> List.memberOf(RunOption.Quiet);
+            let log = runOpts
+                |> List.findMap(x -> match x {
+                    case RunOption.Log(l) => Some(l)
+                    case _ => None
+                });
+            let dimensions = dispOpts
+                |> List.findMap(x -> match x {
+                    case DisplayOption.Dimensions(rows, cols) => Some((rows, cols))
+                    case _ => None
+                })
+                |> Option.getWithDefault(defaultDimensions());
+            let period = dispOpts
+                |> List.findMap(x -> match x {
+                    case DisplayOption.Period(ms) => Some(ms)
+                    case _ => None
+                })
+                |> Option.getWithDefault(1_000);
+            {
+                seed = seed,
+                config = config,
+                log = log,
+                dimensions = dimensions,
+                period = period,
+                quiet = quiet
+            }
+        }
     }
 
     type alias RunConfig = {
