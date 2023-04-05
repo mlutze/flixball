@@ -1,4 +1,4 @@
-namespace Flixball/BoardLibrary {
+mod Flixball/BoardLibrary {
     use Flixball/Core/Board.Board;
     use Flixball/Core/Board.Board.Board;
     use Flixball/Core.Direction.East

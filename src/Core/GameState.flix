@@ -1,4 +1,4 @@
-namespace Flixball/Core/GameState {
+mod Flixball/Core/GameState {
     use Flixball/Core.AiState
     use Flixball/Core.Coordinates
     use Flixball/Core.Move

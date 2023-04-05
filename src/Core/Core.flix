@@ -1,4 +1,4 @@
-namespace Flixball/Core {
+mod Flixball/Core {
     use Flixball/Core/AiInfo.AiInfo
 
     use Direction.{North, East, South, West}
@@ -44,7 +44,7 @@ namespace Flixball/Core {
 
     pub enum Position(Coordinates, Direction) with Eq, Order
 
-    namespace Position {
+    mod Position {
         use Flixball/Core.Position.Position
 
         pub def coordinates(p: Flixball/Core.Position): Flixball/Core.Coordinates = {

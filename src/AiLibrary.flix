@@ -1,4 +1,4 @@
-namespace Flixball/AiLibrary {
+mod Flixball/AiLibrary {
     use Flixball/State.{toState, fromState};
     use Flixball/Core/AiInfo.AiInfo;
     use Flixball/Core/AiInfo.getColumns;

@@ -1,4 +1,4 @@
-namespace TestBoard {
+mod TestBoard {
     use Flixball/Core/Board.Board;
     use Flixball/Core/Board.Board.Board;
     use Flixball/Core.Tile;

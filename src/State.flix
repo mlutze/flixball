@@ -1,4 +1,4 @@
-namespace Flixball {
+mod Flixball {
     use Flixball/Core.AiState;
     use Flixball/Core.AiState.{Value, Collection};
 

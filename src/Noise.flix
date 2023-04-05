@@ -1,4 +1,4 @@
-namespace Flixball/Noise {
+mod Flixball/Noise {
 
     pub type alias Grid[t: Type, r: Region] = Array[Array[t, r], r]
 

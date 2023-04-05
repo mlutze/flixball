@@ -1,4 +1,4 @@
-namespace Flixball/Core/AiInfo {
+mod Flixball/Core/AiInfo {
     use Flixball/Core.Coordinates
     use Flixball/Core.PlayerId
     use Flixball/Core.Position

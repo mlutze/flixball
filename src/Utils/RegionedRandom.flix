@@ -5,7 +5,7 @@ pub enum RegionedRandom[_r: Region] {
     case RegionedRandom(##java.util.Random)
 }
 
-namespace RegionedRandom {
+mod RegionedRandom {
 
     ///
     /// Returns a fresh random number generator initialized with the given seed `s`.

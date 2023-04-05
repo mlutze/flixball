@@ -1,4 +1,4 @@
-namespace TestDisplay {
+mod TestDisplay {
     use Flixball/Core.{Strategy, PlayerId};
     use Flixball/Core/Board.Board.Board;
     use Flixball/Core/Board.Board;

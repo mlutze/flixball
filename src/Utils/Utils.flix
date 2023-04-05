@@ -1,4 +1,4 @@
-namespace Utils {
+mod Utils {
     pub def |||>(triple: (a, b, c), f: (a, b, c) -> d): d = {
         let (a, b, c) = triple;
         f(a, b, c)
@@ -32,7 +32,7 @@ namespace Utils {
         } else x
     }
 
-    namespace Option {
+    mod Option {
         @Unsafe
         pub def unsafeGet(o: Option[a]): a = match o {
             case None => ?unreachable
@@ -52,7 +52,7 @@ namespace Utils {
         }
     }
 
-    namespace Map {
+    mod Map {
 
         pub def unzip(m: Map[k, (v1, v2)]): (Map[k, v1], Map[k, v2]) with Order[k] = region r {
             let m1 = MutMap.new(r);
@@ -70,7 +70,7 @@ namespace Utils {
         }
     }
 
-    namespace Array {
+    mod Array {
 
         @Unsafe
         pub def unsafeNth(n: Int32, x: Array[a, r]): a \ r = {
