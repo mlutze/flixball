@@ -1,4 +1,4 @@
-namespace Flixball/Display {
+mod Flixball/Display {
     use Flixball/Core.Direction
     use Flixball/Core.Direction.{East, North, South, West}
     use Flixball/Core.Tile

@@ -1,7 +1,7 @@
 
 pub def main(): Unit \ {IO, NonDet} = Flixball/Main.main()
 
-namespace Flixball/Main {
+mod Flixball/Main {
     use Flixball/Config.{read => readConfig}
     use Flixball/Config.Config
     use Flixball/Config.Config.Config

@@ -1,4 +1,4 @@
-namespace Flixball/Core/Board {
+mod Flixball/Core/Board {
     use Flixball/Core.Coordinates
     use Flixball/Core.PlayerId
     use Flixball/Core.Position

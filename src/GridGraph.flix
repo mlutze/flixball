@@ -1,4 +1,4 @@
-namespace Flixball/GridGraph {
+mod Flixball/GridGraph {
     use Flixball/Core.Coordinates;
     use Flixball/Core.Direction;
     use Flixball/Core.Direction.{East, North, South, West};

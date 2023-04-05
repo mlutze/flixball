@@ -1,4 +1,4 @@
-namespace TestNoise {
+mod TestNoise {
 
     @test
     def testBoolNoise2d01(): Bool = region r {

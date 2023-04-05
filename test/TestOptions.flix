@@ -1,4 +1,4 @@
-namespace TestOptions {
+mod TestOptions {
     use Flixball/Options.parse;
     use Flixball/Options.Action;
     use Flixball/Options.RunOption;

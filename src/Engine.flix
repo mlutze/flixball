@@ -1,4 +1,4 @@
-namespace Flixball/Engine {
+mod Flixball/Engine {
     use Flixball/Core.Move
     use Flixball/Core.Move.Shoot
     use Flixball/Core.Move.Turn

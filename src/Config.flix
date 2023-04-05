@@ -1,4 +1,4 @@
-namespace Flixball/Config {
+mod Flixball/Config {
     use Flixball/Core.Strategy;
     use Flixball/Core/Board.Board;
     use Json.JsonElement.JsonArray;
