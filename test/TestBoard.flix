@@ -1,8 +1,8 @@
 mod TestBoard {
-    use Flixball/Core/Board.Board;
-    use Flixball/Core/Board.Board.Board;
-    use Flixball/Core.Tile;
-    use Flixball/Core.Direction;
+    use Flixball.Core.Board.Board;
+    use Flixball.Core.Board.Board.Board;
+    use Flixball.Core.Tile;
+    use Flixball.Core.Direction;
 
     /// Returns `true` if the board has a border of walls.
     def hasBorder(b: Board): Bool = region r {
@@ -40,7 +40,7 @@ mod TestBoard {
             " " ::
             Nil;
         let boardString = rowStrings |> String.unlines;
-        Flixball/BoardLibrary.fromString(boardString)
+        Flixball.BoardLibrary.fromString(boardString)
 
     @test
     def testDimensions(): Bool = match testBoard01() {
@@ -77,7 +77,7 @@ mod TestBoard {
 
     @test
     def testError(): Bool =
-        match "  #  \n  v  \n#  Q  " |> Flixball/BoardLibrary.fromString {
+        match "  #  \n  v  \n#  Q  " |> Flixball.BoardLibrary.fromString {
             case Err(_) => true
             case Ok(_) => false
         }

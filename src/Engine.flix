@@ -1,22 +1,22 @@
-mod Flixball/Engine {
-    use Flixball/Core.Move
-    use Flixball/Core.Move.Shoot
-    use Flixball/Core.Move.Turn
-    use Flixball/Core.Move.Walk
-    use Flixball/Core.MoveLogic
-    use Flixball/Core.PlayerId
-    use Flixball/Core.Position
-    use Flixball/Core.Position.Position
-    use Flixball/Core.step
-    use Flixball/Core.Tile.Person
-    use Flixball/Core.Tile.Wall
-    use Flixball/Core/Board.get_
-    use Flixball/Core/Board.players
-    use Flixball/Core/GameState.{board => gsBoard}
-    use Flixball/Core/GameState.computeMoveLogics
-    use Flixball/Core/GameState.GameState
-    use Flixball/Core/GameState.playerPosition
-    use Flixball/GridGraph.raytraceEx
+mod Flixball.Engine {
+    use Flixball.Core.Move
+    use Flixball.Core.Move.Shoot
+    use Flixball.Core.Move.Turn
+    use Flixball.Core.Move.Walk
+    use Flixball.Core.MoveLogic
+    use Flixball.Core.PlayerId
+    use Flixball.Core.Position
+    use Flixball.Core.Position.Position
+    use Flixball.Core.step
+    use Flixball.Core.Tile.Person
+    use Flixball.Core.Tile.Wall
+    use Flixball.Core.Board.get_
+    use Flixball.Core.Board.players
+    use Flixball.Core.GameState.{board => gsBoard}
+    use Flixball.Core.GameState.computeMoveLogics
+    use Flixball.Core.GameState.GameState
+    use Flixball.Core.GameState.playerPosition
+    use Flixball.GridGraph.raytraceEx
 
     ///
     /// Returns an iterator over the game states in this game.
@@ -51,7 +51,7 @@ mod Flixball/Engine {
             Set.foldLeft((acc, p) -> Map.remove(p, acc));
         let state1 = (state0, dead) ||>
             Set.foldLeft((acc, id) ->
-                Flixball/Core/GameState.removePlayer(id, acc)
+                Flixball.Core.GameState.removePlayer(id, acc)
             );
 
         let rotators = moves1
@@ -62,7 +62,7 @@ mod Flixball/Engine {
             });
         let state2 = (state1, rotators) ||>
             Map.foldLeftWithKey((acc, id) -> rot ->
-                Flixball/Core/GameState.rotatePlayer(id, rot, acc)
+                Flixball.Core.GameState.rotatePlayer(id, rot, acc)
             );
         let board2 = gsBoard(state2);
 
@@ -82,7 +82,7 @@ mod Flixball/Engine {
         // a new position cannot be a wall, a previous player's position, or a new player's position
         let state3 = (state2, newPos) ||>
             Map.foldLeftWithKey((acc, id) -> coords -> 
-                Flixball/Core/GameState.movePlayer(id, coords, acc)
+                Flixball.Core.GameState.movePlayer(id, coords, acc)
             );
         
         state3

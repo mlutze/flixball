@@ -1,10 +1,10 @@
-mod Flixball/Core/Board {
-    use Flixball/Core.Coordinates
-    use Flixball/Core.PlayerId
-    use Flixball/Core.Position
-    use Flixball/Core.Position.Position
-    use Flixball/Core.Tile
-    use Flixball/Core.Tile.Person
+mod Flixball.Core.Board {
+    use Flixball.Core.Coordinates
+    use Flixball.Core.PlayerId
+    use Flixball.Core.Position
+    use Flixball.Core.Position.Position
+    use Flixball.Core.Tile
+    use Flixball.Core.Tile.Person
 
     use Board.Board
 

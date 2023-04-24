@@ -1,4 +1,4 @@
-mod Flixball/Version {
+mod Flixball.Version {
 
     use SemanticVersion.SemanticVersion
 

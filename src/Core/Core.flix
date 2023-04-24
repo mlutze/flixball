@@ -1,5 +1,5 @@
-mod Flixball/Core {
-    use Flixball/Core/AiInfo.AiInfo
+mod Flixball.Core {
+    use Flixball.Core.AiInfo.AiInfo
 
     use Direction.{North, East, South, West}
     use Rotation.{Clockwise, Counterclockwise}
@@ -45,14 +45,14 @@ mod Flixball/Core {
     pub enum Position(Coordinates, Direction) with Eq, Order
 
     mod Position {
-        use Flixball/Core.Position.Position
+        use Flixball.Core.Position.Position
 
-        pub def coordinates(p: Flixball/Core.Position): Flixball/Core.Coordinates = {
+        pub def coordinates(p: Flixball.Core.Position): Flixball.Core.Coordinates = {
             let Position(c, _) = p;
             c
         }
 
-        pub def direction(p: Flixball/Core.Position): Flixball/Core.Direction = {
+        pub def direction(p: Flixball.Core.Position): Flixball.Core.Direction = {
             let Position(_, d) = p;
             d
         }

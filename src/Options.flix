@@ -1,4 +1,4 @@
-mod Flixball/Options {
+mod Flixball.Options {
     use GetOpt.{getOpt, usageInfo};
     use GetOpt.OptionDescr;
     use GetOpt.ArgDescr.{NoArg, ReqArg};

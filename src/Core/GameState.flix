@@ -1,21 +1,21 @@
-mod Flixball/Core/GameState {
-    use Flixball/Core.AiState
-    use Flixball/Core.Coordinates
-    use Flixball/Core.Move
-    use Flixball/Core.MoveLogic
-    use Flixball/Core.PlayerId
-    use Flixball/Core.Position
-    use Flixball/Core.Position.Position
-    use Flixball/Core.rotateDir
-    use Flixball/Core.Rotation
-    use Flixball/Core.Strategy
-    use Flixball/Core.Tile.Person
-    use Flixball/Core/Board.{adjust => boardAdjust}
-    use Flixball/Core/Board.Board
-    use Flixball/Core/Board.get_
-    use Flixball/Core/Board.set_
-    use Flixball/Core/Position.{coordinates => posCoords}
-    use Flixball/Core/Position.{direction => posDir}
+mod Flixball.Core.GameState {
+    use Flixball.Core.AiState
+    use Flixball.Core.Coordinates
+    use Flixball.Core.Move
+    use Flixball.Core.MoveLogic
+    use Flixball.Core.PlayerId
+    use Flixball.Core.Position
+    use Flixball.Core.Position.Position
+    use Flixball.Core.rotateDir
+    use Flixball.Core.Rotation
+    use Flixball.Core.Strategy
+    use Flixball.Core.Tile.Person
+    use Flixball.Core.Board.{adjust => boardAdjust}
+    use Flixball.Core.Board.Board
+    use Flixball.Core.Board.get_
+    use Flixball.Core.Board.set_
+    use Flixball.Core.Position.{coordinates => posCoords}
+    use Flixball.Core.Position.{direction => posDir}
 
     use GameState.GameState
 
@@ -86,7 +86,7 @@ mod Flixball/Core/GameState {
     pub def computeMoveLogics(s: GameState): (Map[PlayerId, Move], GameState) = {
         let GameState(players0, b0) = s;
         let (moves, players) = players0 |> Map.mapWithKey((_, info) -> {
-            let (move, state) = (info.ml)(Flixball/Core/AiInfo.fromBoard(b0), info.state);
+            let (move, state) = (info.ml)(Flixball.Core.AiInfo.fromBoard(b0), info.state);
             (move, {state = state | info})
         }) |> Utils/Map.unzip;
         (moves, GameState(players, b0))
@@ -131,7 +131,7 @@ mod Flixball/Core/GameState {
     /// the number of players on the board. 
     ///
     pub def mkGameState(seed: Int64, strategies: Map[PlayerId, Strategy], b: Board): GameState = {
-        let playerMap = Flixball/Core/Board.players(b);
+        let playerMap = Flixball.Core.Board.players(b);
         let ais = strategies |> Map.mapWithKey((id, strat) -> {
             let (stateGen, ml) = strat(id);
             // unsafe get is safe per precondition.
