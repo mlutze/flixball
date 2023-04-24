@@ -1,13 +1,13 @@
-mod Flixball/BoardLibrary {
-    use Flixball/Core/Board.Board;
-    use Flixball/Core/Board.Board.Board;
-    use Flixball/Core.Direction.East
-    use Flixball/Core.Direction.North
-    use Flixball/Core.Direction.South
-    use Flixball/Core.Direction.West
-    use Flixball/Core.Tile
-    use Flixball/Core.Tile.Person
-    use Flixball/Core.Tile.Wall
+mod Flixball.BoardLibrary {
+    use Flixball.Core.Board.Board;
+    use Flixball.Core.Board.Board.Board;
+    use Flixball.Core.Direction.East
+    use Flixball.Core.Direction.North
+    use Flixball.Core.Direction.South
+    use Flixball.Core.Direction.West
+    use Flixball.Core.Tile
+    use Flixball.Core.Tile.Person
+    use Flixball.Core.Tile.Wall
     
     ///
     /// Adds a border around the board by increasing the size in each
@@ -41,7 +41,7 @@ mod Flixball/BoardLibrary {
     /// an encompasing border.  
     ///
     pub def randomBoard(seed: Int64, rows: {rows = Int32}, cols: Int32, density: Float64): Board = region r {
-        let grid = Flixball/Noise.boolNoise2d(r, {width=rows.rows, height=cols}, seed, density);
+        let grid = Flixball.Noise.boolNoise2d(r, {width=rows.rows, height=cols}, seed, density);
         Board({rows=rows.rows, cols=cols, tiles=gridToMap(grid)}) |> addBorder
     }
 
@@ -50,7 +50,7 @@ mod Flixball/BoardLibrary {
     /// sensible defaults, prob=0.40, iterations=3
     ///
     pub def automataBoard(seed: Int64, rows: {rows = Int32}, cols: Int32, density: Float64, iterations: Int32): Board = region r {
-        let grid = Flixball/Noise.cellularGeneration(r, {width=rows.rows, height=cols}, seed, density, iterations);
+        let grid = Flixball.Noise.cellularGeneration(r, {width=rows.rows, height=cols}, seed, density, iterations);
         Board({rows=rows.rows, cols=cols, tiles=gridToMap(grid)}) |> addBorder
     }
 
@@ -76,7 +76,7 @@ mod Flixball/BoardLibrary {
         (b0, choiceToPlayer) ||> List.foldLeft(
             b -> match (id, coords) -> 
                 let dir = RegionedRandom.chooseNel(rand, Nel.Nel(North, East :: South :: West :: Nil));
-                b |> Flixball/Core/Board.set_(coords, Some(Tile.Person(id, dir)))
+                b |> Flixball.Core.Board.set_(coords, Some(Tile.Person(id, dir)))
         )
     }
 

@@ -1,16 +1,16 @@
-mod Flixball/GridGraph {
-    use Flixball/Core.Coordinates;
-    use Flixball/Core.Direction;
-    use Flixball/Core.Direction.{East, North, South, West};
-    use Flixball/Core.Move;
-    use Flixball/Core.Move.{Walk, Shoot, Turn};
-    use Flixball/Core.Position;
-    use Flixball/Core.Position.Position;
-    use Flixball/Core.Rotation;
-    use Flixball/Core.step;
-    use Flixball/Core.Tile;
-    use Flixball/Core/Board.Board;
-    use Flixball/Core/Board.Board.Board;
+mod Flixball.GridGraph {
+    use Flixball.Core.Coordinates;
+    use Flixball.Core.Direction;
+    use Flixball.Core.Direction.{East, North, South, West};
+    use Flixball.Core.Move;
+    use Flixball.Core.Move.{Walk, Shoot, Turn};
+    use Flixball.Core.Position;
+    use Flixball.Core.Position.Position;
+    use Flixball.Core.Rotation;
+    use Flixball.Core.step;
+    use Flixball.Core.Tile;
+    use Flixball.Core.Board.Board;
+    use Flixball.Core.Board.Board.Board;
 
     ///
     /// It is assumed that `available` keeps the search space finite or
@@ -67,7 +67,7 @@ mod Flixball/GridGraph {
 
     /// Returns the three possibles movement moves from `p` and their new position.
     def possibleMoves(r: Region[r], p: Position): Iterator[(Position, Move), r, r] \ Write(r) = {
-        use Flixball/Core.rotateDir;
+        use Flixball.Core.rotateDir;
         let Position(coord, dir) = p;
         let clockwise = (
             Position(coord, rotateDir(Rotation.Clockwise, dir)),
@@ -78,7 +78,7 @@ mod Flixball/GridGraph {
             Turn(Rotation.Counterclockwise)
         );
         let move = (
-            Position(Flixball/Core.step(coord, dir), dir),
+            Position(Flixball.Core.step(coord, dir), dir),
             Walk
         );
         (clockwise :: counterclockwise :: move :: Nil) |> List.iterator(r)

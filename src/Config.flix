@@ -1,6 +1,6 @@
-mod Flixball/Config {
-    use Flixball/Core.Strategy;
-    use Flixball/Core/Board.Board;
+mod Flixball.Config {
+    use Flixball.Core.Strategy;
+    use Flixball.Core.Board.Board;
     use Json.JsonElement.JsonArray;
     use Json.JsonElement.JsonObject;
     use Json.JsonElement.JsonNumber;
@@ -87,7 +87,7 @@ mod Flixball/Config {
                 cols <- asInt("map.data.cols", cols0);
                 density <- asFloat("map.data.density", density0)
                 ) yield {
-                    (numPlayers, seed) -> Flixball/BoardLibrary.randomBoard(seed, rows = rows, cols, density) |> Flixball/BoardLibrary.sprinklePlayers(seed, numPlayers)
+                    (numPlayers, seed) -> Flixball.BoardLibrary.randomBoard(seed, rows = rows, cols, density) |> Flixball.BoardLibrary.sprinklePlayers(seed, numPlayers)
                 }
             }
             case None => Err("missing key 'map.data'")
@@ -99,10 +99,10 @@ mod Flixball/Config {
     /// Creates a player from the ID and configuration data.
     ///
     def mkPlayer(id: String, _data: Option[JsonElement]): Result[String, Strategy] = match id {
-        case "shoot" => Ok(Flixball/AiLibrary.shoot())
-        case "wander" => Ok(Flixball/AiLibrary.wander())
-        case "naive" => Ok(Flixball/AiLibrary.naiveSearchAndDestroy())
-        case "smart" => Ok(Flixball/AiLibrary.smartSearchAndDestroy())
+        case "shoot" => Ok(Flixball.AiLibrary.shoot())
+        case "wander" => Ok(Flixball.AiLibrary.wander())
+        case "naive" => Ok(Flixball.AiLibrary.naiveSearchAndDestroy())
+        case "smart" => Ok(Flixball.AiLibrary.smartSearchAndDestroy())
         case unknownId => Err("unknown player ID ${unknownId}")
     }
 

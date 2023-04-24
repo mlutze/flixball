@@ -1,11 +1,11 @@
-mod Flixball/Core/AiInfo {
-    use Flixball/Core.Coordinates
-    use Flixball/Core.PlayerId
-    use Flixball/Core.Position
-    use Flixball/Core.Tile
-    use Flixball/Core/Board.Board
-    use Flixball/Core/Board.Board.Board
-    use Flixball/Core/Board.{players => boardPlayers}
+mod Flixball.Core.AiInfo {
+    use Flixball.Core.Coordinates
+    use Flixball.Core.PlayerId
+    use Flixball.Core.Position
+    use Flixball.Core.Tile
+    use Flixball.Core.Board.Board
+    use Flixball.Core.Board.Board.Board
+    use Flixball.Core.Board.{players => boardPlayers}
     
     use AiInfo.AiInfo
 

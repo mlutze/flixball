@@ -1,21 +1,21 @@
-mod Flixball/AiLibrary {
-    use Flixball/State.{toState, fromState};
-    use Flixball/Core/AiInfo.AiInfo;
-    use Flixball/Core/AiInfo.getColumns;
-    use Flixball/Core/AiInfo.playerPosition;
-    use Flixball/Core/AiInfo.playerPositions;
-    use Flixball/Core/AiInfo.getRows;
-    use Flixball/Core/AiInfo.getTiles;
-    use Flixball/Core/Board.Board.Board;
-    use Flixball/Core.Direction.{East, North, South, West};
-    use Flixball/Core.Move.{Shoot, Turn, Walk};
-    use Flixball/Core.Position.Position;
-    use Flixball/Core.Rotation.Clockwise;
-    use Flixball/Core.Rotation.Counterclockwise;
-    use Flixball/Core.Tile.{Person, Wall};
-    use Flixball/Core.{Coordinates, Direction, Move,
+mod Flixball.AiLibrary {
+    use Flixball.State.{toState, fromState};
+    use Flixball.Core.AiInfo.AiInfo;
+    use Flixball.Core.AiInfo.getColumns;
+    use Flixball.Core.AiInfo.playerPosition;
+    use Flixball.Core.AiInfo.playerPositions;
+    use Flixball.Core.AiInfo.getRows;
+    use Flixball.Core.AiInfo.getTiles;
+    use Flixball.Core.Board.Board.Board;
+    use Flixball.Core.Direction.{East, North, South, West};
+    use Flixball.Core.Move.{Shoot, Turn, Walk};
+    use Flixball.Core.Position.Position;
+    use Flixball.Core.Rotation.Clockwise;
+    use Flixball.Core.Rotation.Counterclockwise;
+    use Flixball.Core.Tile.{Person, Wall};
+    use Flixball.Core.{Coordinates, Direction, Move,
         MoveLogic, PlayerId, Position, Rotation, Strategy, Tile};
-    use Flixball/GridGraph.{findShortestPath, raytraceEx};
+    use Flixball.GridGraph.{findShortestPath, raytraceEx};
     use Flixball.State
 
     def statelessMoveLogic(logic: AiInfo -> Move): MoveLogic =
