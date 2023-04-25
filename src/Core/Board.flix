@@ -58,7 +58,7 @@ mod Flixball.Core.Board {
 
     pub def player(b: Board, id: PlayerId): Option[Position] =
         let Board(br) = b;
-        br.tiles |> Utils/Map.findMap((coord, tile) -> match tile {
+        br.tiles |> Utils.Map.findMap((coord, tile) -> match tile {
             case Person(id1, dir) if id1 == id => Some(Position(coord, dir))
             case _ => None
         })

@@ -35,7 +35,7 @@ mod Flixball.GridGraph {
                     let Position(nextCoord, _) = next;
                     if (nextCoord == startCoord or available(nextCoord)) {
                         if (goal(next)) foundGoal := Some(next) else ();
-                        let currentLength = MutMap.get(current, dists) |> Utils/Option.unsafeGet;
+                        let currentLength = MutMap.get(current, dists) |> Utils.Option.unsafeGet;
                         if (MutMap.get(next, dists) |> Option.isEmpty) {
                             MutMap.put!(next, currentLength + 1, dists);
                             MutMap.put!(next, (current, move), backtracking);
@@ -55,9 +55,9 @@ mod Flixball.GridGraph {
             case Some(end) => {
                 // construct the path list, end to start
                 def stepBack(pos) = {
-                    let pathLength = MutMap.get(pos, dists) |> Utils/Option.unsafeGet;
+                    let pathLength = MutMap.get(pos, dists) |> Utils.Option.unsafeGet;
                     if (pathLength == 0) None else
-                    MutMap.get(pos, backtracking) |> Utils/Option.unsafeGet |> Some
+                    MutMap.get(pos, backtracking) |> Utils.Option.unsafeGet |> Some
                 };
                 let revPathList = List.unfold(c -> stepBack(c) |> Option.map(match (prev, move) -> (move, prev)), end);
                 Some(List.reverse(revPathList))
