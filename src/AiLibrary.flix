@@ -81,7 +81,7 @@ mod Flixball.AiLibrary {
     pub def goAndSpin(coords: Coordinates): Strategy =
         statelessStrategy((id, info) -> {
             let currentPosition = playerPosition(id, info) |>
-                Utils/Option.unsafeGet;
+                Utils.Option.unsafeGet;
             let goal = match Position(c, _) -> c == coords;
             goTo(
                 currentPosition,
@@ -111,7 +111,7 @@ mod Flixball.AiLibrary {
                 |> List.head;
 
             // Get my own position
-            let Position(coords, dir) = playerPosition(id, info) |> Utils/Option.unsafeGet;
+            let Position(coords, dir) = playerPosition(id, info) |> Utils.Option.unsafeGet;
 
             // Pick a move
             match target {
@@ -147,7 +147,7 @@ mod Flixball.AiLibrary {
                 tiles = tiles
             });
             // Get my own position
-            let Position(coords, dir) = playerPosition(id, info) |> Utils/Option.unsafeGet;
+            let Position(coords, dir) = playerPosition(id, info) |> Utils.Option.unsafeGet;
 
             match raytraceEx(dir, coords, board) {
                 case Some(Person(_, _)) =>

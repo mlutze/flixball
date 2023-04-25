@@ -65,7 +65,7 @@ mod Utils {
         }
 
         pub def findMap(f: k -> v -> Option[a] \ ef, m: Map[k, v]): Option[a] \ ef = {
-            use Utils/Option.noneFlatMap;
+            use Utils.Option.noneFlatMap;
             Map.foldLeftWithKey((acc, k, v) -> noneFlatMap(_ -> f(k, v), acc), None, m)
         }
     }

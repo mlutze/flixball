@@ -88,7 +88,7 @@ mod Flixball.Core.GameState {
         let (moves, players) = players0 |> Map.mapWithKey((_, info) -> {
             let (move, state) = (info.ml)(Flixball.Core.AiInfo.fromBoard(b0), info.state);
             (move, {state = state | info})
-        }) |> Utils/Map.unzip;
+        }) |> Utils.Map.unzip;
         (moves, GameState(players, b0))
     }
 
@@ -135,7 +135,7 @@ mod Flixball.Core.GameState {
         let ais = strategies |> Map.mapWithKey((id, strat) -> {
             let (stateGen, ml) = strat(id);
             // unsafe get is safe per precondition.
-            let pos = Map.get(id, playerMap) |> Utils/Option.unsafeGet;
+            let pos = Map.get(id, playerMap) |> Utils.Option.unsafeGet;
             {state = stateGen(seed), ml = ml, pos = pos}
         });
         GameState(ais, b)
