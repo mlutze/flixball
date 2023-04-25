@@ -17,7 +17,7 @@ mod Flixball.Config {
     ///
     pub def read(json: String): Result[String, Config] = {
         for (
-            obj <- Json/Parse.parse(json) |> Option.toOk("invalid JSON");
+            obj <- Json.Parse.parse(json) |> Option.toOk("invalid JSON");
             res <- fromJson(obj)
         ) yield {
             res
