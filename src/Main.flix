@@ -29,7 +29,7 @@ mod Flixball.Main {
     }
 
     def run(config: RunConfig): Unit \ IO = {
-        import static java.lang.Thread.sleep(Int64): Unit & Impure;
+        import static java.lang.Thread.sleep(Int64): Unit \ IO;
         let Config(mkBoard, strats) = config.config;
         let stratMap = strats
             |> List.zipWithIndex
