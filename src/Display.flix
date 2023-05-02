@@ -13,7 +13,7 @@ mod Flixball.Display {
     /// Clears then screen and then displays the board. The cursor will be left
     /// at the end.
     ///
-    pub def displayBoard(b: Board): Unit & Impure = {
+    pub def displayBoard(b: Board): Unit \ IO = {
         Terminal.clearScreenAndReset();
         b |> boardLines |> List.forEach(println)
     }
@@ -22,8 +22,8 @@ mod Flixball.Display {
     /// Continously simulates the game state and drawing it between each step with a
     /// set delay. One second is `1000i64`.
     ///
-    pub def runGameState(delayDuration: Int64, gs: GameState): Unit & Impure = {
-        import static java.lang.Thread.sleep(Int64): Unit & Impure;
+    pub def runGameState(delayDuration: Int64, gs: GameState): Unit \ IO = {
+        import static java.lang.Thread.sleep(Int64): Unit \ IO;
         displayBoard(gsBoard(gs));
         sleep(delayDuration);
         runGameState(delayDuration, Flixball.Engine.runStep(gs))

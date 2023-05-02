@@ -142,40 +142,40 @@ mod TestDisplay {
 
     // Test Scenarios
 
-    pub def testDisplayBoard01(): Unit & Impure =
+    pub def testDisplayBoard01(): Unit \ IO =
         displayBoard(fst(testBoard01()))
 
-    pub def testRunBoard01(): Unit & Impure =
+    pub def testRunBoard01(): Unit \ IO =
         // OBS letbinding is avoided because of bug
         // https://github.com/flix/flix/issues/4440
         testBoard01() |> match (board, strategies) ->
         runGameState(500i64, mkGameState(42i64, strategies, board))
 
-    pub def testDisplayBoard02(): Unit & Impure =
+    pub def testDisplayBoard02(): Unit \ IO =
         displayBoard(fst(testBoard02()))
 
-    pub def testRunBoard02(): Unit & Impure =
+    pub def testRunBoard02(): Unit \ IO =
         testBoard02() |> match (board, strategies) ->
         runGameState(500i64, mkGameState(42i64, strategies, board))
 
-    pub def testDisplayBoard03(): Unit & Impure =
+    pub def testDisplayBoard03(): Unit \ IO =
         displayBoard(fst(testBoard03()))
 
-    pub def testRunBoard03(): Unit & Impure =
+    pub def testRunBoard03(): Unit \ IO =
         testBoard03() |> match (board, strategies) ->
         runGameState(500i64, mkGameState(42i64, strategies, board))
 
-    pub def testDisplayBoard04(): Unit & Impure =
+    pub def testDisplayBoard04(): Unit \ IO =
         displayBoard(testBoard04())
 
-    pub def testDisplayBoard05(): Unit & Impure =
+    pub def testDisplayBoard05(): Unit \ IO =
         displayBoard(testBoard05())
 
-    pub def testRunBoard06(): Unit & Impure =
+    pub def testRunBoard06(): Unit \ IO =
         testBoard06() |> match (board, strategies) ->
         runGameState(500i64, mkGameState(42i64, strategies, board))
 
-    pub def testRunBoard07(): Unit & Impure =
+    pub def testRunBoard07(): Unit \ IO =
         testBoard07() |> match (board, strategies) ->
         runGameState(500i64, mkGameState(42i64, strategies, board))
 
