@@ -4,19 +4,19 @@ mod Utils {
         f(a, b, c)
     }
     
-    @Unsafe
+    // @Unsafe
     pub def dbg(x: a): a with ToString[a] = unchecked_cast({
         println(x);
         x
     } as _ \ {})
     
-    @Unsafe
+    // @Unsafe
     pub def dbgMsg(msg: String, x: a): a with ToString[a] = unchecked_cast({
         println("${msg}: ${x}");
         x
     } as _ \ {})
 
-    @Unsafe
+    // @Unsafe
     pub def dbgCond(msg: String, cond: a -> Bool \ ef, x: a): a \ ef with ToString[a] = {
         if (cond(x)) {
             unchecked_cast(println("${msg}: ${x}") as _ \ ef);
@@ -24,7 +24,7 @@ mod Utils {
         } else x
     }
 
-    @Unsafe
+    // @Unsafe
     pub def dbgAny(msg: String, cond: a -> Bool \ ef1, toStr: a -> String \ ef2, x: a): a \ {ef1, ef2} = {
         if (cond(x)) {
             unchecked_cast(println("${msg}: ${toStr(x)}") as _ \ ef2);
@@ -33,7 +33,7 @@ mod Utils {
     }
 
     mod Option {
-        @Unsafe
+        // @Unsafe
         pub def unsafeGet(o: Option[a]): a = match o {
             case None => ?unreachable
             case Some(v) => v
@@ -72,7 +72,7 @@ mod Utils {
 
     mod Array {
 
-        @Unsafe
+        // @Unsafe
         pub def unsafeNth(n: Int32, x: Array[a, r]): a \ r = {
             Array.nth(n, x) |> Utils.Option.unsafeGet
         }
