@@ -80,7 +80,7 @@ mod Flixball.BoardLibrary {
         )
     }
 
-    def gridToMap(g: Array[Array[Bool, r], r]): Map[(Int32, Int32), Tile] \ Read(r) = region rh {
+    def gridToMap(g: Array[Array[Bool, r], r]): Map[(Int32, Int32), Tile] \ r = region rh {
         let mutTiles = MutMap.new(rh);
         foreach(
             (x, arr) <- Array.enumerator(rh, g) |> Iterator.toList; // TODO wasted traversal
