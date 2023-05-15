@@ -4,7 +4,7 @@ mod Flixball.Noise {
 
     pub type alias Dimensions = {width = Int32, height = Int32} 
 
-    def createGrid(r: Region[r], f: (Int32, Int32) -> t \ ef, d: Dimensions): Grid[t, r] \ {Write(r), ef} = {
+    def createGrid(r: Region[r], f: (Int32, Int32) -> t \ ef, d: Dimensions): Grid[t, r] \ {r, ef} = {
         use Array.init;
         init(r, x -> init(r, y -> f(x, y), d.height), d.width)
     }
@@ -12,7 +12,7 @@ mod Flixball.Noise {
     ///
     /// Returns a two-dimensional array of random values >= 0.
     ///
-    pub def int32Noise2d(r: Region[r], d: Dimensions, seed: Int64): Grid[Int32, r] \ Write(r) = region r1 {
+    pub def int32Noise2d(r: Region[r], d: Dimensions, seed: Int64): Grid[Int32, r] \ r = region r1 {
         use RegionedRandom.nextInt32;
         let rand = RegionedRandom.newWithSeed(r1, seed);
         createGrid(r, (_, _) -> Int32.abs(nextInt32(rand)), d)
@@ -22,7 +22,7 @@ mod Flixball.Noise {
     /// boolean noise with `prob` probability of `true`.
     /// prob is between 0 and 1 inclusive.
     ///
-    pub def boolNoise2d(r: Region[r], d: Dimensions, seed: Int64, prob: Float64): Grid[Bool, r] \ Write(r) = region r1 {
+    pub def boolNoise2d(r: Region[r], d: Dimensions, seed: Int64, prob: Float64): Grid[Bool, r] \ r = region r1 {
         use RegionedRandom.nextFloat64;
         let rand = RegionedRandom.newWithSeed(r1, seed);
 
@@ -39,7 +39,7 @@ mod Flixball.Noise {
     /// Cellular Automata Refinement.
     /// sensible defaults, prob=0.40, iterations=3
     ///
-    pub def cellularGeneration(r: Region[r], d: Dimensions, seed: Int64, prob: Float64, iterations: Int32): Grid[Bool, r] \ Write(r) = region r1 {
+    pub def cellularGeneration(r: Region[r], d: Dimensions, seed: Int64, prob: Float64, iterations: Int32): Grid[Bool, r] \ r = region r1 {
         let floorToWallReq = 4;
         let wallToFloorReq = 3;
 

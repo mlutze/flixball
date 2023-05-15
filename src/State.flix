@@ -11,8 +11,8 @@ mod Flixball {
     }
 
     pub class MutState[m: Region -> Type] {
-        pub def toState(x: m[r]): AiState \ Read(r)
-        pub def fromState(r: Region[r], x: AiState): Option[m[r]] \ Write(r)
+        pub def toState(x: m[r]): AiState \ r
+        pub def fromState(r: Region[r], x: AiState): Option[m[r]] \ r
     }
 
     instance State[AiState] {
@@ -102,10 +102,10 @@ mod Flixball {
     }
 
     instance MutState[Ref[a]] with State[a] {
-        pub def toState(x: Ref[a, r]): AiState \ Read(r) =
+        pub def toState(x: Ref[a, r]): AiState \ r =
             Flixball.State.toState(deref x)
     
-        pub def fromState(r: Region[r], x: AiState): Option[Ref[a, r]] \ Write(r) =
+        pub def fromState(r: Region[r], x: AiState): Option[Ref[a, r]] \ r =
             Flixball.State.fromState(x) |> Option.map(y -> ref y @ r)
     }
     
