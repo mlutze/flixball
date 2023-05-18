@@ -18,8 +18,5 @@ jobs:
           # download Flix JAR
           curl -L https://github.com/flix/flix/releases/latest/download/flix.jar > flix.jar
 
-          # hack the repl to install dependencies
-          echo ":q" | java -jar flix.jar
-
           # run tests
-          java -jar flix.jar test
+          java -jar flix.jar test --github-key ${{ github.token }}
