@@ -24,8 +24,5 @@ jobs:
           yesterday_url="https://flix.dev/nightly/flix-${yesterday}.jar"
           curl -L -f "${today_url}" > flix.jar || curl -L -f "${yesterday_url}" > flix.jar
 
-          # hack the repl to install dependencies
-          echo ":q" | java -jar flix.jar
-
           # run tests
-          java -jar flix.jar test
+          java -jar flix.jar test --github-key ${{ github.token }}
