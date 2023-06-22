@@ -25,7 +25,7 @@ mod Flixball.Core.GameState {
         pos = Position
     }
 
-    pub opaque enum GameState(
+    pub enum GameState(
         Map[PlayerId, PlayerInfo],
         Board
     )
