@@ -9,7 +9,7 @@ mod Flixball.Core.AiInfo {
     
     use AiInfo.AiInfo
 
-    pub opaque enum AiInfo(Board, Map[PlayerId, Position])
+    pub enum AiInfo(Board, Map[PlayerId, Position])
 
     pub def getTiles(i: AiInfo): Map[Coordinates, Tile] = {
         let AiInfo(Board(br), _) = i;
