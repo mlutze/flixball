@@ -59,7 +59,7 @@ mod Flixball.Main {
                     case _ => None
                 })
                 |> Option.toOk("missing config");
-            file <- File.read(configPath);
+            file <- Files.read(configPath);
             config <- readConfig(file)
         ) yield {
             let quiet = runOpts |> List.memberOf(RunOption.Quiet);
