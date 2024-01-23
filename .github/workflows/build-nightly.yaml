@@ -25,4 +25,4 @@ jobs:
           curl -L -f "${today_url}" > flix.jar || curl -L -f "${yesterday_url}" > flix.jar
 
           # run tests
-          java -jar flix.jar test --github-key ${{ github.token }}
+          java -jar flix.jar test --github-token ${{ github.token }}
