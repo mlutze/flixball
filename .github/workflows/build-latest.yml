@@ -12,11 +12,11 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2.5.0
         with:
-          java-version: 17
+          java-version: 21
           distribution: zulu
       - run: |
           # download Flix JAR
           curl -L https://github.com/flix/flix/releases/latest/download/flix.jar > flix.jar
 
           # run tests
-          java -jar flix.jar test --github-key ${{ github.token }}
+          java -jar flix.jar test --github-token ${{ github.token }}

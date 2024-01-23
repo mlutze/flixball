@@ -1,5 +1,5 @@
 
-pub def main(): Unit \ {IO, NonDet} = Flixball.Main.main()
+pub def main(): Unit \ IO = Flixball.Main.main()
 
 mod Flixball.Main {
     use Flixball.Config.{read => readConfig}
@@ -13,7 +13,7 @@ mod Flixball.Main {
     use Flixball.Options.usage
     use Flixball.Version.version
 
-    pub def main(): Unit \ {IO, NonDet} = {
+    pub def main(): Unit \ IO = {
         let args = Environment.getArgs();
         match parse(args) {
             case Action.Version => println(version())
@@ -44,7 +44,7 @@ mod Flixball.Main {
         }
     }
 
-    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[String, RunConfig] \ NonDet = {
+    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[String, RunConfig] \ IO = {
         use Result.flatMap;
         let seed = runOpts
             |> List.findMap(x -> match x {
