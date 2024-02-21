@@ -70,7 +70,7 @@ mod Flixball.AiLibrary {
     })
 
     pub def spinAndShoot(r: Rotation): Strategy = mkStrategy(_id -> {
-        let stateGen = seed -> Int64.mod(seed, 2i64) == 0i64;
+        let stateGen = seed -> Int64.modulo(seed, 2i64) == 0i64;
         let moveLogic = (_, shoot) -> {
             if (shoot) (Shoot, false)
             else (Turn(r), true)

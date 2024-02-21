@@ -53,7 +53,7 @@ mod Flixball.Display {
 
     def mkIdColorMap(_b: Board): Int32 -> String -> String =
         // all the ANSI colors
-        id -> match (Int32.mod(id, 12)) {
+        id -> match (Int32.modulo(id, 12)) {
             case 0 => Console.magenta
             case 1 => Console.red
             case 2 => Console.yellow
