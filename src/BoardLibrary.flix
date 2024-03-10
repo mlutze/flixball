@@ -18,7 +18,7 @@ mod Flixball.BoardLibrary {
         let Board(br) = b;
         let rows = br.rows+2;
         let cols = br.cols+2;
-        let translatedMap = MutMap.new(r);
+        let translatedMap = MutMap.empty(r);
         // Add translated existing tiles
         foreach(((x, y), tile) <- br.tiles |> Map.toList) { // TODO wasted traversal
             MutMap.put!((x+1, y+1), tile, translatedMap)
@@ -81,7 +81,7 @@ mod Flixball.BoardLibrary {
     }
 
     def gridToMap(g: Array[Array[Bool, r], r]): Map[(Int32, Int32), Tile] \ r = region rh {
-        let mutTiles = MutMap.new(rh);
+        let mutTiles = MutMap.empty(rh);
         foreach(
             (x, arr) <- Array.enumerator(rh, g) |> Iterator.toList; // TODO wasted traversal
             (y, b) <- Array.enumerator(rh, arr) |> Iterator.toList  // TODO wasted traversal
@@ -110,7 +110,7 @@ mod Flixball.BoardLibrary {
             List.map(String.length) |>
             List.maximum |>
             Option.getWithDefault(0);
-        let tileMap = MutMap.new(r);
+        let tileMap = MutMap.empty(r);
 
         let availableId = ref 0 @ r;
         def freshId() = {

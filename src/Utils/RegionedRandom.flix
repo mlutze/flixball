@@ -11,7 +11,7 @@ mod RegionedRandom {
     /// Returns a fresh random number generator initialized with the given seed `s`.
     ///
     pub def newWithSeed(_r: Region[r], s: Int64): RegionedRandom[r] \ r = {
-        import new java.util.Random(Int64): ##java.util.Random \ r as newRandom;
+        import java_new java.util.Random(Int64): ##java.util.Random \ r as newRandom;
         RegionedRandom(newRandom(s))
     }
 

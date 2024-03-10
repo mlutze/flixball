@@ -31,10 +31,10 @@ mod Flixball.Display {
 
     def boardLines(b: Board): List[String] = region r {
         let Board(br) = b;
-        let lines = MutList.new(r);
+        let lines = MutList.empty(r);
         let idColor = mkIdColorMap(b);
         Iterator.range(r, 0, br.rows) |> Iterator.forEach(row -> {
-            let sb = StringBuilder.new(r);
+            let sb = StringBuilder.empty(r);
             Iterator.range(r, 0, br.cols) |> Iterator.forEach(column -> {
                 match Map.get((row, column), br.tiles) {
                     case None => StringBuilder.append!(" ", sb)
