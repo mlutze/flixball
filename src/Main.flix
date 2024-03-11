@@ -51,7 +51,7 @@ mod Flixball.Main {
                 case RunOption.Seed(s) => Some(s)
                 case _ => None
             })
-            |> Option.getWithDefault(Random.nextInt64(Random.new()));
+            |> Option.getWithDefault(Random.nextInt64(Random.fresh()));
         for (
             configPath <- runOpts
                 |> List.findMap(x -> match x {

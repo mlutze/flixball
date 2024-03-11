@@ -55,8 +55,8 @@ mod Utils {
     mod Map {
 
         pub def unzip(m: Map[k, (v1, v2)]): (Map[k, v1], Map[k, v2]) with Order[k] = region r {
-            let m1 = MutMap.new(r);
-            let m2 = MutMap.new(r);
+            let m1 = MutMap.empty(r);
+            let m2 = MutMap.empty(r);
             foreach((k, (v1, v2)) <- m |> Map.toList) { // TODO wasted traversal
                 MutMap.put!(k, v1, m1);
                 MutMap.put!(k, v2, m2)
