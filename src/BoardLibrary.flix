@@ -63,7 +63,7 @@ mod Flixball.BoardLibrary {
         let rows = List.range(0, rec.rows);
         let cols = List.range(0, rec.cols);
         let options = {
-            for (
+            forM (
                 row <- rows;
                 col <- cols;
                 if (Map.get((row, col), rec.tiles) == None)
