@@ -52,7 +52,7 @@ mod Flixball.Main {
                 case _ => None
             })
             |> Option.getWithDefault(Random.nextInt64(Random.fresh()));
-        for (
+        forM (
             configPath <- runOpts
                 |> List.findMap(x -> match x {
                     case RunOption.Config(c) => Some(c)
