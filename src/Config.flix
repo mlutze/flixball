@@ -16,7 +16,7 @@ mod Flixball.Config {
     /// Reads the run configuration from a JSON string.
     ///
     pub def read(json: String): Result[String, Config] = {
-        for (
+        forM (
             obj <- Json.Parse.parse(json) |> Option.toOk("invalid JSON");
             res <- fromJson(obj)
         ) yield {
@@ -25,7 +25,7 @@ mod Flixball.Config {
     }
 
     def fromJson(json: JsonElement): Result[String, Config] = {
-        for (
+        forM (
             o <- asObject(".", json);
             mapJson <- Map.get("map", o) |> Option.toOk("missing key 'map'");
             playersJson <- Map.get("players", o) |> Option.toOk("missing key 'players'");
@@ -41,7 +41,7 @@ mod Flixball.Config {
 
     def readMap(json: JsonElement): Result[String, (Int32, Int64) -> Board] = match json {
         case JsonObject(o) => {
-            for (
+            forM (
                 id0 <- Map.get("id", o) |> Option.toOk("missing key 'map.id'");
                 id <- asString(".map", id0);
                 data <- Map.get("data", o) |> Ok;
@@ -52,7 +52,7 @@ mod Flixball.Config {
     }
 
     def readPlayers(json: JsonElement): Result[String, List[Strategy]] = {
-        for (
+        forM (
             a <- asArray(".players", json);
             res <- Result.traverse(readPlayer, a)
         ) yield {
@@ -61,7 +61,7 @@ mod Flixball.Config {
     }
 
     def readPlayer(json: JsonElement): Result[String, Strategy] = {
-        for (
+        forM (
             o <- asObject(".players[_]", json);
             id0 <- Map.get("id", o) |> Option.toOk("missing key 'players[_].id'");
             id <- asString(".players[_]", id0);
@@ -78,7 +78,7 @@ mod Flixball.Config {
     def mkMap(id: String, data: Option[JsonElement]): Result[String, (Int32, Int64) -> Board] = match id {
         case "random" => match data {
             case Some(json) => {
-                for (
+                forM (
                 o <- asObject("map.data", json);
                 rows0 <- Map.get("rows", o) |> Option.toOk("missing key 'map.data.rows'");
                 cols0 <- Map.get("cols", o) |> Option.toOk("missing key 'map.data.cols'");

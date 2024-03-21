@@ -98,7 +98,7 @@ mod Flixball.Options {
     def dimensions(d: String): Option[Flag] = {
         match String.splitOn(substr = "x", d) {
             case rows0 :: cols0 :: Nil => {
-                for (
+                forM (
                     rows <- Int32.fromString(rows0);
                     cols <- Int32.fromString(cols0)
                 ) yield {

@@ -196,7 +196,7 @@ mod Flixball.AiLibrary {
             else
                 Map.get(c, tiles) == None
         };
-        for (
+        forM (
             moves <- findShortestPath(availablePosition, p, goal);
             res <- List.head(moves)
         ) yield {

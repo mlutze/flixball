@@ -2,7 +2,7 @@ mod Flixball {
     use Flixball.Core.AiState;
     use Flixball.Core.AiState.{Value, Collection};
 
-    pub lawful class State[a] {
+    pub lawful trait State[a] {
         pub def toState(x: a): AiState
         pub def fromState(x: AiState): Option[a]
 
@@ -10,7 +10,7 @@ mod Flixball {
             Flixball.State.fromState(Flixball.State.toState(x)) == Some(x)
     }
 
-    pub class MutState[m: Region -> Type] {
+    pub trait MutState[m: Region -> Type] {
         pub def toState(x: m[r]): AiState \ r
         pub def fromState(r: Region[r], x: AiState): Option[m[r]] \ r
     }
@@ -81,7 +81,7 @@ mod Flixball {
         }
 
         pub def fromState(x: AiState): Option[Map[k, v]] = {
-            for (
+            forM (
                 list <- Flixball.State.fromState(x)
             ) yield {
                 List.toMap(list)
