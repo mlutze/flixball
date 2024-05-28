@@ -6,8 +6,9 @@ mod Flixball {
         pub def toState(x: a): AiState
         pub def fromState(x: AiState): Option[a]
 
-        law inverse: forall (x: a) with Eq[a] .
+        law inverse: forall (x: a) with Eq[a] {
             Flixball.State.fromState(Flixball.State.toState(x)) == Some(x)
+        }
     }
 
     pub trait MutState[m: Region -> Type] {
