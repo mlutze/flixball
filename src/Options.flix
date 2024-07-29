@@ -41,10 +41,10 @@ mod Flixball.Options {
     pub def parse(args: List[String]): Action = {
         match getOpt(Permute, options(), args) {
             case Validation.Success(flags) =>
-                if (flags.nonOptions != Nil)
+                if (flags#nonOptions != Nil)
                     Error
                 else
-                    flagsToAction(flags.options)
+                    flagsToAction(flags#options)
             case Validation.Failure(_) => Error
         }
     }

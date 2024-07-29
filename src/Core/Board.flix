@@ -25,7 +25,7 @@ mod Flixball.Core.Board {
     ///
     /// North, East, South, West correspond to the drawing above, likewise
     /// with Clockwise and Counterclockwise.
-    /// 
+    ///
     pub enum Board({rows = Int32, cols = Int32, tiles = Map[Coordinates, Tile]})
 
     pub def set_(coords: Coordinates, tile: Option[Tile], board0: Board): Board = {
@@ -50,7 +50,7 @@ mod Flixball.Core.Board {
 
     pub def players(b: Board): Map[PlayerId, Position] = {
         let Board(br) = b;
-        br.tiles |> Map.toList |> List.filterMap(match (coords, t) -> match t {
+        br#tiles |> Map.toList |> List.filterMap(match (coords, t) -> match t {
             case Person(id, dir) => Some(id, Position(coords, dir))
             case _ => None
         }) |> List.toMap
@@ -58,7 +58,7 @@ mod Flixball.Core.Board {
 
     pub def player(b: Board, id: PlayerId): Option[Position] =
         let Board(br) = b;
-        br.tiles |> Utils.Map.findMap((coord, tile) -> match tile {
+        br#tiles |> Utils.Map.findMap((coord, tile) -> match tile {
             case Person(id1, dir) if id1 == id => Some(Position(coord, dir))
             case _ => None
         })

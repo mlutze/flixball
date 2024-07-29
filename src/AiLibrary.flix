@@ -90,7 +90,7 @@ mod Flixball.AiLibrary {
                 getTiles(info)
             ) |> Option.getWithDefault(Turn(Clockwise))
         })
-    
+
     ///
     /// Go to the next player on the list and shoot them.
     /// Doesn't necessarily take the shortest path to find a shooting angle.
@@ -106,7 +106,7 @@ mod Flixball.AiLibrary {
             });
             // Pick a target from among the players (lowest ID except me)
             let target = playerMap
-                |> Map.filterWithKey((id2, _) -> id != id2) 
+                |> Map.filterWithKey((id2, _) -> id != id2)
                 |> Map.toList
                 |> List.head;
 
@@ -124,7 +124,7 @@ mod Flixball.AiLibrary {
                     match raytraceEx(dir, coords, board) {
                         // Case 2.1: Looking at my target. Shoot.
                         case Some(Person(viewId, _)) if viewId == targetId =>
-                            Shoot 
+                            Shoot
                         // Case 2.2: Not looking at my target. Keep moving.
                         case _ =>
                             goTo(
@@ -165,7 +165,7 @@ mod Flixball.AiLibrary {
                             case _ => false
                         }
                     };
-                    // go to such a position, otherwise do a victory spin 
+                    // go to such a position, otherwise do a victory spin
                     goTo(
                         Position(coords, dir),
                         goal,
@@ -191,7 +191,7 @@ mod Flixball.AiLibrary {
 
         // todo: this predicate should just be caller supplied
         def availablePosition(c: Coordinates) = {
-            if (passablePlayers.passablePlayers)
+            if (passablePlayers#passablePlayers)
                 Map.get(c, tiles) != Some(Wall)
             else
                 Map.get(c, tiles) == None

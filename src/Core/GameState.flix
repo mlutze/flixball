@@ -30,7 +30,7 @@ mod Flixball.Core.GameState {
         Board
     )
 
-    //law gamestatea = 
+    //law gamestatea =
 
     /// Returns the board of the state.
     pub def board(s: GameState): Board = {
@@ -43,7 +43,7 @@ mod Flixball.Core.GameState {
     ///
     pub def playerPosition(id: PlayerId, s: GameState): Option[Position] = {
         let GameState(players, _) = s;
-        players |> Map.get(id) |> Option.map(info -> info.pos)
+        players |> Map.get(id) |> Option.map(info -> info#pos)
     }
 
     /// Position updates are naively done without care for collisions or inconsistensies.
@@ -60,7 +60,7 @@ mod Flixball.Core.GameState {
                 // remove previous
                 board := set_(posCoords(info0.pos), None, deref board);
                 // insert new
-                board := set_(posCoords(info.pos), Some(Person(id, posDir(info.pos))), deref board)
+                board := set_(posCoords(info.pos), Some(Person(id, posDir(info#pos))), deref board)
             } else ();
             info
         });
@@ -73,9 +73,9 @@ mod Flixball.Core.GameState {
         let board = ref board0 @ r;
         let players = players0 |> Map.adjust(info0 -> {
             let info = f(info0);
-            if (info.pos != info0.pos) {
-                board := set_(posCoords(info0.pos), None, deref board);
-                board := set_(posCoords(info.pos), Some(Person(id, posDir(info.pos))), deref board)
+            if (info#pos != info0#pos) {
+                board := set_(posCoords(info0#pos), None, deref board);
+                board := set_(posCoords(info#pos), Some(Person(id, posDir(info#pos))), deref board)
             } else ();
             info
         }, id);
@@ -86,7 +86,7 @@ mod Flixball.Core.GameState {
     pub def computeMoveLogics(s: GameState): (Map[PlayerId, Move], GameState) = {
         let GameState(players0, b0) = s;
         let (moves, players) = players0 |> Map.mapWithKey((_, info) -> {
-            let (move, state) = (info.ml)(Flixball.Core.AiInfo.fromBoard(b0), info.state);
+            let (move, state) = (info.ml)(Flixball.Core.AiInfo.fromBoard(b0), info#state);
             (move, {state = state | info})
         }) |> Utils.Map.unzip;
         (moves, GameState(players, b0))
@@ -113,7 +113,7 @@ mod Flixball.Core.GameState {
     /// Does nothing if the player does not exist in the game.
     pub def rotatePlayer(id: PlayerId, rot: Rotation, gs: GameState): GameState =
         gs |> adjust(id, info -> {
-            let pos = Position(posCoords(info.pos), posDir(info.pos) |> rotateDir(rot));
+            let pos = Position(posCoords(info#pos), posDir(info#pos) |> rotateDir(rot));
             {pos = pos | info}
         })
 
@@ -121,14 +121,14 @@ mod Flixball.Core.GameState {
     /// Does not change the direction of the player.
     pub def movePlayer(id: PlayerId, coords: Coordinates, gs: GameState): GameState =
         gs |> adjust(id, info -> {
-            let pos = Position(coords, posDir(info.pos));
+            let pos = Position(coords, posDir(info#pos));
             {pos = pos | info}
         })
-    
+
     ///
     /// Create a gamestate based on a seed (for ais), strategies and a board.
     /// Precondition: The domain of `strategies` must be `[0,n]` where `n` is
-    /// the number of players on the board. 
+    /// the number of players on the board.
     ///
     pub def mkGameState(seed: Int64, strategies: Map[PlayerId, Strategy], b: Board): GameState = {
         let playerMap = Flixball.Core.Board.players(b);

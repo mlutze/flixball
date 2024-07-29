@@ -33,9 +33,9 @@ mod Flixball.Display {
         let Board(br) = b;
         let lines = MutList.empty(r);
         let idColor = mkIdColorMap(b);
-        Iterator.range(r, 0, br.rows) |> Iterator.forEach(row -> {
+        Iterator.range(r, 0, br#rows) |> Iterator.forEach(row -> {
             let sb = StringBuilder.empty(r);
-            Iterator.range(r, 0, br.cols) |> Iterator.forEach(column -> {
+            Iterator.range(r, 0, br#cols) |> Iterator.forEach(column -> {
                 match Map.get((row, column), br.tiles) {
                     case None => StringBuilder.append!(" ", sb)
                     case Some(tile) => StringBuilder.append!(tileStr(idColor, tile), sb)

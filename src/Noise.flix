@@ -2,11 +2,11 @@ mod Flixball.Noise {
 
     pub type alias Grid[t: Type, r: Region] = Array[Array[t, r], r]
 
-    pub type alias Dimensions = {width = Int32, height = Int32} 
+    pub type alias Dimensions = {width = Int32, height = Int32}
 
     def createGrid(r: Region[r], f: (Int32, Int32) -> t \ ef, d: Dimensions): Grid[t, r] \ {r, ef} = {
         use Array.init;
-        init(r, x -> init(r, y -> f(x, y), d.height), d.width)
+        init(r, x -> init(r, y -> f(x, y), d#height), d#width)
     }
 
     ///
@@ -44,7 +44,7 @@ mod Flixball.Noise {
         let wallToFloorReq = 3;
 
         let current = ref boolNoise2d(r, d, seed, prob) @ r1;
-        let isWall = p -> (deref current) |> Utils.Array.unsafeNth(p.x) |> Utils.Array.unsafeNth(p.y);
+        let isWall = p -> (deref current) |> Utils.Array.unsafeNth(p#x) |> Utils.Array.unsafeNth(p#y);
         let swap = ref createGrid(r, (_, _) -> false, d) @ r1;
         // perform automation step in current, storing the result in swap,
         // and the swapping them.
@@ -78,11 +78,11 @@ mod Flixball.Noise {
 
     def mooreNeighborhood(p: {x = Int32, y = Int32}, d: Dimensions): List[{x = Int32, y = Int32}] = {
         let inbound = px -> px.x >= 0 and px.x < d.width and px.y >= 0 and px.y < d.height;
-        let self = px -> px.x == p.x and px.y == p.y;
+        let self = px -> px.x == p#x and px.y == p#y;
         let offsets = List.range(-1, 2);
         offsets |> List.flatMap(xset ->
             offsets |> List.filterMap(yset -> {
-                let nb = {x=p.x + xset, y=p.y + yset};
+                let nb = {x=p#x + xset, y=p#y + yset};
                 if (inbound(nb) and not self(nb)) Some(nb) else None
             })
         )
