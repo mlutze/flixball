@@ -100,9 +100,9 @@ mod Flixball.GridGraph {
         // todo: by the border requirement of boards, this does not need the bounds.
         let (row, col) = coords0;
         let Board(rec) = board;
-        let rows = rec.rows;
-        let cols = rec.cols;
-        let tiles = rec.tiles;
+        let rows = rec#rows;
+        let cols = rec#cols;
+        let tiles = rec#tiles;
         if (row < 0 or row >= rows) {
             None
         } else if (col < 0 or col >= cols) {

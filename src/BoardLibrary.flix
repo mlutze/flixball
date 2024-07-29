@@ -8,19 +8,19 @@ mod Flixball.BoardLibrary {
     use Flixball.Core.Tile
     use Flixball.Core.Tile.Person
     use Flixball.Core.Tile.Wall
-    
+
     ///
     /// Adds a border around the board by increasing the size in each
     /// dimension by two and increasing each tile position by one in
     /// each dimension.
-    /// 
+    ///
     pub def addBorder(b: Board): Board = region r {
         let Board(br) = b;
-        let rows = br.rows+2;
-        let cols = br.cols+2;
+        let rows = br#rows+2;
+        let cols = br#cols+2;
         let translatedMap = MutMap.empty(r);
         // Add translated existing tiles
-        foreach(((x, y), tile) <- br.tiles |> Map.toList) { // TODO wasted traversal
+        foreach(((x, y), tile) <- br#tiles |> Map.toList) { // TODO wasted traversal
             MutMap.put!((x+1, y+1), tile, translatedMap)
         };
         // Add border walls
@@ -38,7 +38,7 @@ mod Flixball.BoardLibrary {
     ///
     /// Creates a pseudo-random board from the seed with an average wall
     /// density of `density` in the range [0.0, 1.0]. The map will have
-    /// an encompasing border.  
+    /// an encompasing border.
     ///
     pub def randomBoard(seed: Int64, rows: {rows = Int32}, cols: Int32, density: Float64): Board = region r {
         let grid = Flixball.Noise.boolNoise2d(r, {width=rows.rows, height=cols}, seed, density);
@@ -60,13 +60,13 @@ mod Flixball.BoardLibrary {
     pub def sprinklePlayers(seed: Int64, n: Int32, b0: Board): Board = region r {
         let rand = RegionedRandom.newWithSeed(r, seed);
         let Board(rec) = b0;
-        let rows = List.range(0, rec.rows);
-        let cols = List.range(0, rec.cols);
+        let rows = List.range(0, rec#rows);
+        let cols = List.range(0, rec#cols);
         let options = {
             forM (
                 row <- rows;
                 col <- cols;
-                if (Map.get((row, col), rec.tiles) == None)
+                if (Map.get((row, col), rec#tiles) == None)
             ) yield {
                 (row, col)
             }
@@ -74,7 +74,7 @@ mod Flixball.BoardLibrary {
         let choices = options |> RegionedRandom.shuffleList(rand) |> List.take(n);
         let choiceToPlayer = choices |> List.zipWithIndex;
         (b0, choiceToPlayer) ||> List.foldLeft(
-            b -> match (id, coords) -> 
+            b -> match (id, coords) ->
                 let dir = RegionedRandom.chooseNel(rand, Nel.Nel(North, East :: South :: West :: Nil));
                 b |> Flixball.Core.Board.set_(coords, Some(Tile.Person(id, dir)))
         )
@@ -96,7 +96,7 @@ mod Flixball.BoardLibrary {
     /// Each line of the string is a row. If lines are of different
     /// lengths they will be interpreted as being right-padded with
     /// spaces. The board will have an surrounding edge added. Players
-    /// are numbered from 0, top-to-bottom, left-to-right. 
+    /// are numbered from 0, top-to-bottom, left-to-right.
     ///
     /// " " = empty tile
     /// "#" = wall tile

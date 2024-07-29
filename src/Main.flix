@@ -18,7 +18,7 @@ mod Flixball.Main {
         match parse(args) {
             case Action.Version => println(version())
             case Action.Help => println(usage())
-            case Action.Run(runOpts, dispOpts) => 
+            case Action.Run(runOpts, dispOpts) =>
                 match mkRunConfig(runOpts, dispOpts) {
                     case Ok(config) => run(config)
                     case Err(s) => println("Error: ${s}")
@@ -30,16 +30,16 @@ mod Flixball.Main {
 
     def run(config: RunConfig): Unit \ IO = {
         import static java.lang.Thread.sleep(Int64): Unit \ IO;
-        let Config(mkBoard, strats) = config.config;
+        let Config(mkBoard, strats) = config#config;
         let stratMap = strats
             |> List.zipWithIndex
             |> List.toMap;
-        let gs0 = Flixball.Core.GameState.mkGameState(config.seed, stratMap, mkBoard(config.seed));
+        let gs0 = Flixball.Core.GameState.mkGameState(config#seed, stratMap, mkBoard(config#seed));
         region r {
             let stream = Flixball.Engine.runGame(r, gs0);
             stream |> Iterator.forEach(gs -> {
                 Flixball.Display.displayBoard(gsBoard(gs));
-                sleep(config.period |> Int32.toInt64)
+                sleep(config#period |> Int32.toInt64)
             })
         }
     }
