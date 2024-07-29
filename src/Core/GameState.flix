@@ -56,11 +56,11 @@ mod Flixball.Core.GameState {
         let board = ref board0 @ r;
         let players = players0 |> Map.mapWithKey((id, info0) -> {
             let info = f(id, info0);
-            if (info.pos != info0.pos) {
+            if (info#pos != info0#pos) {
                 // remove previous
-                board := set_(posCoords(info0.pos), None, deref board);
+                board := set_(posCoords(info0#pos), None, deref board);
                 // insert new
-                board := set_(posCoords(info.pos), Some(Person(id, posDir(info#pos))), deref board)
+                board := set_(posCoords(info#pos), Some(Person(id, posDir(info#pos))), deref board)
             } else ();
             info
         });
@@ -86,7 +86,7 @@ mod Flixball.Core.GameState {
     pub def computeMoveLogics(s: GameState): (Map[PlayerId, Move], GameState) = {
         let GameState(players0, b0) = s;
         let (moves, players) = players0 |> Map.mapWithKey((_, info) -> {
-            let (move, state) = (info.ml)(Flixball.Core.AiInfo.fromBoard(b0), info#state);
+            let (move, state) = (info#ml)(Flixball.Core.AiInfo.fromBoard(b0), info#state);
             (move, {state = state | info})
         }) |> Utils.Map.unzip;
         (moves, GameState(players, b0))

@@ -36,7 +36,7 @@ mod Flixball.Display {
         Iterator.range(r, 0, br#rows) |> Iterator.forEach(row -> {
             let sb = StringBuilder.empty(r);
             Iterator.range(r, 0, br#cols) |> Iterator.forEach(column -> {
-                match Map.get((row, column), br.tiles) {
+                match Map.get((row, column), br#tiles) {
                     case None => StringBuilder.append!(" ", sb)
                     case Some(tile) => StringBuilder.append!(tileStr(idColor, tile), sb)
                 }

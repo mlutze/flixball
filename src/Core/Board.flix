@@ -31,15 +31,15 @@ mod Flixball.Core.Board {
     pub def set_(coords: Coordinates, tile: Option[Tile], board0: Board): Board = {
         let Board(rec0) = board0;
         let tiles = match tile {
-            case None => rec0.tiles |> Map.remove(coords)
-            case Some(t) => rec0.tiles |> Map.insert(coords, t)
+            case None => rec0#tiles |> Map.remove(coords)
+            case Some(t) => rec0#tiles |> Map.insert(coords, t)
         };
         Board({tiles = tiles | rec0})
     }
 
     pub def get_(coords: Coordinates, board: Board): Option[Tile] = {
         let Board(rec) = board;
-        rec.tiles |> Map.get(coords)
+        rec#tiles |> Map.get(coords)
     }
 
     pub def adjust(f: Option[Tile] -> Option[Tile], coords: Coordinates, board: Board): Board = {

@@ -77,8 +77,8 @@ mod Flixball.Noise {
     }
 
     def mooreNeighborhood(p: {x = Int32, y = Int32}, d: Dimensions): List[{x = Int32, y = Int32}] = {
-        let inbound = px -> px.x >= 0 and px.x < d.width and px.y >= 0 and px.y < d.height;
-        let self = px -> px.x == p#x and px.y == p#y;
+        let inbound = px -> px#x >= 0 and px#x < d#width and px#y >= 0 and px#y < d#height;
+        let self = px -> px#x == p#x and px#y == p#y;
         let offsets = List.range(-1, 2);
         offsets |> List.flatMap(xset ->
             offsets |> List.filterMap(yset -> {
