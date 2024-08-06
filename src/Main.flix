@@ -2,6 +2,8 @@
 pub def main(): Unit \ IO = Flixball.Main.main()
 
 mod Flixball.Main {
+    import java.lang.Thread
+
     use Flixball.Config.{read => readConfig}
     use Flixball.Config.Config
     use Flixball.Config.Config.Config
@@ -29,7 +31,6 @@ mod Flixball.Main {
     }
 
     def run(config: RunConfig): Unit \ IO = {
-        import static java.lang.Thread.sleep(Int64): Unit \ IO;
         let Config(mkBoard, strats) = config#config;
         let stratMap = strats
             |> List.zipWithIndex
@@ -39,7 +40,7 @@ mod Flixball.Main {
             let stream = Flixball.Engine.runGame(r, gs0);
             stream |> Iterator.forEach(gs -> {
                 Flixball.Display.displayBoard(gsBoard(gs));
-                sleep(config#period |> Int32.toInt64)
+                Thread.sleep(config#period |> Int32.toInt64)
             })
         }
     }

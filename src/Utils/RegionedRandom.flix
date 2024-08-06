@@ -1,18 +1,19 @@
+import java.util.Random
 ///
 /// Represents a random number generator.
 ///
 pub enum RegionedRandom[_r: Region] {
-    case RegionedRandom(##java.util.Random)
+    case RegionedRandom(Random)
 }
 
 mod RegionedRandom {
+    import java.util.Random
 
     ///
     /// Returns a fresh random number generator initialized with the given seed `s`.
     ///
     pub def newWithSeed(_r: Region[r], s: Int64): RegionedRandom[r] \ r = {
-        import java_new java.util.Random(Int64): ##java.util.Random \ r as newRandom;
-        RegionedRandom(newRandom(s))
+        RegionedRandom(checked_ecast(unsafe new Random(s)))
     }
 
     ///
@@ -70,64 +71,55 @@ mod RegionedRandom {
     /// Returns the next pseudorandom boolean from the given random number generator `r`.
     ///
     pub def nextBool(ran: RegionedRandom[r]): Bool \ r = {
-        import java.util.Random.nextBoolean(): Bool \ r;
         let RegionedRandom(o) = ran;
-        nextBoolean(o)
+        checked_ecast(unsafe o.nextBoolean())
     }
 
     ///
     /// Returns the next pseudorandom 32-bit floating point number from the given random number generator `r`.
     ///
     pub def nextFloat32(ran: RegionedRandom[r]): Float32 \ r = {
-        import java.util.Random.nextFloat(): Float32 \ r;
         let RegionedRandom(o) = ran;
-        nextFloat(o)
+        checked_ecast(unsafe o.nextFloat())
     }
 
     ///
     /// Returns the next pseudorandom 64-bit floating point number from the given random number generator `r`.
     ///
     pub def nextFloat64(ran: RegionedRandom[r]): Float64 \ r = {
-        import java.util.Random.nextDouble(): Float64 \ r;
         let RegionedRandom(o) = ran;
-        nextDouble(o)
+        checked_ecast(unsafe o.nextDouble())
     }
 
     ///
     /// Returns the next pseudorandom 32-bit integer value from the given random number generator `r`.
     ///
     pub def nextInt32(ran: RegionedRandom[r]): Int32 \ r = {
-        import java.util.Random.nextInt(): Int32 \ r;
         let RegionedRandom(o) = ran;
-        nextInt(o)
+        checked_ecast(unsafe o.nextInt())
     }
 
     ///
     /// Returns the next pseudorandom 64-bit integer value from the given random number generator `r`.
     ///
     pub def nextInt64(ran: RegionedRandom[r]): Int64 \ r = {
-        import java.util.Random.nextLong(): Int64 \ r;
         let RegionedRandom(o) = ran;
-        nextLong(o)
+        checked_ecast(unsafe o.nextLong())
     }
 
     ///
     /// Returns the next pseudorandom Gaussian distributed 64-bit floating point number.
     ///
     pub def nextGaussian(ran: RegionedRandom[r]): Float64 \ r = {
-        import java.util.Random.nextGaussian(): Float64 \ r;
         let RegionedRandom(o) = ran;
-        nextGaussian(o)
+        checked_ecast(unsafe o.nextGaussian())
     }
 
     ///
     /// Returns the next pseudorandom 32-bit integer value between `0` and `m` (exclusive) using the given random number generator `r`.
     ///
     pub def nextNatWithMax(ran: RegionedRandom[r], m: Int32): Int32 \ r = {
-        import java.util.Random.nextInt(Int32): Int32 \ r;
         let RegionedRandom(o) = ran;
-        nextInt(o, m)
+        checked_ecast(unsafe o.nextInt(m))
     }
-
-
 }

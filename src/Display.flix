@@ -1,4 +1,6 @@
 mod Flixball.Display {
+    import java.lang.Thread
+
     use Flixball.Core.Direction
     use Flixball.Core.Direction.{East, North, South, West}
     use Flixball.Core.Tile
@@ -23,9 +25,8 @@ mod Flixball.Display {
     /// set delay. One second is `1000i64`.
     ///
     pub def runGameState(delayDuration: Int64, gs: GameState): Unit \ IO = {
-        import static java.lang.Thread.sleep(Int64): Unit \ IO;
         displayBoard(gsBoard(gs));
-        sleep(delayDuration);
+        Thread.sleep(delayDuration);
         runGameState(delayDuration, Flixball.Engine.runStep(gs))
     }
 
