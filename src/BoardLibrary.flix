@@ -112,16 +112,16 @@ mod Flixball.BoardLibrary {
             Option.getWithDefault(0);
         let tileMap = MutMap.empty(r);
 
-        let availableId = ref 0 @ r;
+        let availableId = Ref.fresh(r, 0);
         def freshId() = {
-            let id = deref availableId;
-            availableId := id + 1;
+            let id = Ref.get(availableId);
+            Ref.put(id + 1, availableId);
             id
         };
 
-        let error = ref None @ r;
+        let error = Ref.fresh(r, None);
         def addError(msg: String) = {
-            if (deref error == None) error := Some(msg)
+            if (Ref.get(error) == None) Ref.put(Some(msg), error)
             else ()
         };
 
@@ -140,7 +140,7 @@ mod Flixball.BoardLibrary {
                 }
             }
         };
-        match deref error {
+        match Ref.get(error) {
             case None => {
                 let b = Board({cols = cols, rows = rows, tiles = MutMap.toMap(tileMap)});
                 Ok(addBorder(b))

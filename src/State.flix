@@ -104,10 +104,10 @@ mod Flixball {
 
     instance MutState[Ref[a]] with State[a] {
         pub def toState(x: Ref[a, r]): AiState \ r =
-            Flixball.State.toState(deref x)
+            Flixball.State.toState(Ref.get(x))
     
         pub def fromState(r: Region[r], x: AiState): Option[Ref[a, r]] \ r =
-            Flixball.State.fromState(x) |> Option.map(y -> ref y @ r)
+            Flixball.State.fromState(x) |> Option.map(y -> Ref.fresh(r, y))
     }
     
 }

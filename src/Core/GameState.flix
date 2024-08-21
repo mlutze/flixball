@@ -53,33 +53,33 @@ mod Flixball.Core.GameState {
     /// Position updates are naively done without care for collisions or inconsistensies.
     pub def mapWithId(f: (PlayerId, PlayerInfo) -> PlayerInfo, s: GameState): GameState = region r {
         let GameState(players0, board0) = s;
-        let board = ref board0 @ r;
+        let board = Ref.fresh(r, board0);
         let players = players0 |> Map.mapWithKey((id, info0) -> {
             let info = f(id, info0);
             if (info#pos != info0#pos) {
                 // remove previous
-                board := set_(posCoords(info0#pos), None, deref board);
+                Ref.put(set_(posCoords(info0#pos), None, Ref.get(board)), board);
                 // insert new
-                board := set_(posCoords(info#pos), Some(Person(id, posDir(info#pos))), deref board)
+                Ref.put(set_(posCoords(info#pos), Some(Person(id, posDir(info#pos))), Ref.get(board)), board)
             } else ();
             info
         });
-        GameState(players, deref board)
+        GameState(players, Ref.get(board))
     }
 
     /// Adjusts the playerinfo of player `id`. Position updates are not verified.
     pub def adjust(id: PlayerId, f: PlayerInfo -> PlayerInfo, s: GameState): GameState = region r {
         let GameState(players0, board0) = s;
-        let board = ref board0 @ r;
+        let board = Ref.fresh(r, board0);
         let players = players0 |> Map.adjust(info0 -> {
             let info = f(info0);
             if (info#pos != info0#pos) {
-                board := set_(posCoords(info0#pos), None, deref board);
-                board := set_(posCoords(info#pos), Some(Person(id, posDir(info#pos))), deref board)
+                Ref.put(set_(posCoords(info0#pos), None, Ref.get(board)), board);
+                Ref.put(set_(posCoords(info#pos), Some(Person(id, posDir(info#pos))), Ref.get(board)), board)
             } else ();
             info
         }, id);
-        GameState(players, deref board)
+        GameState(players, Ref.get(board))
     }
 
     /// Computes the logics of all players, returning their map of moves.
