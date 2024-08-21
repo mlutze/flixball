@@ -27,14 +27,14 @@ mod Flixball.GridGraph {
         let backtracking: MutMap[Position, (Position, Move), r] = MutMap.empty(r);
         MutMap.put!(start, 0, dists);
         let taskList = MutDeque.empty(r);
-        let foundGoal = ref None @ r;
+        let foundGoal = Ref.fresh(r, None);
         MutDeque.pushBack(start, taskList);
         def bfsLoop() = match MutDeque.popFront(taskList) {
             case Some(current) => {
                 foreach((next, move) <- possibleMoves(r, current) |> Iterator.toList) { // TODO wasted traversal
                     let Position(nextCoord, _) = next;
                     if (nextCoord == startCoord or available(nextCoord)) {
-                        if (goal(next)) foundGoal := Some(next) else ();
+                        if (goal(next)) Ref.put(Some(next), foundGoal) else ();
                         let currentLength = MutMap.get(current, dists) |> Utils.Option.unsafeGet;
                         if (MutMap.get(next, dists) |> Option.isEmpty) {
                             MutMap.put!(next, currentLength + 1, dists);
@@ -43,14 +43,14 @@ mod Flixball.GridGraph {
                         } else ()
                     } else ()
                 };
-                if (Option.isEmpty(deref foundGoal)) bfsLoop() else ()
+                if (Option.isEmpty(Ref.get(foundGoal))) bfsLoop() else ()
             }
             case None => ()
         };
         bfsLoop();
 
         // return none if not reachable
-        match deref foundGoal {
+        match Ref.get(foundGoal) {
             case None => None // no reachable goal
             case Some(end) => {
                 // construct the path list, end to start

@@ -23,10 +23,10 @@ mod Flixball.Engine {
     ///
     pub def runGame(r: Region[r], gs0: GameState): Iterator[GameState, r, r] \ r = {
         // TODO use pure unfold when that is added to stdlib
-        let gs = ref gs0 @ r;
+        let gs = Ref.fresh(r, gs0);
         def next() = {
-            let res = deref gs;
-            gs := runStep(res);
+            let res = Ref.get(gs);
+            Ref.put(runStep(res), gs);
             Iterator.Step.Ans(res)
         };
         Iterator.Iterator(r, next)

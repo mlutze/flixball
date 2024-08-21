@@ -43,14 +43,14 @@ mod Flixball.Noise {
         let floorToWallReq = 4;
         let wallToFloorReq = 3;
 
-        let current = ref boolNoise2d(r, d, seed, prob) @ r1;
-        let isWall = p -> (deref current) |> Utils.Array.unsafeNth(p#x) |> Utils.Array.unsafeNth(p#y);
-        let swap = ref createGrid(r, (_, _) -> false, d) @ r1;
+        let current = Ref.fresh(r1, boolNoise2d(r, d, seed, prob));
+        let isWall = p -> Ref.get(current) |> Utils.Array.unsafeNth(p#x) |> Utils.Array.unsafeNth(p#y);
+        let swap = Ref.fresh(r1, createGrid(r, (_, _) -> false, d));
         // perform automation step in current, storing the result in swap,
         // and the swapping them.
         def simulationStep(iteration) = if (iteration <= 0) () else {
             foreach(
-                (x, arr) <- Array.enumerator(r1, deref current) |> Iterator.toList; // TODO wasted traversal
+                (x, arr) <- Array.enumerator(r1, Ref.get(current)) |> Iterator.toList; // TODO wasted traversal
                 (y, _) <- Array.enumerator(r1, arr) |> Iterator.toList) // TODO wasted traversal
             {
                 let p = {x = x, y = y};
@@ -60,20 +60,20 @@ mod Flixball.Noise {
                 if (isWall(p)) {
                     // stays true/wall if there is enough nearby walls
                     // and vice versa
-                    (deref swap) |> Utils.Array.unsafeNth(x) |> Array.put(oob+wallCount >= wallToFloorReq, y)
+                    Ref.get(swap) |> Utils.Array.unsafeNth(x) |> Array.put(oob+wallCount >= wallToFloorReq, y)
                 } else {
                     // floor/false swaps to wall if there are enough nearby
                     // walls and vice versa
-                    (deref swap) |> Utils.Array.unsafeNth(x) |> Array.put(oob+wallCount > floorToWallReq, y)
+                    Ref.get(swap) |> Utils.Array.unsafeNth(x) |> Array.put(oob+wallCount > floorToWallReq, y)
                 }
             };
-            let tmp = deref current;
-            current := deref swap;
-            swap := tmp;
+            let tmp = Ref.get(current);
+            Ref.put(Ref.get(swap), current);
+            Ref.put(tmp, swap);
             simulationStep(iteration-1)
         };
         simulationStep(iterations);
-        deref current
+        Ref.get(current)
     }
 
     def mooreNeighborhood(p: {x = Int32, y = Int32}, d: Dimensions): List[{x = Int32, y = Int32}] = {
