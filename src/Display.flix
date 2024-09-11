@@ -16,7 +16,7 @@ mod Flixball.Display {
     /// at the end.
     ///
     pub def displayBoard(b: Board): Unit \ IO = {
-        Terminal.clearScreenAndReset();
+        Console.run(() -> Terminal.clearScreenAndReset());
         b |> boardLines |> List.forEach(println)
     }
 
@@ -55,18 +55,18 @@ mod Flixball.Display {
     def mkIdColorMap(_b: Board): Int32 -> String -> String =
         // all the ANSI colors
         id -> match (Int32.modulo(id, 12)) {
-            case 0 => Console.magenta
-            case 1 => Console.red
-            case 2 => Console.yellow
-            case 3 => Console.blue
-            case 4 => Console.cyan
-            case 5 => Console.green
-            case 6 => Console.magentaBright
-            case 7 => Console.redBright
-            case 8 => Console.yellowBright
-            case 9 => Console.blueBright
-            case 10 => Console.cyanBright
-            case _ => Console.greenBright
+            case 0 => Chalk.magenta
+            case 1 => Chalk.red
+            case 2 => Chalk.yellow
+            case 3 => Chalk.blue
+            case 4 => Chalk.cyan
+            case 5 => Chalk.green
+            case 6 => Chalk.magentaBright
+            case 7 => Chalk.redBright
+            case 8 => Chalk.yellowBright
+            case 9 => Chalk.blueBright
+            case 10 => Chalk.cyanBright
+            case _ => Chalk.greenBright
         }
 
     def directionStr(d: Direction): String = match d {
