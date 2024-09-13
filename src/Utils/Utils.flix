@@ -72,9 +72,29 @@ mod Utils {
 
     mod Array {
 
+        import java.util.Random
+
         // @Unsafe
         pub def unsafeNth(n: Int32, x: Array[a, r]): a \ r = {
             Array.nth(n, x) |> Utils.Option.unsafeGet
         }
+
+        ///
+        /// Shuffles `a` using the Fisher–Yates shuffle.
+        ///
+        pub def shuffle(r: Random, a: Array[a, r]): Unit \ r + IO = {
+            let len = Array.length(a);
+            def loop(i) = {
+                if (i > 0) {
+                    let j = r.nextInt(i + 1);
+                    Array.swap!(i, j, a);
+                    loop(i - 1)
+                }
+                else
+                    ()
+            };
+            loop(len - 1)
+        }
+
     }
 }
