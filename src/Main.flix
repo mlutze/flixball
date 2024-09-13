@@ -3,6 +3,7 @@ pub def main(): Unit \ IO = Flixball.Main.main()
 
 mod Flixball.Main {
     import java.lang.Thread
+    import java.util.Random
 
     use Flixball.Config.{read => readConfig}
     use Flixball.Config.Config
@@ -52,7 +53,7 @@ mod Flixball.Main {
                 case RunOption.Seed(s) => Some(s)
                 case _ => None
             })
-            |> Option.getWithDefault(Random.nextInt64(Random.fresh()));
+            |> Option.getWithDefault(new Random().nextLong());
         forM (
             configPath <- runOpts
                 |> List.findMap(x -> match x {
