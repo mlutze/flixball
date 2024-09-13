@@ -53,7 +53,6 @@ mod RegionedRandom {
     /// Shuffles `a` to a random permutation.
     ///
     pub def shuffleArray(ran: RegionedRandom[r1], a: Array[a, r2]): Unit \ {r1, r2} = {
-        use Random.{Random => FlixRandom};
         let RegionedRandom(javaRandom) = ran;
         unchecked_cast(Utils.Array.shuffle(javaRandom, a) as _ \ {r1, r2})
     }
@@ -62,7 +61,6 @@ mod RegionedRandom {
     /// Returns a random permutation of `l`.
     ///
     pub def shuffleList(ran: RegionedRandom[r], l: List[a]): List[a] \ r = {
-        use Random.{Random => FlixRandom};
         let RegionedRandom(javaRandom) = ran;
         unchecked_cast(region rc {
             l |> List.toArray(rc) !> Utils.Array.shuffle(javaRandom) |> Array.toList
