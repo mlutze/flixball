@@ -3,34 +3,6 @@ mod Utils {
         let (a, b, c) = triple;
         f(a, b, c)
     }
-    
-    // @Unsafe
-    pub def dbg(x: a): a with ToString[a] = unchecked_cast({
-        println(x);
-        x
-    } as _ \ {})
-    
-    // @Unsafe
-    pub def dbgMsg(msg: String, x: a): a with ToString[a] = unchecked_cast({
-        println("${msg}: ${x}");
-        x
-    } as _ \ {})
-
-    // @Unsafe
-    pub def dbgCond(msg: String, cond: a -> Bool \ ef, x: a): a \ ef with ToString[a] = {
-        if (cond(x)) {
-            unchecked_cast(println("${msg}: ${x}") as _ \ ef);
-            x
-        } else x
-    }
-
-    // @Unsafe
-    pub def dbgAny(msg: String, cond: a -> Bool \ ef1, toStr: a -> String \ ef2, x: a): a \ {ef1, ef2} = {
-        if (cond(x)) {
-            unchecked_cast(println("${msg}: ${toStr(x)}") as _ \ ef2);
-            x
-        } else x
-    }
 
     mod Option {
         // @Unsafe
