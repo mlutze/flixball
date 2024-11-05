@@ -59,7 +59,7 @@ mod Utils {
             def loop(i) = {
                 if (i > 0) {
                     let j = r.nextInt(i + 1);
-                    Array.swap!(i, j, a);
+                    Array.swap(i, j, a);
                     loop(i - 1)
                 }
                 else
