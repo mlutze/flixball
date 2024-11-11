@@ -42,7 +42,7 @@ mod Flixball.Display {
                     case Some(tile) => StringBuilder.append!(tileStr(idColor, tile), sb)
                 }
             });
-            MutList.push!(StringBuilder.toString(sb), lines)
+            MutList.push(StringBuilder.toString(sb), lines)
         });
         MutList.toList(lines)
     }
