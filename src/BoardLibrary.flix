@@ -21,16 +21,16 @@ mod Flixball.BoardLibrary {
         let translatedMap = MutMap.empty(r);
         // Add translated existing tiles
         foreach(((x, y), tile) <- br#tiles |> Map.toList) { // TODO wasted traversal
-            MutMap.put!((x+1, y+1), tile, translatedMap)
+            MutMap.put((x+1, y+1), tile, translatedMap)
         };
         // Add border walls
         foreach(i <- List.range(0, cols)) { // TODO wasted traversal
-            MutMap.put!((0, i), Wall, translatedMap);
-            MutMap.put!((rows-1, i), Wall, translatedMap)
+            MutMap.put((0, i), Wall, translatedMap);
+            MutMap.put((rows-1, i), Wall, translatedMap)
         };
         foreach(i <- List.range(0, rows)) { // TODO wasted traversal
-            MutMap.put!((i, 0), Wall, translatedMap);
-            MutMap.put!((i, cols-1), Wall, translatedMap)
+            MutMap.put((i, 0), Wall, translatedMap);
+            MutMap.put((i, cols-1), Wall, translatedMap)
         };
         Board({rows = rows, cols = cols, tiles = MutMap.toMap(translatedMap)})
     }
@@ -86,7 +86,7 @@ mod Flixball.BoardLibrary {
             (x, arr) <- Array.enumerator(rh, g) |> Iterator.toList; // TODO wasted traversal
             (y, b) <- Array.enumerator(rh, arr) |> Iterator.toList  // TODO wasted traversal
         ) {
-                if (b) mutTiles |> MutMap.put!((x, y), Wall)
+                if (b) mutTiles |> MutMap.put((x, y), Wall)
                 else ()
         };
         MutMap.toMap(mutTiles)
@@ -128,7 +128,7 @@ mod Flixball.BoardLibrary {
         foreach((row, line) <- lines |> List.zipWithIndex) { // TODO wasted traversal
             let cells = String.toList(line);
             foreach((col, cell) <- cells |> List.zipWithIndex) {  // TODO wasted traversal
-                def addTile(tile) = MutMap.put!((row, col), tile, tileMap);
+                def addTile(tile) = MutMap.put((row, col), tile, tileMap);
                 match cell {
                     case ' ' => () // do nothing
                     case '<' => addTile(Person(freshId(), West))

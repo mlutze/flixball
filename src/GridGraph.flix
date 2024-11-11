@@ -25,7 +25,7 @@ mod Flixball.GridGraph {
         let Position(startCoord, _) = start;
         let dists: MutMap[Position, Int32, r] = MutMap.empty(r);
         let backtracking: MutMap[Position, (Position, Move), r] = MutMap.empty(r);
-        MutMap.put!(start, 0, dists);
+        MutMap.put(start, 0, dists);
         let taskList = MutDeque.empty(r);
         let foundGoal = Ref.fresh(r, None);
         MutDeque.pushBack(start, taskList);
@@ -37,8 +37,8 @@ mod Flixball.GridGraph {
                         if (goal(next)) Ref.put(Some(next), foundGoal) else ();
                         let currentLength = MutMap.get(current, dists) |> Utils.Option.unsafeGet;
                         if (MutMap.get(next, dists) |> Option.isEmpty) {
-                            MutMap.put!(next, currentLength + 1, dists);
-                            MutMap.put!(next, (current, move), backtracking);
+                            MutMap.put(next, currentLength + 1, dists);
+                            MutMap.put(next, (current, move), backtracking);
                             MutDeque.pushBack(next, taskList)
                         } else ()
                     } else ()
