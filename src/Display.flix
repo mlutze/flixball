@@ -38,8 +38,8 @@ mod Flixball.Display {
             let sb = StringBuilder.empty(r);
             Iterator.range(r, 0, br#cols) |> Iterator.forEach(column -> {
                 match Map.get((row, column), br#tiles) {
-                    case None => StringBuilder.append!(" ", sb)
-                    case Some(tile) => StringBuilder.append!(tileStr(idColor, tile), sb)
+                    case None => StringBuilder.append(" ", sb)
+                    case Some(tile) => StringBuilder.append(tileStr(idColor, tile), sb)
                 }
             });
             MutList.push(StringBuilder.toString(sb), lines)
