@@ -23,7 +23,7 @@ mod Flixball.Main {
             case Action.Help => println(usage())
             case Action.Run(runOpts, dispOpts) =>
                 match mkRunConfig(runOpts, dispOpts) {
-                    case Ok(config) => run(config)
+                    case Ok(config) => runFlixball(config)
                     case Err(s) => println("Error: ${s}")
                 }
             case Action.Replay(_) => println("Replay not implemented")
@@ -31,7 +31,7 @@ mod Flixball.Main {
         }
     }
 
-    def run(config: RunConfig): Unit \ IO = {
+    def runFlixball(config: RunConfig): Unit \ IO = {
         let Config(mkBoard, strats) = config#config;
         let stratMap = strats
             |> List.zipWithIndex

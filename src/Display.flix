@@ -16,7 +16,7 @@ mod Flixball.Display {
     /// at the end.
     ///
     pub def displayBoard(b: Board): Unit \ IO = {
-        Console.run(() -> Terminal.clearScreenAndReset());
+        Console.runWithIO(() -> Terminal.clearScreenAndReset());
         b |> boardLines |> List.forEach(println)
     }
 
