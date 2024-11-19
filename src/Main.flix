@@ -26,7 +26,7 @@ mod Flixball.Main {
                     case Ok(config) => runFlixball(config)
                     case Err(s) => println("Error: ${s}")
                 }
-            case Action.Replay(_) => println("Replay not implemented")
+            case Action.Replay(_, _) => println("Replay not implemented")
             case Action.Error => println(usage())
         }
     }

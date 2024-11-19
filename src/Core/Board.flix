@@ -51,7 +51,7 @@ mod Flixball.Core.Board {
     pub def players(b: Board): Map[PlayerId, Position] = {
         let Board(br) = b;
         br#tiles |> Map.toList |> List.filterMap(match (coords, t) -> match t {
-            case Person(id, dir) => Some(id, Position(coords, dir))
+            case Person(id, dir) => Some((id, Position(coords, dir)))
             case _ => None
         }) |> List.toMap
     }

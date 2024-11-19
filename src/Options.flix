@@ -159,7 +159,7 @@ mod Flixball.Options {
     def mapRun(f: List[RunOption] -> List[RunOption], a: Action): Action = match a {
         case Action.Error => Action.Error
         case Action.Help => Action.Help
-        case Action.Replay(dispOpts) => Action.Replay(dispOpts)
+        case Action.Replay(dispOpts1, dispOpts2) => Action.Replay(dispOpts1, dispOpts2)
         case Action.Run(runOpts, dispOpts) => Action.Run(f(runOpts), dispOpts)
         case Action.Version => Action.Version
     }
