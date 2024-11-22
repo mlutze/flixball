@@ -7,4 +7,4 @@ authors = ["Matthew Lutze", "Jonathan Starup"]
 
 [dependencies]
 "github:JonathanStarup/Flix-ANSI-Terminal" = "1.7.0"
-"github:mlutze/flix-json" = "0.12.15"
+"github:mlutze/flix-json" = "0.12.16"
