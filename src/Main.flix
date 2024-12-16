@@ -1,5 +1,5 @@
 
-pub def main(): Unit \ IO = Flixball.Main.main()
+pub def main(): Unit \ {IO, Sys} = Flixball.Main.main()
 
 mod Flixball.Main {
     import java.lang.Thread
@@ -16,7 +16,8 @@ mod Flixball.Main {
     use Flixball.Options.usage
     use Flixball.Version.version
 
-    pub def main(): Unit \ IO = {
+    pub def main(): Unit \ {IO, Sys} = {
+        Environment.handle(() ->
         let args = Environment.getArgs();
         match parse(args) {
             case Action.Version => println(version())
@@ -28,7 +29,7 @@ mod Flixball.Main {
                 }
             case Action.Replay(_, _) => println("Replay not implemented")
             case Action.Error => println(usage())
-        }
+        })()
     }
 
     def runFlixball(config: RunConfig): Unit \ IO = {
