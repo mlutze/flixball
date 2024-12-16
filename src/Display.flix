@@ -54,7 +54,7 @@ mod Flixball.Display {
 
     def mkIdColorMap(_b: Board): Int32 -> String -> String =
         // all the ANSI colors
-        id -> match (Int32.modulo(id, 12)) {
+        id -> s -> unsafe Environment.handle(match (Int32.modulo(id, 12)) {
             case 0 => Chalk.magenta
             case 1 => Chalk.red
             case 2 => Chalk.yellow
@@ -67,7 +67,7 @@ mod Flixball.Display {
             case 9 => Chalk.blueBright
             case 10 => Chalk.cyanBright
             case _ => Chalk.greenBright
-        }
+        })(s)
 
     def directionStr(d: Direction): String = match d {
         case North => "^"
