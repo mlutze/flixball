@@ -1,5 +1,5 @@
 
-pub def main(): Unit \ {IO, Sys} = Flixball.Main.main()
+pub def main(): Unit \ {IO, Sys, NonDet} = Flixball.Main.main()
 
 mod Flixball.Main {
     import java.lang.Thread
@@ -16,7 +16,7 @@ mod Flixball.Main {
     use Flixball.Options.usage
     use Flixball.Version.version
 
-    pub def main(): Unit \ {IO, Sys} = {
+    pub def main(): Unit \ {IO, Sys, NonDet} = {
         Environment.handle(() ->
         let args = Environment.getArgs();
         match parse(args) {
@@ -47,7 +47,7 @@ mod Flixball.Main {
         }
     }
 
-    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[String, RunConfig] \ IO = {
+    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[String, RunConfig] \ IO + NonDet = {
         use Result.flatMap;
         let seed = runOpts
             |> List.findMap(x -> match x {

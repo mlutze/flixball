@@ -54,7 +54,7 @@ mod Utils {
         ///
         /// Shuffles `a` using the Fisher–Yates shuffle.
         ///
-        pub def shuffle(r: Random, a: Array[a, r]): Unit \ r + IO = {
+        pub def shuffle(r: Random, a: Array[a, r]): Unit \ r + IO + NonDet = {
             let len = Array.length(a);
             def loop(i) = {
                 if (i > 0) {
