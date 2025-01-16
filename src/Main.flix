@@ -17,19 +17,21 @@ mod Flixball.Main {
     use Flixball.Version.version
 
     pub def main(): Unit \ {IO, Sys, NonDet} = {
-        Environment.handle(() ->
-        let args = Environment.getArgs();
-        match parse(args) {
-            case Action.Version => println(version())
-            case Action.Help => println(usage())
-            case Action.Run(runOpts, dispOpts) =>
-                match mkRunConfig(runOpts, dispOpts) {
-                    case Ok(config) => runFlixball(config)
-                    case Err(s) => println("Error: ${s}")
-                }
-            case Action.Replay(_, _) => println("Replay not implemented")
-            case Action.Error => println(usage())
-        })()
+        run {
+            let args = Environment.getArgs();
+            match parse(args) {
+                case Action.Version => println(version())
+                case Action.Help => println(usage())
+                case Action.Run(runOpts, dispOpts) =>
+                    match mkRunConfig(runOpts, dispOpts) {
+                        case Ok(config) => runFlixball(config)
+                        case Err(s) => println("Error: ${s}")
+                    }
+                case Action.Replay(_, _) => println("Replay not implemented")
+                case Action.Error => println(usage())
+            }
+        } with Environment.runWithIO
+            with FileReadWithResult.runWithIO
     }
 
     def runFlixball(config: RunConfig): Unit \ IO = {
@@ -47,7 +49,7 @@ mod Flixball.Main {
         }
     }
 
-    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[String, RunConfig] \ IO + NonDet = {
+    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[String, RunConfig] \ IO + FileReadWithResult + NonDet = {
         use Result.flatMap;
         let seed = runOpts
             |> List.findMap(x -> match x {
@@ -62,7 +64,7 @@ mod Flixball.Main {
                     case _ => None
                 })
                 |> Option.toOk("missing config");
-            file <- Files.read(configPath) |> Result.mapErr(ToString.toString);
+            file <- FileReadWithResult.read(configPath) |> Result.mapErr(ToString.toString);
             config <- readConfig(file)
         ) yield {
             let quiet = runOpts |> List.memberOf(RunOption.Quiet);
