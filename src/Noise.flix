@@ -44,7 +44,9 @@ mod Flixball.Noise {
         let wallToFloorReq = 3;
 
         let current = Ref.fresh(r1, boolNoise2d(r, d, seed, prob));
-        let isWall = p -> Ref.get(current) |> Utils.Array.unsafeNth(p#x) |> Utils.Array.unsafeNth(p#y);
+        def isWall(p: {x = Int32, y = Int32}) = {
+            Ref.get(current) |> Utils.Array.unsafeNth(p#x) |> Utils.Array.unsafeNth(p#y)
+        };
         let swap = Ref.fresh(r1, createGrid(r, (_, _) -> false, d));
         // perform automation step in current, storing the result in swap,
         // and the swapping them.
