@@ -17,12 +17,9 @@ jobs:
           java-version: 21
           distribution: zulu
       - run: |
-          # download today's or yesterday's Flix JAR
-          today=$(date -d today +%Y-%m-%d)
-          yesterday=$(date -d yesterday +%Y-%m-%d)
-          today_url="https://flix.dev/nightly/flix-${today}.jar"
-          yesterday_url="https://flix.dev/nightly/flix-${yesterday}.jar"
-          curl -L -f "${today_url}" > flix.jar || curl -L -f "${yesterday_url}" > flix.jar
+          # download the latest nightly Flix JAR
+          url="https://github.com/mlutze/flix-nightly/releases/latest/download/flix.jar"
+          curl -L -f "$url" > flix.jar
 
           # run tests
           java -jar flix.jar test --github-token ${{ github.token }}
