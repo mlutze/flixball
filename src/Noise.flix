@@ -52,8 +52,8 @@ mod Flixball.Noise {
         // and the swapping them.
         def simulationStep(iteration) = if (iteration <= 0) () else {
             foreach(
-                (x, arr) <- Array.enumerator(r1, Ref.get(current)) |> Iterator.toList; // TODO wasted traversal
-                (y, _) <- Array.enumerator(r1, arr) |> Iterator.toList) // TODO wasted traversal
+                (x, arr) <- Array.iterator(r1, Ref.get(current)) |> Iterator.zipWithIndex |> Iterator.toList; // TODO wasted traversal
+                (y, _) <- Array.iterator(r1, arr) |> Iterator.zipWithIndex |> Iterator.toList) // TODO wasted traversal
             {
                 let p = {x = x, y = y};
                 let nbh = mooreNeighborhood(p, d);
