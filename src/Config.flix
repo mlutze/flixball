@@ -107,7 +107,7 @@ mod Flixball.Config {
     }
 
     def asArray(path: String, json: JsonElement): Result[String, List[JsonElement]] = match json {
-        case JsonArray(a) => Ok(a)
+        case JsonArray(a) => Ok(a |> Vector.toList)
         case _ => Err("non-array at ${path}")
     }
 
