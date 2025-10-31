@@ -54,7 +54,7 @@ mod Flixball.Display {
 
     def mkIdColorMap(_b: Board): Int32 -> String -> String =
         // all the ANSI colors
-        id -> s -> unsafe Environment.handle(match (Int32.modulo(id, 12)) {
+        id -> s -> unsafe Env.handle(match (Int32.modulo(id, 12)) {
             case 0 => Chalk.magenta
             case 1 => Chalk.red
             case 2 => Chalk.yellow

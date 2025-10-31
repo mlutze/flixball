@@ -18,7 +18,7 @@ mod Flixball.Main {
 
     pub def main(): Unit \ IO = {
         run {
-            let args = Environment.getArgs();
+            let args = Env.getArgs();
             match parse(args) {
                 case Action.Version => println(version())
                 case Action.Help => println(usage())
@@ -30,7 +30,7 @@ mod Flixball.Main {
                 case Action.Replay(_, _) => println("Replay not implemented")
                 case Action.Error => println(usage())
             }
-        } with Environment.runWithIO
+        } with Env.runWithIO
             with FileReadWithResult.runWithIO
     }
 
