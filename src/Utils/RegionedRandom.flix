@@ -13,7 +13,7 @@ mod RegionedRandom {
     /// Returns a fresh random number generator initialized with the given seed `s`.
     ///
     pub def newWithSeed(_r: Region[r], s: Int64): RegionedRandom[r] \ r = {
-        RegionedRandom(checked_ecast(unsafe new Random(s)))
+        RegionedRandom(unsafe IO as r { new Random(s) })
     }
 
     ///
@@ -72,7 +72,7 @@ mod RegionedRandom {
     ///
     pub def nextBool(ran: RegionedRandom[r]): Bool \ r = {
         let RegionedRandom(o) = ran;
-        checked_ecast(unsafe o.nextBoolean())
+        unsafe IO as r { o.nextBoolean() }
     }
 
     ///
@@ -80,7 +80,7 @@ mod RegionedRandom {
     ///
     pub def nextFloat32(ran: RegionedRandom[r]): Float32 \ r = {
         let RegionedRandom(o) = ran;
-        checked_ecast(unsafe o.nextFloat())
+        unsafe IO as r { o.nextFloat() }
     }
 
     ///
@@ -88,7 +88,7 @@ mod RegionedRandom {
     ///
     pub def nextFloat64(ran: RegionedRandom[r]): Float64 \ r = {
         let RegionedRandom(o) = ran;
-        checked_ecast(unsafe o.nextDouble())
+        unsafe IO as r { o.nextDouble() }
     }
 
     ///
@@ -96,7 +96,7 @@ mod RegionedRandom {
     ///
     pub def nextInt32(ran: RegionedRandom[r]): Int32 \ r = {
         let RegionedRandom(o) = ran;
-        checked_ecast(unsafe o.nextInt())
+        unsafe IO as r { o.nextInt() }
     }
 
     ///
@@ -104,7 +104,7 @@ mod RegionedRandom {
     ///
     pub def nextInt64(ran: RegionedRandom[r]): Int64 \ r = {
         let RegionedRandom(o) = ran;
-        checked_ecast(unsafe o.nextLong())
+        unsafe IO as r { o.nextLong() }
     }
 
     ///
@@ -112,7 +112,7 @@ mod RegionedRandom {
     ///
     pub def nextGaussian(ran: RegionedRandom[r]): Float64 \ r = {
         let RegionedRandom(o) = ran;
-        checked_ecast(unsafe o.nextGaussian())
+        unsafe IO as r { o.nextGaussian() }
     }
 
     ///
@@ -120,6 +120,6 @@ mod RegionedRandom {
     ///
     pub def nextNatWithMax(ran: RegionedRandom[r], m: Int32): Int32 \ r = {
         let RegionedRandom(o) = ran;
-        checked_ecast(unsafe o.nextInt(m))
+        unsafe IO as r { o.nextInt(m) }
     }
 }
