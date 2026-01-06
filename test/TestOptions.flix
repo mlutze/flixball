@@ -4,33 +4,48 @@ mod TestOptions {
     use Flixball.Options.RunOption;
 
     @Test
-    def testEmpty(): Bool = {
+    def testEmpty(): Unit \ Assert = {
         let input = Nil;
-        parse(input) == Action.Run(Nil, Nil)
+        if (parse(input) == Action.Run(Nil, Nil))
+            ()
+        else
+            Assert.fail("expected Action.Run(Nil, Nil)")
     }
 
     @Test
-    def testRunWithConfig(): Bool = {
+    def testRunWithConfig(): Unit \ Assert = {
         let input = "--config" :: "flixball.cfg" :: Nil;
-        parse(input) == Action.Run(RunOption.Config("flixball.cfg") :: Nil, Nil)
+        if (parse(input) == Action.Run(RunOption.Config("flixball.cfg") :: Nil, Nil))
+            ()
+        else
+            Assert.fail("expected Action.Run with Config")
     }
 
     @Test
-    def testRunWithSeed(): Bool = {
+    def testRunWithSeed(): Unit \ Assert = {
         let input = "--seed" :: "12345" :: Nil;
-        parse(input) == Action.Run(RunOption.Seed(12345i64) :: Nil, Nil)
+        if (parse(input) == Action.Run(RunOption.Seed(12345i64) :: Nil, Nil))
+            ()
+        else
+            Assert.fail("expected Action.Run with Seed")
     }
 
     @Test
-    def testVersion(): Bool = {
+    def testVersion(): Unit \ Assert = {
         let input = "--version" :: Nil;
-        parse(input) == Action.Version
+        if (parse(input) == Action.Version)
+            ()
+        else
+            Assert.fail("expected Action.Version")
     }
 
     @Test
-    def testHelp(): Bool = {
+    def testHelp(): Unit \ Assert = {
         let input = "--help" :: Nil;
-        parse(input) == Action.Help
+        if (parse(input) == Action.Help)
+            ()
+        else
+            Assert.fail("expected Action.Help")
     }
 
 }
