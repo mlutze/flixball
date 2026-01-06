@@ -4,8 +4,8 @@ mod TestBoard {
     use Flixball.Core.Tile;
     use Flixball.Core.Direction;
 
-    /// Returns `true` if the board has a border of walls.
-    def hasBorder(b: Board): Bool = region r {
+    /// Asserts that the board has a border of walls.
+    def hasBorder(b: Board): Unit \ Assert = region r {
         let Board(br) = b;
         let lastCol = br#cols-1;
         let lastRow = br#rows-1;
@@ -21,15 +21,15 @@ mod TestBoard {
             Iterator.foldLeft((acc, col) -> {
                 acc and isWall(0, col) and isWall(lastRow, col)
             }, true);
-        cols and rows
+        Assert.assertEq(expected = true, cols and rows)
     }
 
-    def inboundTiles(b: Board): Bool =
+    def inboundTiles(b: Board): Unit \ Assert =
         let Board(br) = b;
         let inbound = match (row, col) ->
             0 <= row and row < br#rows and
             0 <= col and col < br#cols;
-        br#tiles |> Map.keysOf |> Set.forAll(inbound)
+        Assert.assertEq(expected = true, br#tiles |> Map.keysOf |> Set.forAll(inbound))
 
     def testBoard01(): Result[String, Board] =
         let rowStrings =
@@ -43,43 +43,44 @@ mod TestBoard {
         Flixball.BoardLibrary.fromString(boardString)
 
     @Test
-    def testDimensions(): Bool = match testBoard01() {
-        case Err(_) => false
+    def testDimensions(): Unit \ Assert = match testBoard01() {
+        case Err(_) => Assert.fail("expected Ok")
         case Ok(Board(br)) =>
-            br#rows == 5+2 and br#cols == 10+2
+            Assert.assertEq(expected = 5 + 2, br#rows);
+            Assert.assertEq(expected = 10 + 2, br#cols)
     }
 
     @Test
-    def testTiles(): Bool = match testBoard01() {
-        case Err(_) => false
+    def testTiles(): Unit \ Assert = match testBoard01() {
+        case Err(_) => Assert.fail("expected Ok")
         case Ok(Board(br)) =>
             // offset by 1 for the border
             def check(row, col, tile) =
-                tile == Map.get((row+1, col+1), br#tiles);
-            check(1, 4, Tile.Person(0, Direction.South) |> Some) and
-            check(3, 4, Tile.Person(1, Direction.North) |> Some) and
-            check(2, 4, Tile.Wall |> Some) and
-            check(1, 8, Tile.Wall |> Some) and
+                Assert.assertEq(expected = tile, Map.get((row+1, col+1), br#tiles));
+            check(1, 4, Tile.Person(0, Direction.South) |> Some);
+            check(3, 4, Tile.Person(1, Direction.North) |> Some);
+            check(2, 4, Tile.Wall |> Some);
+            check(1, 8, Tile.Wall |> Some);
             check(3, 5, None)
     }
 
     @Test
-    def testBorder(): Bool = match testBoard01() {
-        case Err(_) => false
+    def testBorder(): Unit \ Assert = match testBoard01() {
+        case Err(_) => Assert.fail("expected Ok")
         case Ok(b) => hasBorder(b)
     }
 
     @Test
-    def testInboundCoordinates(): Bool = match testBoard01() {
-        case Err(_) => false
+    def testInboundCoordinates(): Unit \ Assert = match testBoard01() {
+        case Err(_) => Assert.fail("expected Ok")
         case Ok(b) => inboundTiles(b)
     }
 
     @Test
-    def testError(): Bool =
+    def testError(): Unit \ Assert =
         match "  #  \n  v  \n#  Q  " |> Flixball.BoardLibrary.fromString {
-            case Err(_) => true
-            case Ok(_) => false
+            case Err(_) => ()
+            case Ok(_) => Assert.fail("expected Err")
         }
 
 }
