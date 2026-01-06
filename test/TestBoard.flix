@@ -42,14 +42,14 @@ mod TestBoard {
         let boardString = rowStrings |> String.unlines;
         Flixball.BoardLibrary.fromString(boardString)
 
-    @test
+    @Test
     def testDimensions(): Bool = match testBoard01() {
         case Err(_) => false
         case Ok(Board(br)) =>
             br#rows == 5+2 and br#cols == 10+2
     }
 
-    @test
+    @Test
     def testTiles(): Bool = match testBoard01() {
         case Err(_) => false
         case Ok(Board(br)) =>
@@ -63,19 +63,19 @@ mod TestBoard {
             check(3, 5, None)
     }
 
-    @test
+    @Test
     def testBorder(): Bool = match testBoard01() {
         case Err(_) => false
         case Ok(b) => hasBorder(b)
     }
 
-    @test
+    @Test
     def testInboundCoordinates(): Bool = match testBoard01() {
         case Err(_) => false
         case Ok(b) => inboundTiles(b)
     }
 
-    @test
+    @Test
     def testError(): Bool =
         match "  #  \n  v  \n#  Q  " |> Flixball.BoardLibrary.fromString {
             case Err(_) => true
