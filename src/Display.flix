@@ -1,6 +1,9 @@
 mod Flixball.Display {
     import java.lang.Thread
 
+    use Sys.Console
+    use Sys.Env
+
     use Flixball.Core.Direction
     use Flixball.Core.Direction.{East, North, South, West}
     use Flixball.Core.Tile

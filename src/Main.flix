@@ -5,6 +5,8 @@ mod Flixball.Main {
     import java.lang.Thread
     import java.util.Random
 
+    use Sys.Env
+
     use Flixball.Config.{read => readConfig}
     use Flixball.Config.Config
     use Flixball.Config.Config.Config
