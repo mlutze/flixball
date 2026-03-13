@@ -6,6 +6,6 @@ flix    = "0.49.0"
 authors = ["Matthew Lutze", "Jonathan Starup"]
 
 [dependencies]
-"github:JonathanStarup/Flix-ANSI-Terminal" = "1.8.0"
+"github:JonathanStarup/Flix-ANSI-Terminal" = "1.9.0"
 "github:mlutze/flix-json" = "0.13.1"
-"github:flix/chalk" = "1.1.0"
+"github:flix/chalk" = "1.1.1"
