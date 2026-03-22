@@ -33,7 +33,7 @@ mod Flixball.Main {
                 case Action.Error => println(usage())
             }
         } with Env.runWithIO
-            with FileReadWithResult.runWithIO
+            with Fs.FileRead.runWithIO
     }
 
     def runFlixball(config: RunConfig): Unit \ IO = {
@@ -51,7 +51,7 @@ mod Flixball.Main {
         }
     }
 
-    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[String, RunConfig] \ IO + FileReadWithResult = {
+    def mkRunConfig(runOpts: List[RunOption], dispOpts: List[DisplayOption]): Result[String, RunConfig] \ IO + Fs.FileRead = {
         use Result.flatMap;
         let seed = runOpts
             |> List.findMap(x -> match x {
@@ -66,7 +66,7 @@ mod Flixball.Main {
                     case _ => None
                 })
                 |> Option.toOk("missing config");
-            file <- FileReadWithResult.read(configPath) |> Result.mapErr(ToString.toString);
+            file <- Fs.FileRead.read(configPath) |> Result.mapErr(ToString.toString);
             config <- readConfig(file)
         ) yield {
             let quiet = runOpts |> List.memberOf(RunOption.Quiet);
