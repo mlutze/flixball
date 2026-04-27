@@ -19,18 +19,16 @@ mod Flixball.Core.GameState {
 
     use GameState.GameState
 
-    type alias PlayerInfo = {
-        state = AiState,
-        ml = MoveLogic,
-        pos = Position
-    }
-
     pub enum GameState(
         Map[PlayerId, PlayerInfo],
         Board
     )
 
-    //law gamestatea =
+    type alias PlayerInfo = {
+        state = AiState,
+        ml = MoveLogic,
+        pos = Position
+    }
 
     /// Returns the board of the state.
     pub def board(s: GameState): Board = {
