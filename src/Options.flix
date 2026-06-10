@@ -1,8 +1,8 @@
 mod Flixball.Options {
-    use GetOpt.{getOpt, usageInfo};
-    use GetOpt.OptionDescr;
-    use GetOpt.ArgDescr.{NoArg, ReqArg};
-    use GetOpt.ArgOrder.Permute;
+    use Util.GetOpt.{getOpt, usageInfo};
+    use Util.GetOpt.OptionDescr;
+    use Util.GetOpt.ArgDescr.{NoArg, ReqArg};
+    use Util.GetOpt.ArgOrder.Permute;
 
     use Action.{Error, Help, Replay, Run, Version}
 
