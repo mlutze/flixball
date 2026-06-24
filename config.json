@@ -1,0 +1,16 @@
+{
+  "map": {
+    "id": "random",
+    "data": {
+      "rows": 15,
+      "cols": 15,
+      "density": 0.2
+    }
+  },
+  "players": [
+    { "id": "smart" },
+    { "id": "naive" },
+    { "id": "wander" },
+    { "id": "shoot" }
+  ]
+}

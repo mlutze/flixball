@@ -86,7 +86,7 @@ mod Flixball.AiLibrary {
             goTo(
                 currentPosition,
                 goal,
-                passablePlayers=false,
+                playersUnpassable,
                 getTiles(info)
             ) |> Option.getWithDefault(Turn(Clockwise))
         })
@@ -169,7 +169,7 @@ mod Flixball.AiLibrary {
                     goTo(
                         Position(coords, dir),
                         goal,
-                        passablePlayers = false,
+                        playersUnpassable,
                         tiles
                     ) |> Option.getWithDefault(Turn(Counterclockwise))
                 }
@@ -184,17 +184,15 @@ mod Flixball.AiLibrary {
     /// `passablePlayers` is `false`.
     ///
     def goTo(
-        p: Position, goal: Position -> Bool \ ef,
-        passablePlayers: {passablePlayers=Bool}, tiles: Map[Coordinates, Tile]
-    ): Option[Move] \ ef = {
+        p: Position, goal: Position -> Bool \ ef1,
+        isPassable: Option[Tile] -> Bool \ ef2,
+        tiles: Map[Coordinates, Tile]
+    ): Option[Move] \ ef1 + ef2 = {
         use Option.flatMap;
 
         // todo: this predicate should just be caller supplied
         def availablePosition(c: Coordinates) = {
-            if (passablePlayers#passablePlayers)
-                Map.get(c, tiles) != Some(Wall)
-            else
-                Map.get(c, tiles) == None
+            isPassable(Map.get(c, tiles))
         };
         forM (
             moves <- findShortestPath(availablePosition, p, goal);
@@ -202,6 +200,18 @@ mod Flixball.AiLibrary {
         ) yield {
             res
         }
+    }
+
+    def playersPassable(tile: Option[Tile]): Bool = match tile {
+        case None => true
+        case Some(Wall) => false
+        case Some(Person(_, _)) => true
+    }
+
+    def _playersUnpassable(tile: Option[Tile]): Bool = match tile {
+        case None => true
+        case Some(Wall) => false
+        case Some(Person(_, _)) => false
     }
 
 }
