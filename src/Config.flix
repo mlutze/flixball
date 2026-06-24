@@ -103,6 +103,8 @@ mod Flixball.Config {
         case "wander" => Ok(Flixball.AiLibrary.wander())
         case "naive" => Ok(Flixball.AiLibrary.naiveSearchAndDestroy())
         case "smart" => Ok(Flixball.AiLibrary.smartSearchAndDestroy())
+        case "tactical" => Ok(Flixball.AiLibrary.tacticalSearchAndDestroy())
+        case "camper" => Ok(Flixball.AiLibrary.camper())
         case unknownId => Err("unknown player ID ${unknownId}")
     }
 

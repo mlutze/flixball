@@ -8,6 +8,8 @@
     }
   },
   "players": [
+    { "id": "tactical" },
+    { "id": "camper" },
     { "id": "smart" },
     { "id": "naive" },
     { "id": "wander" },
