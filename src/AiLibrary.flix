@@ -86,7 +86,7 @@ mod Flixball.AiLibrary {
             goTo(
                 currentPosition,
                 goal,
-                passablePlayers=false,
+                playersUnpassable,
                 getTiles(info)
             ) |> Option.getWithDefault(Turn(Clockwise))
         })
@@ -130,7 +130,7 @@ mod Flixball.AiLibrary {
                             goTo(
                                 Position(coords, dir),
                                 goal,
-                                passablePlayers = true,
+                                playersPassable,
                                 tiles
                             ) |> Option.getWithDefault(Turn(Counterclockwise))
                             // TODO pick another target if inaccessible
@@ -169,10 +169,115 @@ mod Flixball.AiLibrary {
                     goTo(
                         Position(coords, dir),
                         goal,
-                        passablePlayers = false,
+                        playersUnpassable,
                         tiles
                     ) |> Option.getWithDefault(Turn(Counterclockwise))
                 }
+            }
+        })
+
+    ///
+    /// Like `smartSearchAndDestroy`, but prefers positions from which it can
+    /// shoot an opponent AND no opponent currently has line of sight to that
+    /// position. Falls back to any shooting position if no safe position is
+    /// reachable.
+    ///
+    pub def tacticalSearchAndDestroy(): Strategy =
+        statelessStrategy((id, info) -> {
+            let tiles = getTiles(info);
+            let board = Board({
+                rows = getRows(info),
+                cols = getColumns(info),
+                tiles = tiles
+            });
+            let Position(coords, dir) = playerPosition(id, info) |> Utils.Option.unsafeGet;
+
+            match raytraceEx(dir, coords, board) {
+                case Some(Person(seenId, _)) if seenId != id =>
+                    Shoot
+                case _ => {
+                    let canShootFrom = match Position(c, d) -> {
+                        match raytraceEx(d, c, board) {
+                            case Some(Person(seenId, _)) => seenId != id
+                            case _ => false
+                        }
+                    };
+                    let isSafeAt = c -> {
+                        let dirs = North :: East :: South :: West :: Nil;
+                        dirs |> List.forAll(d -> match raytraceEx(d, c, board) {
+                            case Some(Person(otherId, otherDir)) =>
+                                otherId == id or otherDir != oppositeDir(d)
+                            case _ => true
+                        })
+                    };
+                    let safeAndShoot = match Position(c, d) ->
+                        canShootFrom(Position(c, d)) and isSafeAt(c);
+                    let safeMove = goTo(
+                        Position(coords, dir),
+                        safeAndShoot,
+                        playersUnpassable,
+                        tiles
+                    );
+                    match safeMove {
+                        case Some(m) => m
+                        case None =>
+                            goTo(
+                                Position(coords, dir),
+                                canShootFrom,
+                                playersUnpassable,
+                                tiles
+                            ) |> Option.getWithDefault(Turn(Counterclockwise))
+                    }
+                }
+            }
+        })
+
+    def oppositeDir(d: Direction): Direction = match d {
+        case North => South
+        case South => North
+        case East => West
+        case West => East
+    }
+
+    ///
+    /// Rushes to the nearest cell with walls (or board edges) on three of
+    /// four sides, then turns to face the open side and shoots from cover.
+    ///
+    pub def camper(): Strategy =
+        statelessStrategy((id, info) -> {
+            let tiles = getTiles(info);
+            let rows = getRows(info);
+            let cols = getColumns(info);
+            let Position(coords, dir) = playerPosition(id, info) |> Utils.Option.unsafeGet;
+
+            let dirs = North :: East :: South :: West :: Nil;
+            def isBlocked(c, d) = {
+                let (r0, c0) = Flixball.Core.step(c, d);
+                if (r0 < 0 or r0 >= rows or c0 < 0 or c0 >= cols) true
+                else match Map.get((r0, c0), tiles) {
+                    case Some(Wall) => true
+                    case _ => false
+                }
+            };
+            def openSides(c) = dirs |> List.filter(d -> not isBlocked(c, d));
+            def isCamp(c) = match openSides(c) {
+                case _ :: Nil => true
+                case _ => false
+            };
+
+            if (isCamp(coords)) {
+                let openDir = openSides(coords) |> List.head |> Utils.Option.unsafeGet;
+                if (dir == openDir) Shoot
+                else if (Flixball.Core.rotateDir(Clockwise, dir) == openDir) Turn(Clockwise)
+                else Turn(Counterclockwise)
+            } else {
+                let goal = match Position(c, _) -> isCamp(c);
+                goTo(
+                    Position(coords, dir),
+                    goal,
+                    playersUnpassable,
+                    tiles
+                ) |> Option.getWithDefault(Turn(Clockwise))
             }
         })
 
@@ -184,17 +289,15 @@ mod Flixball.AiLibrary {
     /// `passablePlayers` is `false`.
     ///
     def goTo(
-        p: Position, goal: Position -> Bool \ ef,
-        passablePlayers: {passablePlayers=Bool}, tiles: Map[Coordinates, Tile]
-    ): Option[Move] \ ef = {
+        p: Position, goal: Position -> Bool \ ef1,
+        isPassable: Option[Tile] -> Bool \ ef2,
+        tiles: Map[Coordinates, Tile]
+    ): Option[Move] \ ef1 + ef2 = {
         use Option.flatMap;
 
         // todo: this predicate should just be caller supplied
         def availablePosition(c: Coordinates) = {
-            if (passablePlayers#passablePlayers)
-                Map.get(c, tiles) != Some(Wall)
-            else
-                Map.get(c, tiles) == None
+            isPassable(Map.get(c, tiles))
         };
         forM (
             moves <- findShortestPath(availablePosition, p, goal);
@@ -202,6 +305,18 @@ mod Flixball.AiLibrary {
         ) yield {
             res
         }
+    }
+
+    def playersPassable(tile: Option[Tile]): Bool = match tile {
+        case None => true
+        case Some(Wall) => false
+        case Some(Person(_, _)) => true
+    }
+
+    def playersUnpassable(tile: Option[Tile]): Bool = match tile {
+        case None => true
+        case Some(Wall) => false
+        case Some(Person(_, _)) => false
     }
 
 }

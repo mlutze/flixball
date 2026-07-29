@@ -2,6 +2,7 @@
 # Standard output folders of flix
 build/
 target/
+artifact/
 
 # Everything in the lib folder, they should be installed locally
 lib/**
