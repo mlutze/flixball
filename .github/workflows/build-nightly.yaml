@@ -4,8 +4,6 @@ name: Build on Nightly
 on:
   pull_request:
     branches: [ master ]
-  schedule:
-    - cron: '0 0 * * *'
 
 jobs:
   build-nightly:
